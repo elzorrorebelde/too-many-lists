@@ -1,9 +1,9 @@
-# Ownership 101
+# Propiedad (Ownership) 101
 
-Now that we can construct a list, it'd be nice to be able to *do* something
-with it. We do that with "normal" (non-static) methods. Methods are a special
-case of function in Rust because of  the `self` argument, which doesn't have
-a declared type:
+Ahora que podemos construir una lista, estaría bien poder *hacer* algo
+con ella. Hacemos eso con métodos "normales" (no estáticos). Los métodos son un
+caso especial de función en Rust por el argumento `self`, que no tiene
+un tipo declarado:
 
 ```rust ,ignore
 fn foo(self, arg2: Type2) -> ReturnType {
@@ -11,35 +11,37 @@ fn foo(self, arg2: Type2) -> ReturnType {
 }
 ```
 
-There are 3 primary forms that self can take: `self`, `&mut self`, and `&self`.
-These 3 forms represent the three primary forms of ownership in Rust:
+Hay 3 formas principales que self puede tomar: `self`, `&mut self` y `&self`.
+Estas 3 formas representan las tres formas principales de propiedad (ownership)
+en Rust:
 
-* `self` - Value
-* `&mut self` - mutable reference
-* `&self` - shared reference
+* `self` — Valor
+* `&mut self` — Referencia mutable
+* `&self` — Referencia compartida
 
-A value represents *true* ownership. You can do whatever you want with a value:
-move it, destroy it, mutate it, or loan it out via a reference. When you pass
-something by value, it's *moved* to the new location. The new location now
-owns the value, and the old location can no longer access it. For this reason
-most methods don't want `self` -- it would be pretty lame if trying to work with
-a list made it go away!
+Un valor representa *propiedad verdadera*. Puedes hacer lo que quieras con un valor:
+moverlo, destruirlo, mutarlo, o prestarlo mediante una referencia. Cuando pasas
+algo por valor, se *mueve* a la nueva ubicación. La nueva ubicación ahora
+posee el valor, y la ubicación anterior ya no puede acceder a él. Por esta razón,
+la mayoría de los métodos no quieren `self` — sería bastante malo si intentar
+trabajar con una lista hiciera que desapareciera.
 
-A mutable reference represents temporary *exclusive access* to a value that you
-don't own. You're allowed to do absolutely anything you want to a value you
-have a mutable reference to as long you leave it in a valid state when you're
-done (it would be rude to the owner otherwise!). This means you can actually completely
-overwrite the value. A really useful special case of this is *swapping* a value
-out for another, which we'll be using a lot. The only thing you can't do with an
-`&mut` is move the value out with no replacement. `&mut self` is great for
-methods that want to mutate `self`.
+Una referencia mutable representa *acceso exclusivo* temporal a un valor que no
+posees. Puedes hacer absolutamente cualquier cosa que quieras a un valor del que
+tienes una referencia mutable, siempre que lo dejes en un estado válido cuando
+termines (¡sería grosero con el dueño si no!). Esto significa que puedes incluso
+sobrescribir completamente el valor. Un caso especial realmente útil de esto es
+*intercambiar* un valor por otro, que usaremos mucho. La única cosa que no puedes
+hacer con un `&mut` es mover el valor sin reemplazo. `&mut self` es genial para
+métodos que quieren mutar `self`.
 
-A shared reference represents temporary *shared access* to a value that you
-don't own. Because you have shared access, you're generally not allowed to
-mutate anything. Think of `&` as putting the value out on display in a museum.
-`&` is great for methods that only want to observe `self`.
+Una referencia compartida representa *acceso compartido* temporal a un valor que no
+posees. Como tienes acceso compartido, generalmente no se te permite
+mutar nada. Piensa en `&` como poner el valor en exhibición en un museo.
+`&` es genial para métodos que solo quieren observar `self`.
 
-Later we'll see that the rule about mutation can be bypassed in certain cases.
-This is why shared references aren't called *immutable* references. Really,
-mutable references could be called *unique* references, but we've found that
-relating ownership to mutability gives the right intuition 99% of the time.
+Más tarde veremos que la regla sobre la mutación puede ser eludida en ciertos
+casos. Por eso las referencias compartidas no se llaman referencias *inmutables*.
+En realidad, las referencias mutables podrían llamarse referencias *únicas*, pero
+hemos descubierto que relacionar la propiedad con la mutabilidad da la intuición
+correcta el 99% del tiempo.
