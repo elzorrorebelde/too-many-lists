@@ -1,7 +1,7 @@
-# Final Code
+# Código Final
 
-That's all I really have to say on the immutable stack. We're getting pretty
-good at implementing lists now!
+Eso es todo lo que tengo que decir sobre la pila inmutable. ¡Nos estamos
+volviendo bastante buenos implementando listas ahora!
 
 ```rust
 use std::rc::Rc;

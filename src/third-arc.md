@@ -1,68 +1,75 @@
 # Arc
 
-One reason to use an immutable linked list is to share data across threads.
-After all, shared mutable state is the root of all evil, and one way to solve
-that is to kill the *mutable* part forever.
+Una razón para usar una lista enlazada inmutable es compartir datos entre
+hilos. Después de todo, el estado mutable compartido es la raíz de todos los
+males, y una forma de resolverlo es matar la parte *mutable* para siempre.
 
-Except our list isn't thread-safe at all. In order to be thread-safe, we need
-to fiddle with reference counts *atomically*. Otherwise, two threads could
-try to increment the reference count, *and only one would happen*. Then the
-list could get freed too soon!
+Excepto que nuestra lista no es para nada segura para hilos (thread-safe).
+Para ser segura para hilos, necesitamos manipular los contadores de referencias
+*atómicamente*. De lo contrario, dos hilos podrían intentar incrementar el
+contador de referencias, *y solo uno ocurriría*. ¡Entonces la lista podría
+liberarse demasiado pronto!
 
-In order to get thread safety, we have to use *Arc*. Arc is completely identical
-to Rc except for the fact that reference counts are modified atomically. This
-has a bit of overhead if you don't need it, so Rust exposes both.
-All we need to do to make our list thread safe is replace every reference to Rc
-with `std::sync::Arc`. That's it. We're thread safe. Done!
+Para obtener seguridad para hilos, tenemos que usar *Arc*. Arc es
+completamente idéntico a Rc excepto por el hecho de que los contadores de
+referencias se modifican atómicamente. Esto tiene un poco de sobrecarga si no
+lo necesitas, así que Rust expone ambos. Todo lo que necesitamos hacer para
+hacer nuestra lista segura para hilos es reemplazar cada referencia a Rc con
+`std::sync::Arc`. Eso es todo. Somos seguros para hilos. ¡Hecho!
 
-But this raises an interesting question: how do we *know* if a type is
-thread-safe or not? Can we accidentally mess up?
+Pero esto plantea una pregunta interesante: ¿cómo *sabemos* si un tipo es
+seguro para hilos o no? ¿Podemos estropearlo accidentalmente?
 
-No! You can't mess up thread-safety in Rust!
+¡No! ¡No puedes estropear la seguridad para hilos en Rust!
 
-The reason this is the case is because Rust models thread-safety in a
-first-class way with two traits: `Send` and `Sync`.
+La razón por la que esto es así es porque Rust modela la seguridad para hilos
+de primera clase con dos traits: `Send` y `Sync`.
 
-A type is *Send* if it's safe to *move* to another thread. A type is *Sync* if
-it's safe to *share* between multiple threads. That is, if `T` is Sync, `&T` is
-Send. Safe in this case means it's impossible to cause *data races*, (not to
-be mistaken with the more general issue of *race conditions*).
+Un tipo es *Send* si es seguro *moverlo* a otro hilo. Un tipo es *Sync* si es
+seguro *compartirlo* entre múltiples hilos. Es decir, si `T` es Sync, `&T` es
+Send. Seguro en este caso significa que es imposible causar *data races* (que
+no debe confundirse con el problema más general de *race conditions*).
 
-These are marker traits, which is a fancy way of saying they're traits that
-provide absolutely no interface. You either *are* Send, or you aren't. It's just
-a property *other* APIs can require. If you aren't appropriately Send,
-then it's statically impossible to be sent to a different thread! Sweet!
+Estos son traits marcadores (marker traits), que es una forma elegante de
+decir que son traits que no proporcionan absolutamente ninguna interfaz. O
+*eres* Send, o no lo eres. Es solo una propiedad que otras *APIs* pueden
+exigir. ¡Si no eres apropiadamente Send, entonces es estáticamente imposible
+ser enviado a un hilo diferente! ¡Genial!
 
-Send and Sync are also automatically derived traits based on whether you are
-totally composed of Send and Sync types. It's similar to how you can only
-implement Copy if you're only made of Copy types, but then we just go ahead
-and implement it automatically if you are.
+Send y Sync también son traits que se derivan automáticamente basándose en si
+estás totalmente compuesto de tipos Send y Sync. Es similar a cómo solo
+puedes implementar Copy si estás hecho solo de tipos Copy, pero entonces
+simplemente lo implementamos automáticamente si lo eres.
 
-Almost every type is Send and Sync. Most types are Send because they totally
-own their data. Most types are Sync because the only way to share data across
-threads is to put them behind a shared reference, which makes them immutable!
+Casi todos los tipos son Send y Sync. La mayoría de los tipos son Send porque
+poseen totalmente sus datos. La mayoría de los tipos son Sync porque la única
+forma de compartir datos entre hilos es ponerlos detrás de una referencia
+compartida, ¡lo que los hace inmutables!
 
-However there are special types that violate these properties: those that have
-*interior mutability*. So far we've only really interacted with *inherited
-mutability* (AKA external mutability): the mutability of a value is inherited
-from the mutability of its container. That is, you can't just randomly mutate
-some field of a non-mutable value because you feel like it.
+Sin embargo, hay tipos especiales que violan estas propiedades: aquellos que
+tienen *mutabilidad interior (interior mutability)*. Hasta ahora solo hemos
+interactuado realmente con *mutabilidad heredada (inherited mutability)*
+(también conocida como mutabilidad externa): la mutabilidad de un valor se
+hereda de la mutabilidad de su contenedor. Es decir, no puedes simplemente
+mutar aleatoriamente algún campo de un valor no mutable porque te apetezca.
 
-Interior mutability types violate this: they let you mutate through a shared
-reference. There are two major classes of interior mutability: cells, which
-only work in a single-threaded context; and locks, which work in a
-multi-threaded context. For obvious reasons, cells are cheaper when you can
-use them. There's also atomics, which are primitives that act like a lock.
+Los tipos de mutabilidad interior violan esto: te permiten mutar a través de
+una referencia compartida. Hay dos clases principales de mutabilidad interior:
+cells (celdas), que solo funcionan en un contexto de un solo hilo; y locks
+(cerrojos), que funcionan en un contexto de múltiples hilos. Por razones
+obvias, las cells son más baratas cuando puedes usarlas. También están los
+atómicos, que son primitivos que actúan como un lock.
 
-So what does all of this have to do with Rc and Arc? Well, they both use
-interior mutability for their *reference count*. Worse, this reference count
-is shared between every instance! Rc just uses a cell, which means it's not
-thread safe. Arc uses an atomic, which means it *is* thread safe. Of course,
-you can't magically make a type thread safe by putting it in Arc. Arc can only
-derive thread-safety like any other type.
+Entonces, ¿qué tiene que ver todo esto con Rc y Arc? Bueno, ambos usan
+mutabilidad interior para su *contador de referencias*. Peor aún, este
+contador de referencias se comparte entre cada instancia. Rc simplemente usa
+una cell, lo que significa que no es seguro para hilos. Arc usa un atómico,
+lo que significa que *sí* es seguro para hilos. Por supuesto, no puedes
+magicamente hacer que un tipo sea seguro para hilos poniéndolo en Arc. Arc
+solo puede derivar seguridad para hilos como cualquier otro tipo.
 
-I really really really don't want to get into the finer details of atomic
-memory models or non-derived Send implementations. Needless to say, as you get
-deeper into Rust's thread-safety story, stuff gets more complicated. As a
-high-level consumer, it all *just works* and you don't really need to think
-about it.
+Realmente, realmente, realmente no quiero entrar en los detalles más finos de
+los modelos de memoria atómicos o implementaciones de Send no derivadas. No
+hace falta decir que, a medida que te adentras en la historia de seguridad
+para hilos de Rust, las cosas se complican más. Como consumidor de alto nivel,
+todo *simplemente funciona* y realmente no necesitas pensar en ello.
