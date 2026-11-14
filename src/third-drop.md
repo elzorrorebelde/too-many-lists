@@ -1,10 +1,11 @@
 # Drop
 
-Like the mutable lists, we have a recursive destructor problem.
-Admittedly, this isn't as bad of a problem for the immutable list: if we ever
-hit another node that's the head of another list *somewhere*, we won't
-recursively drop it. However it's still a thing we should care about, and
-how to deal with isn't as clear. Here's how we solved it before:
+Como con las listas mutables, tenemos un problema de destructor recursivo.
+Admitidamente, esto no es un problema tan grave para la lista inmutable: si
+alguna vez alcanzamos otro nodo que es la cabeza de otra lista *en algún
+lugar*, no lo soltaremos recursivamente. Sin embargo, sigue siendo algo que
+debería importarnos, y cómo lidiar con ello no está tan claro. Así es como lo
+resolvimos antes:
 
 ```rust ,ignore
 impl<T> Drop for List<T> {
@@ -17,20 +18,21 @@ impl<T> Drop for List<T> {
 }
 ```
 
-The problem is the body of the loop:
+El problema es el cuerpo del bucle:
 
 ```rust ,ignore
 cur_link = boxed_node.next.take();
 ```
 
-This is mutating the Node inside the Box, but we can't do that with Rc; it only
-gives us shared access, because any number of other Rc's could be pointing at it.
+Esto está mutando el Node dentro del Box, pero no podemos hacer eso con Rc;
+solo nos da acceso compartido, porque cualquier número de otros Rc podrían
+estar apuntando a él.
 
-But if we know that we're the last list that knows about this node, it
-*would* actually be fine to move the Node out of the Rc. Then we could also
-know when to stop: whenever we *can't* hoist out the Node.
+Pero si supiéramos que somos la última lista que conoce este nodo,
+*entonces* estaría bien mover el Node fuera del Rc. Entonces también podríamos
+saber cuándo parar: cuando *no podamos* sacar el Node.
 
-And look at that, Rc has a method that does exactly this: `try_unwrap`:
+Y mira eso, Rc tiene un método que hace exactamente esto: `try_unwrap`:
 
 ```rust ,ignore
 impl<T> Drop for List<T> {
@@ -66,5 +68,5 @@ test third::test::iter ... ok
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ```
 
-Great!
-Nice.
+¡Genial!
+Bien.
