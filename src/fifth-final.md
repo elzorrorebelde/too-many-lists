@@ -1,12 +1,15 @@
-# Final Code
+# Código Final
 
-Alright, so with a teeny-tiny dash of unsafety we managed to get a linear
-time improvement over the naive safe queue, and we managed to reuse almost
-all of the logic from the safe stack!
+Muy bien, así que con una pizca diminuta de inseguridad logramos una mejora
+de tiempo lineal sobre la cola segura ingenua, ¡y logramos reutilizar casi
+toda la lógica de la pila segura!
 
-You know, except for that part where miri completely dunked on us and we had to write a short master's thesis on rust's memory model. You know, as you do.
+Ya sabes, excepto por esa parte donde miri nos humilló completamente y
+tuvimos que escribir una tesis corta sobre el modelo de memoria de Rust.
+Ya sabes, como se hace.
 
-But on the bright side we *didn't* have to write any jank Rc or RefCell stuff.
+Pero en el lado positivo, *no* tuvimos que escribir ningún código enmarañado
+de Rc o RefCell.
 
 ```rust
 use std::ptr;
