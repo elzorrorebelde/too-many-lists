@@ -1,9 +1,9 @@
-# Building Up
+# Construyendo (Building Up)
 
-Alright, we'll start with building the list. That's pretty straight-forward
-with this new system. `new` is still trivial, just None out all the fields.
-Also because it's getting a bit unwieldy, let's break out a Node constructor
-too:
+Muy bien, empezaremos construyendo la lista. Eso es bastante sencillo
+con este nuevo sistema. `new` sigue siendo trivial, solo poner None en todos
+los campos. También, como se está volviendo un poco difícil de manejar,
+creemos también un constructor de Node:
 
 ```rust ,ignore
 impl<T> Node<T> {
@@ -26,27 +26,29 @@ impl<T> List<T> {
 ```text
 > cargo build
 
-**A BUNCH OF DEAD CODE WARNINGS BUT IT BUILT**
+**UN MONTÓN DE ADVERTENCIAS DE CÓDIGO MUERTO PERO COMPILÓ**
 ```
 
-Yay!
+¡Yupi!
 
-Now let's try to write pushing onto the front of the list. Because
-doubly-linked lists are significantly more complicated, we're going to need
-to do a fair bit more work. Where singly-linked list operations could be
-reduced to an easy one-liner, doubly-linked list ops are fairly complicated.
+Ahora intentemos escribir push al frente de la lista. Como las listas
+doblemente enlazadas son significativamente más complicadas, vamos a necesitar
+hacer un poco más de trabajo. Mientras que las operaciones de listas
+enlazadas individualmente podían reducirse a una línea fácil, las operaciones
+de listas doblemente enlazadas son bastante complicadas.
 
-In particular we now need to specially handle some boundary cases around
-empty lists. Most operations will only touch the `head` or `tail` pointer.
-However when transitioning to or from the empty list, we need to edit
-*both* at once.
+En particular, ahora necesitamos manejar especialmente algunos casos límite
+alrededor de listas vacías. La mayoría de las operaciones solo tocarán el
+puntero `head` o `tail`. Sin embargo, al transicionar hacia o desde la lista
+vacía, necesitamos editar *ambos* a la vez.
 
-An easy way for us to validate if our methods make sense is if we maintain
-the following invariant: each node should have exactly two pointers to it.
-Each node in the middle of the list is pointed at by its predecessor and
-successor, while the nodes on the ends are pointed to by the list itself.
+Una forma fácil para nosotros de validar si nuestros métodos tienen sentido
+es si mantenemos la siguiente invariante: cada nodo debería tener exactamente
+dos punteros hacia él. Cada nodo en el medio de la lista es apuntado por su
+predecesor y sucesor, mientras que los nodos en los extremos son apuntados por
+la propia lista.
 
-Let's take a crack at it:
+Intentémoslo:
 
 ```rust ,ignore
 pub fn push_front(&mut self, elem: T) {
@@ -86,22 +88,23 @@ error[E0609]: no field `next` on type `std::rc::Rc<std::cell::RefCell<fourth::No
    |                          ^^^^ unknown field
 ```
 
-Alright. Compiler error. Good start. Good start.
+Muy bien. Error del compilador. Buen comienzo. Buen comienzo.
 
-Why can't we access the `prev` and `next` fields on our nodes? It worked before
-when we just had an `Rc<Node>`. Seems like the `RefCell` is getting in the way.
+¿Por qué no podemos acceder a los campos `prev` y `next` en nuestros nodos?
+Funcionaba antes cuando solo teníamos un `Rc<Node>`. Parece que el `RefCell`
+se está interponiendo.
 
-We should probably check the docs.
+Deberíamos revisar la documentación.
 
-*Google's "rust refcell"*
+*Google "rust refcell"*
 
-*[clicks first link](https://doc.rust-lang.org/std/cell/struct.RefCell.html)*
+*[hace clic en el primer enlace](https://doc.rust-lang.org/std/cell/struct.RefCell.html)*
 
 > A mutable memory location with dynamically checked borrow rules
 >
 > See the [module-level documentation](https://doc.rust-lang.org/std/cell/index.html) for more.
 
-*clicks link*
+*hace clic en el enlace*
 
 > Shareable mutable containers.
 >
@@ -163,16 +166,17 @@ We should probably check the docs.
 > scenarios. Consider using `Mutex<T>` if you need shared mutability in a multi-threaded
 > situation.
 
-Hey, Rust's docs continue to be incredibly awesome.
+Oye, los documentos de Rust continúan siendo increíblemente geniales.
 
-The meaty bit we care about is this line:
+La parte sustancial que nos importa es esta línea:
 
 ```rust ,ignore
 shared_map.borrow_mut().insert("africa", 92388);
 ```
 
-In particular, the `borrow_mut` thing. Seems we need to explicitly borrow a
-RefCell. The `.` operator's not going to do it for us. Weird. Let's try:
+En particular, lo de `borrow_mut`. Parece que necesitamos explícitamente
+pedir prestado un RefCell. El operador `.` no va a hacerlo por nosotros.
+Qué raro. Intentemos:
 
 ```rust ,ignore
 pub fn push_front(&mut self, elem: T) {
@@ -204,4 +208,4 @@ warning: field is never used: `elem`
    = note: #[warn(dead_code)] on by default
 ```
 
-Hey, it built! Docs win again.
+Oye, ¡compiló! Los docs ganan otra vez.

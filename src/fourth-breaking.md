@@ -1,7 +1,7 @@
-# Breaking Down
+# Rompiendo (Breaking Down)
 
-`pop_front` should be the same basic logic as `push_front`, but backwards. Let's
-try:
+`pop_front` debería ser la misma lógica básica que `push_front`, pero al
+revés. Intentemos:
 
 ```rust ,ignore
 pub fn pop_front(&mut self) -> Option<T> {
@@ -35,7 +35,7 @@ error[E0609]: no field `elem` on type `std::rc::Rc<std::cell::RefCell<fourth::No
    |                      ^^^^ unknown field
 ```
 
-ACK. *RefCells*. Gotta `borrow_mut` again I guess...
+ACK. *RefCells*. Tengo que usar `borrow_mut` otravez, supongo...
 
 ```rust ,ignore
 pub fn pop_front(&mut self) -> Option<T> {
@@ -64,21 +64,21 @@ error[E0507]: cannot move out of borrowed content
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^ cannot move out of borrowed content
 ```
 
-*sigh*
+*suspira*
 
 > cannot move out of borrowed content
 
-Hrm... It seems that Box was *really* spoiling us. `borrow_mut` only gets us
-an `&mut Node<T>`, but we can't move out of that!
+Hrm... Parece que Box nos estaba *realmente* mimando. `borrow_mut` solo nos da
+un `&mut Node<T>`, ¡pero no podemos mover nada fuera de eso!
 
-We need something that takes a `RefCell<T>` and gives us a `T`. Let's check
-[the docs][refcell] for something like that:
+Necesitamos algo que tome un `RefCell<T>` y nos dé un `T`. Revisemos
+[la documentación][refcell] para algo así:
 
 > `fn into_inner(self) -> T`
 >
 > Consumes the RefCell, returning the wrapped value.
 
-That looks promising!
+¡Eso parece prometedor!
 
 ```rust ,ignore
 old_head.into_inner().elem
@@ -94,27 +94,29 @@ error[E0507]: cannot move out of an `Rc`
    |             ^^^^^^^^ cannot move out of an `Rc`
 ```
 
-Ah dang. `into_inner` wants to move out the RefCell, but we can't, because it's
-in an `Rc`. As we saw in the previous chapter, `Rc<T>` only lets us get shared references
-into its internals. That makes sense, because that's *the whole point* of
-reference counted pointers: they're shared!
+Ah, caramba. `into_inner` quiere mover el RefCell fuera, pero no podemos,
+porque está en un `Rc`. Como vimos en el capítulo anterior, `Rc<T>` solo
+nos permite obtener referencias compartidas a sus internos. Eso tiene sentido,
+porque ese es *el sentido mismo* de los punteros de contador de referencias:
+¡son compartidos!
 
-This was a problem for us when we wanted to implement Drop for our reference
-counted list, and the solution is the same: `Rc::try_unwrap`, which moves out
-the contents of an Rc if its refcount is 1.
+Esto fue un problema para nosotros cuando queríamos implementar Drop para
+nuestra lista de contador de referencias, y la solución es la misma:
+`Rc::try_unwrap`, que mueve los contenidos de un Rc si su contador de
+referencias es 1.
 
 ```rust ,ignore
 Rc::try_unwrap(old_head).unwrap().into_inner().elem
 ```
 
-`Rc::try_unwrap` returns a `Result<T, Rc<T>>`. Results are basically a
-generalized `Option`, where the `None` case has data associated with it. In
-this case, the `Rc` you tried to unwrap. Since we don't care about the case
-where it fails (if we wrote our program correctly, it *has* to succeed), we
-just call `unwrap` on it.
+`Rc::try_unwrap` devuelve un `Result<T, Rc<T>>`. Los Results son básicamente
+un `Option` generalizado, donde el caso `None` tiene datos asociados. En
+este caso, el `Rc` que intentaste desenvolver (unwrap). Como no nos importa
+el caso donde falla (si escribimos nuestro programa correctamente, *tiene* que
+funcionar), simplemente llamamos a `unwrap` en él.
 
-Anyway, let's see what compiler error we get next (let's face it, there's going
-to be one).
+Como sea, veamos qué error del compilador obtenemos ahora (aceptémoslo, va a
+haber uno).
 
 ```text
 > cargo build
@@ -129,33 +131,34 @@ error[E0599]: no method named `unwrap` found for type `std::result::Result<std::
            `std::rc::Rc<std::cell::RefCell<fourth::Node<T>>> : std::fmt::Debug`
 ```
 
-UGH. `unwrap` on Result requires that you can debug-print the error case.
-`RefCell<T>` only implements `Debug` if `T` does. `Node` doesn't implement Debug.
+UF. `unwrap` en Result requiere que puedas imprimir el caso de error con
+debug. `RefCell<T>` solo implementa `Debug` si `T` lo hace. `Node` no
+implementa Debug.
 
-Rather than doing that, let's just work around it by converting the Result to
-an Option with `ok`:
+En lugar de hacer eso, evitemos el problema convirtiendo el Result a
+un Option con `ok`:
 
 ```rust ,ignore
 Rc::try_unwrap(old_head).ok().unwrap().into_inner().elem
 ```
 
-PLEASE.
+POR FAVOR.
 
 ```text
 cargo build
 
 ```
 
-YES.
+SÍ.
 
 *phew*
 
-We did it.
+Lo logramos.
 
-We implemented `push` and `pop`.
+Implementamos `push` y `pop`.
 
-Let's test by stealing the old `stack` basic test (because that's all that
-we've implemented so far):
+Probemos robando el antiguo test básico de stack (porque es todo lo que
+hemos implementado hasta ahora):
 
 ```rust ,ignore
 #[cfg(test)]
@@ -213,22 +216,24 @@ test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-*Nailed it*.
+*Clavado*.
 
-Now that we can properly remove things from the list, we can implement Drop.
-Drop is a little more conceptually interesting this time around. Where
-previously we bothered to implement Drop for our stacks just to avoid unbounded
-recursion, now we need to implement Drop to get *anything* to happen at all.
+Ahora que podemos eliminar cosas de la lista adecuadamente, podemos
+implementar Drop. Drop es un poco más interesante conceptualmente esta vez.
+Mientras que antes nos molestamos en implementar Drop para nuestras pilas solo
+para evitar la recursión sin límites, ahora necesitamos implementar Drop para
+que *algo* ocurra en absoluto.
 
-`Rc` can't deal with cycles. If there's a cycle, everything will keep everything
-else alive. A doubly-linked list, as it turns out, is just a big chain of tiny
-cycles! So when we drop our list, the two end nodes will have their refcounts
-decremented down to 1... and then nothing else will happen. Well, if our list
-contains exactly one node we're good to go. But ideally a list should work right
-if it contains multiple elements. Maybe that's just me.
+`Rc` no puede lidiar con ciclos. Si hay un ciclo, todo mantendrá todo lo demás
+vivo. Una lista doblemente enlazada, resulta, es solo una gran cadena de
+pequeños ciclos. Así que cuando soltamos nuestra lista, los dos nodos finales
+tendrán sus contadores de referencia decrementados a 1... y entonces no
+ocurrirá nada más. Bueno, si nuestra lista contiene exactamente un nodo,
+estamos bien. Pero idealmente una lista debería funcionar correctamente si
+contiene múltiples elementos. Quizás eso soy solo yo.
 
-As we saw, removing elements was a bit painful. So the easiest thing for us to
-do is just `pop` until we get None:
+Como vimos, eliminar elementos fue un poco doloroso. Así que lo más fácil
+para nosotros es simplemente hacer `pop` hasta obtener None:
 
 ```rust ,ignore
 impl<T> Drop for List<T> {
@@ -243,12 +248,12 @@ cargo build
 
 ```
 
-(We actually could have done this with our mutable stacks, but shortcuts are for
-people who understand things!)
+(En realidad podríamos haber hecho esto con nuestras pilas mutables, ¡pero
+los atajos son para personas que entienden las cosas!)
 
-We could look at implementing the `_back` versions of `push` and `pop`, but
-they're just copy-paste jobs which we'll defer to later in the chapter. For now
-let's look at more interesting things!
+Podríamos considerar implementar las versiones `_back` de `push` y `pop`, pero
+son solo trabajos de copiar y pegar que pospondremos para más adelante en el
+capítulo. Por ahora, ¡veamos cosas más interesantes!
 
 
 [refcell]: https://doc.rust-lang.org/std/cell/struct.RefCell.html
