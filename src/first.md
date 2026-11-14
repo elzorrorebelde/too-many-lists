@@ -1,15 +1,14 @@
-# A Bad Singly-Linked Stack
+# Una Pila Mala Enlazada Individualmente
 
-This one's gonna be *by far* the longest, as we need to introduce basically
-all of Rust, and are gonna build up some things "the hard way" to better
-understand the language.
+Este va a ser *con diferencia* el más largo, ya que necesitamos introducir básicamente
+todo Rust, y vamos a construir algunas cosas "a la manera difícil" para entender
+mejor el lenguaje.
 
-We'll put our first list in `src/first.rs`. We need to tell Rust that `first.rs` is
-something that our lib uses. All that requires is that we put this at the top of
-`src/lib.rs` (which Cargo made for us):
+Pondremos nuestra primera lista en `src/first.rs`. Necesitamos decirle a Rust que `first.rs` es
+algo que nuestra lib usa. Todo lo que requiere es que pongamos esto al principio de
+`src/lib.rs` (que Cargo creó por nosotros):
 
 ```rust ,ignore
 // in lib.rs
 pub mod first;
 ```
-
