@@ -1,13 +1,13 @@
 # Drop
 
-We can make a stack, push on to, pop off it, and we've even tested that it all
-works right!
+Podemos crear una pila, hacer push, hacer pop, ¡e incluso hemos probado que
+todo funciona correctamente!
 
-Do we need to worry about cleaning up our list? Technically, no, not at all!
-Like C++, Rust uses destructors to automatically clean up resources when they're
-done with. A type has a destructor if it implements a *trait* called Drop.
-Traits are Rust's fancy term for interfaces. The Drop trait has the following
-interface:
+¿Necesitamos preocuparnos por limpiar nuestra lista? Técnicamente, ¡no, en
+absoluto! Como C++, Rust usa destructores para limpiar automáticamente los
+recursos cuando ya no se necesitan. Un tipo tiene un destructor si implementa
+un *trait* llamado Drop. Los traits son el término elegante de Rust para las
+interfaces. El trait Drop tiene la siguiente interfaz:
 
 ```rust ,ignore
 pub trait Drop {
@@ -15,30 +15,29 @@ pub trait Drop {
 }
 ```
 
-Basically, "when you go out of scope, I'll give you a second to clean up your
-affairs".
+Básicamente, "cuando salgas del ámbito (scope), te daré un segundo para que
+ordene tus asuntos".
 
-You don't actually need to implement Drop if you contain types that implement
-Drop, and all you'd want to do is call *their* destructors. In the case of
-List, all it would want to do is drop its head, which in turn would *maybe*
-try to drop a `Box<Node>`. All that's handled for us automatically... with one
-hitch.
+En realidad no necesitas implementar Drop si contienes tipos que implementan
+Drop, y todo lo que querrías hacer es llamar a *sus* destructores. En el caso
+de List, todo lo que querría hacer es soltar su cabeza, que a su vez
+*quizás* intentaría soltar un `Box<Node>`. Todo eso se maneja por nosotros
+automáticamente... con un problema.
 
-The automatic handling is going to be bad.
+El manejo automático va a ser malo.
 
-Let's consider a simple list:
-
+Consideremos una lista simple:
 
 ```text
 list -> A -> B -> C
 ```
 
-When `list` gets dropped, it will try to drop A, which will try to drop B,
-which will try to drop C. Some of you might rightly be getting nervous. This is
-recursive code, and recursive code can blow the stack!
+Cuando se suelta `list`, intentará soltar A, que intentará soltar B,
+que intentará soltar C. Algunos podrían estar poniéndose nerviosos con razón.
+¡Esto es código recursivo, y el código recursivo puede reventar la pila!
 
-As an example, if we include a test that tries to push many items into our
-list, it will fail due to stack overflow.
+Como ejemplo, si incluimos una prueba que intenta insertar muchos elementos en
+nuestra lista, fallará debido a un desbordamiento de pila (stack overflow).
 
 ```rust, ignore
 #[test]
@@ -55,27 +54,28 @@ fn long_list() {
 thread 'first::test::long_list' has overflowed its stack
 ```
 
-Some of you might be thinking "this is clearly tail recursive, and any decent
-language would ensure that such code wouldn't blow the stack". This is, in fact,
-incorrect! To see why, let's try to write what the compiler has to do, by
-manually implementing Drop for our List as the compiler would:
+Algunos podrían estar pensando "esto es claramente recursivo por la cola
+(tail recursive), y cualquier lenguaje decente se aseguraría de que tal código
+no reventara la pila". ¡Esto es, de hecho, incorrecto! Para ver por qué,
+intentemos escribir lo que el compilador tiene que hacer, implementando
+manualmente Drop para nuestra List como lo haría el compilador:
 
 
 ```rust ,ignore
 impl Drop for List {
     fn drop(&mut self) {
-        // NOTE: you can't actually explicitly call `drop` in real Rust code;
-        // we're pretending to be the compiler!
-        self.head.drop(); // tail recursive - good!
+        // NOTA: en realidad no puedes llamar explícitamente a `drop` en Rust;
+        // ¡estamos pretendiendo ser el compilador!
+        self.head.drop(); // tail recursive - bien!
     }
 }
 
 impl Drop for Link {
     fn drop(&mut self) {
         match *self {
-            Link::Empty => {} // Done!
+            Link::Empty => {} // ¡Hecho!
             Link::More(ref mut boxed_node) => {
-                boxed_node.drop(); // tail recursive - good!
+                boxed_node.drop(); // tail recursive - bien!
             }
         }
     }
@@ -83,7 +83,7 @@ impl Drop for Link {
 
 impl Drop for Box<Node> {
     fn drop(&mut self) {
-        self.ptr.drop(); // uh oh, not tail recursive!
+        self.ptr.drop(); // uh oh, no es tail recursive!
         deallocate(self.ptr);
     }
 }
@@ -95,27 +95,28 @@ impl Drop for Node {
 }
 ```
 
-We *can't* drop the contents of the Box *after* deallocating, so there's no
-way to drop in a tail-recursive manner! Instead we're going to have to manually
-write an iterative drop for `List` that hoists nodes out of their boxes.
+*No podemos* soltar el contenido del Box *después* de desasignarlo, así que no
+hay forma de soltar de manera recursiva por la cola. En su lugar, vamos a
+tener que escribir manualmente un drop iterativo para `List` que extraiga los
+nodos de sus cajas (boxes).
 
 
 ```rust ,ignore
 impl Drop for List {
     fn drop(&mut self) {
         let mut cur_link = mem::replace(&mut self.head, Link::Empty);
-        // `while let` == "do this thing until this pattern doesn't match"
+        // `while let` == "haz esto hasta que este patrón no coincida"
         while let Link::More(mut boxed_node) = cur_link {
             cur_link = mem::replace(&mut boxed_node.next, Link::Empty);
-            // boxed_node goes out of scope and gets dropped here;
-            // but its Node's `next` field has been set to Link::Empty
-            // so no unbounded recursion occurs.
+            // boxed_node sale del ámbito y se suelta aquí;
+            // pero el campo `next` de su Node se ha puesto a Link::Empty
+            // así que no ocurre recursión sin límites.
         }
     }
 }
 ```
 
-With our custom drop trait implementation, now both test works.
+Con nuestra implementación personalizada de drop, ahora ambas pruebas funcionan.
 
 ```text
 > cargo test
@@ -130,25 +131,27 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Great!
+¡Genial!
 
 ----------------------
 
 <span style="float:left">![Bonus](img/profbee.gif)</span>
 
-## Bonus Section For Premature Optimization!
+## Sección Extra para Optimización Prematura!
 
-Our implementation of drop is actually *very* similar to
-`while let Some(_) = self.pop() { }`, which is certainly simpler. How is
-it different, and what performance issues could result from it once we start
-generalizing our list to store things other than integers?
+Nuestra implementación de drop es en realidad *muy* similar a
+`while let Some(_) = self.pop() { }`, que es ciertamente más simple. ¿Cómo
+es diferente, y qué problemas de rendimiento podrían resultar de ella una vez
+que comencemos a generalizar nuestra lista para almacenar cosas que no sean
+enteros?
 
 <details>
-  <summary>Click to expand for answer</summary>
+  <summary>Haz clic para expandir la respuesta</summary>
 
-Pop returns `Option<i32>`, while our implementation only manipulates Links (`Box<Node>`). So our implementation only moves around pointers to nodes, while the pop-based one will move around the values we stored in nodes. This could be very expensive if we generalize our list and someone uses it to store instances of VeryBigThingWithADropImpl (VBTWADI). Box is able to run the drop implementation of its contents in-place, so it doesn't suffer from this issue. Since VBTWADI is *exactly* the kind of thing that actually makes using a linked-list desirable over an array, behaving poorly on this case would be a bit of a disappointment.
+Pop devuelve `Option<i32>`, mientras que nuestra implementación solo manipula Links (`Box<Node>`). Así que nuestra implementación solo mueve punteros a nodos, mientras que la basada en pop moverá los valores que almacenamos en los nodos. Esto podría ser muy costoso si generalizamos nuestra lista y alguien la usa para almacenar instancias de VeryBigThingWithADropImpl (VBTWADI). Box puede ejecutar la implementación de drop de sus contenidos in-situ, por lo que no sufre de este problema. Como VBTWADI es *exactamente* el tipo de cosa que realmente hace que usar una lista enlazada sea deseable sobre un array, comportarse mal en este caso sería una decepción.
 
-If you wish to have the best of both implementations, you could add a new method,
-`fn pop_node(&mut self) -> Link`, from-which `pop` and `drop` can both be cleanly derived.
+Si deseas tener lo mejor de ambas implementaciones, podrías añadir un nuevo método,
+`fn pop_node(&mut self) -> Link`, del cual tanto `pop` como `drop` pueden
+derivarse limpiamente.
 
 </details>
