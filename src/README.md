@@ -90,7 +90,7 @@ Solo para que estemos total y absolutamente claros: odio las listas enlazadas. C
 pasión. Las listas enlazadas son estructuras de datos terribles. Ahora bien, por
 supuesto hay varios casos de uso excelentes para una lista enlazada:
 
-* Quieres hacer *mucho*分割 o fusión de listas grandes. *Mucho*.
+* Quieres hacer un *montón* de divisiones o fusiones de listas grandes. *Un montón*.
 * Estás haciendo algo genial de concurrencia sin bloqueos (lock-free).
 * Estás escribiendo un núcleo/sistema embebido y quieres usar una lista intrusiva.
 * Estás usando un lenguaje puramente funcional y la semántica limitada y la
