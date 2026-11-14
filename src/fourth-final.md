@@ -1,22 +1,23 @@
-# Final Code
+# Código Final
 
-Alright, so that's implementing a 100% safe doubly-linked list in Rust. It was
-a nightmare to implement, leaks implementation details, and doesn't support several
-fundamental operations.
+Muy bien, eso es implementar una lista doblemente enlazada 100% segura en Rust.
+Fue una pesadilla de implementar, filtra detalles de implementación, y no
+soporta varias operaciones fundamentales.
 
-But, it exists.
+Pero existe.
 
-Oh, I guess it's also riddled with tons of "unnecessary" runtime checks for
-correctness between `Rc` and `RefCell`. I put unnecessary in quotes because
-they're actually necessary to guarantee the whole *actually being safe* thing.
-We encountered a few places where those checks actually *were* necessary.
-Doubly-linked lists have a horribly tangled aliasing and ownership story!
+Oh, también está plagada de montones de comprobaciones de tiempo de ejecución
+"innecesarias" para la corrección entre `Rc` y `RefCell`. Pongo innecesarias
+entre comillas porque en realidad son necesarias para garantizar todo eso de
+*ser realmente seguro*. Encontramos algunos lugares donde esas comprobaciones
+realmente *eran* necesarias. ¡Las listas doblemente enlazadas tienen una
+historia horriblemente enredada de aliasing y propiedad!
 
-Still, it's a thing we can do. Especially if we don't care about exposing
-internal data structures to our consumers.
+Aún así, es algo que podemos hacer. Especialmente si no nos importa exponer
+estructuras de datos internas a nuestros consumidores.
 
-From here on out, we're going to be focusing on other side of this coin:
-getting back all the control by making our implementation *unsafe*.
+De aquí en adelante, nos vamos a centrar en el otro lado de esta moneda:
+recuperar todo el control haciendo nuestra implementación *insegura (unsafe)*.
 
 ```rust
 use std::rc::Rc;
