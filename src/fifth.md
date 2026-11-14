@@ -1,20 +1,21 @@
-# An Ok Unsafe Singly-Linked Queue
+# Una Cola Insegura Aceptable Enlazada Individualmente
 
-Ok that reference-counted interior mutability stuff got a little out of
-control. Surely Rust doesn't really expect you to do that sort of thing
-in general? Well, yes and no. Rc and Refcell can be great for handling
-simple cases, but they can get unwieldy. Especially if you
-want to hide that it's happening. There's gotta be a better way!
+Ok, eso de la mutabilidad interior con contador de referencias se salió un
+poco de control. Seguramente Rust no espera realmente que hagas ese tipo de
+cosas en general? Bueno, sí y no. Rc y RefCell pueden ser geniales para
+manejar casos simples, pero pueden volverse difíciles de manejar.
+Especialmente si quieres ocultar que está sucediendo. ¡Tiene que haber una
+mejor manera!
 
-In this chapter we're going to roll back to singly-linked lists and
-implement a singly-linked queue to dip our toes into *raw pointers*
-and *Unsafe Rust*.
+En este capítulo vamos a retroceder a listas enlazadas individualmente e
+implementar una cola enlazada individualmente para mojarnos los pies con
+*punteros crudos (raw pointers)* y *Rust Inseguro (Unsafe Rust)*.
 
-> **NARRATOR:** And I will point out the mistakes.
+> **NARRADOR:** Y señalaré los errores.
 
-And we won't make *any* mistakes.
+Y no cometeremos *ningún* error.
 
-Let's add a new file called `fifth.rs`:
+Añadamos un nuevo archivo llamado `fifth.rs`:
 
 ```rust ,ignore
 // in lib.rs
@@ -26,7 +27,7 @@ pub mod fourth;
 pub mod fifth;
 ```
 
-Our code is largely going to be derived from second.rs, since a queue is
-mostly an augmentation of a stack in the world of linked lists. Still, we're
-going to go from scratch because there's some fundamental issues we want to
-address with layout and what-not.
+Nuestro código se derivará en gran medida de second.rs, ya que una cola es
+principalmente un aumento de una pila en el mundo de las listas enlazadas.
+Aún así, vamos a empezar desde cero porque hay algunos problemas
+fundamentales que queremos abordar con el diseño y demás.
