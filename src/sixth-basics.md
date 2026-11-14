@@ -1,6 +1,6 @@
-# Basics
+# Conceptos Básicos (Basics)
 
-Alright, this is the part of the book that sucks, and why it took me 7 years to write this chapter! Time to just burn through a whole lot of really boring stuff we've done 5 times already, but extra verbose and long because we have to do everything twice and with `Option<NonNull<Node<T>>>`!
+Muy bien, this is the part of the book that sucks, and why it took me 7 years to write this chapter! Time to just burn through a whole lot of really boring stuff we've done 5 times already, but extra verbose and long because we have to do everything twice and with `Option<NonNull<Node<T>>>`!
 
 ```rust ,ignore
 impl<T> LinkedList<T> {
@@ -54,7 +54,7 @@ error[E0614]: type `NonNull<Node<T>>` cannot be dereferenced
 ```
 
 
-Ah yes, I truly hate my pointer-y children. We need to explicitly get the raw pointer out of NonNull with `as_ptr`, because DerefMut is defined in terms of `&mut` and we don't want to randomly introduce safe references into our unsafe code!
+Ah yes, I truly hate my pointer-y children. We need to explicitly get the raw pointer out of NonNull with `as_ptr`, because DerefMut is defined in terms of `&mut` and we no want to randomly introduce safe references into our unsafe code!
 
 
 ```rust ,ignore

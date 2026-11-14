@@ -1,8 +1,8 @@
-# Basics
+# Conceptos Básicos (Basics)
 
 > **NARRATOR:** This section has a looming fundamental error in it, because that's the whole point of the book. However once we start using `unsafe` it's possible to do things wrong and still have everything compile and *seemingly* work. The fundamental mistake will be identified in the next section. Don't actually use the contents of this section in production code!
 
-Alright, back to basics. How do we construct our list?
+Muy bien, back to basics. How do we construct our list?
 
 Before we just did:
 
@@ -31,7 +31,7 @@ error[E0308]: mismatched types
 ```
 
 We *could* use an Option, but unlike Box, `*mut` *is* nullable. This means it
-can't benefit from the null pointer optimization. Instead, we'll be using `null`
+no puede benefit from the null pointer optimization. Instead, we'll be using `null`
 to represent None.
 
 So how do we get a null pointer? There's a few ways, but I prefer to use
@@ -82,11 +82,11 @@ warning: field is never used: `head`
 
 *shush* compiler, we will use them soon.
 
-Alright, let's move on to writing `push` again. This time, instead of grabbing
+Muy bien, let's move on to writing `push` again. This time, instead of grabbing
 an `Option<&mut Node<T>>` after we insert, we're just going to grab a
 `*mut Node<T>` to the insides of the Box right away. We know we can soundly do
 this because the contents of a Box has a stable address, even if we move the
-Box around. Of course, this isn't *safe*, because if we just drop the Box we'll
+Box around. Of course, this no es *safe*, because if we just drop the Box we'll
 have a pointer to freed memory.
 
 How do we make a raw pointer from a normal pointer? Coercions! If a variable
@@ -134,7 +134,7 @@ error[E0609]: no field `next` on type `*mut fifth::Node<T>`
    |             try dereferencing it: `(*self.tail).next`
 ```
 
-Huh? We have a pointer to a Node, why can't we get the `next` field?
+Huh? We have a pointer to a Node, why no puede we get the `next` field?
 
 Rust is kinda a jerk when you use raw pointers. To access the contents of a
 raw pointer, it insists that we manually deref them, because it's such an unsafe
@@ -183,11 +183,11 @@ THIS. SHOULDN'T. BE. THIS. HARD.
 
 Remember how I said Unsafe Rust is like an FFI language for Safe Rust? Well, the
 compiler wants us to explicitly delimit where we're doing this FFI-ing. We have
-two options. First, we can mark our *entire* function as unsafe, in which case
+two options. Primero, we can mark our *entire* function as unsafe, in which case
 it becomes an Unsafe Rust function and can only be called in an `unsafe`
-context. This isn't great, because we want our list to be safe to use. Second,
+context. This no es great, because we want our list to be safe to use. Second,
 we can write an `unsafe` block inside our function, to delimit the FFI boundary.
-This declares the overall function to be safe. Let's do that one:
+This declares the overall function to be safe. Vamos a do that one:
 
 
 ```rust ,ignore
@@ -226,14 +226,14 @@ warning: field is never used: `elem`
 
 Yay!
 
-It's kind of interesting that that's the *only* place we've had to write an
+Es kind of interesting that that's the *only* place we've had to write an
 unsafe block so far. We do raw pointer stuff all over the place, what's up with
 that?
 
 It turns out that Rust is a massive rules-lawyer pedant when it comes to
 `unsafe`. We quite reasonably want to maximize the set of Safe Rust programs,
 because those are programs we can be much more confident in. To accomplish this,
-Rust carefully carves out a minimal surface area for unsafety. Note that all
+Rust carefully carves out a minimal surface area for unsafety. Nótese que all
 the other places we've worked with raw pointers has been *assigning* them, or
 just observing whether they're null or not.
 
@@ -290,7 +290,7 @@ Again we see another case where safety is stateful. If we fail to null out the
 tail pointer in *this* function, we'll see no problems at all. However
 subsequent calls to `push` will start writing to the dangling tail!
 
-Let's test it out:
+Vamos a test it out:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -338,7 +338,7 @@ mod test {
 
 This is just the stack test, but with the expected `pop` results flipped around.
 I also added some extra steps at the end to make sure that tail-pointer
-corruption case in `pop` doesn't occur.
+corruption case in `pop` no occur.
 
 ```text
 cargo test

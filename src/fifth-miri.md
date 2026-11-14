@@ -1,6 +1,6 @@
 # Miri
 
-*nervously laughs* This unsafe stuff is so easy, I don't know why everyone says otherwise. Our program works perfectly.
+*nervously laughs* This unsafe stuff is so easy, I no know why everyone says otherwise. Our program works perfectly.
 
 > **NARRATOR:** 🙂
 
@@ -8,9 +8,9 @@
 
 > **NARRATOR:** 🙂
 
-Well, we're writing `unsafe` code now, so the compiler can't help us catch mistakes as well. It could be that the tests *happened* to work, but were actually doing something non-deterministic. Something Undefined Behavioury.
+Well, we're writing `unsafe` code now, so the compiler no puede help us catch mistakes as well. It could be that the tests *happened* to work, but were actually doing something non-deterministic. Something Undefined Behavioury.
 
-But what can we do? We've pried open the windows and snuck out of rustc's classroom. No one can help us now.
+But what can we do? Hemos pried open the windows and snuck out of rustc's classroom. No one can help us now.
 
 ...Wait, who's that sketchy looking person in the alleyway?
 
@@ -18,7 +18,7 @@ But what can we do? We've pried open the windows and snuck out of rustc's classr
 
 Wh- no? Why,
 
-*"It's wild man, it can validate that the actual dynamic execution of your program conforms to the semantics of Rust's memory model. Blows your mind..."*
+*"Es wild man, it can validate that the actual dynamic execution of your program conforms to the semantics of Rust's memory model. Blows your mind..."*
 
 What?
 
@@ -61,8 +61,8 @@ What did you just install on my computer!?
 > so it's only available for nightly toolchains.
 >
 > `+nightly-2022-01-21` tells `rustup` we want to install miri with the rust 
-> nightly toolchain for that date. I'm giving a specific date because sometimes
-> miri falls behind and can't be built for a few nightlies. rustup will
+> nightly toolchain for that date. Estoy giving a specific date because sometimes
+> miri falls behind and no puede be built for a few nightlies. rustup will
 > automatically download whatever toolchain we specify with `+` if we don't
 > have it installed yet.
 >
@@ -71,7 +71,7 @@ What did you just install on my computer!?
 > You can just use `+nightly` if you're feeling lucky.
 > 
 > Whenever we invoke miri via `cargo miri` we will also use this `+` syntax to
-> specify the toolchain we installed miri on. If you don't want to have to
+> specify the toolchain we installed miri on. If you no want to have to
 > specify it every time, you can use [`rustup override set`](https://rust-lang.github.io/rustup/overrides.html).
 
 ```text
@@ -83,7 +83,7 @@ a recent enough xargo. Proceed? [Y/n]
 
 UH WHAT ON EARTH IS XARGO?
 
-*"It's fine, don't worry about it."*
+*"Es fine, no worry about it."*
 
 ```text
 > y
@@ -102,7 +102,7 @@ the `rust-src` component for the selected toolchain. Proceed? [Y/n]
 
 UH???
 
-*"Who doesn't love having a copy of Rust's source code?"*
+*"Who no love having a copy of Rust's source code?"*
 
 ```text
 > y
@@ -170,7 +170,7 @@ note: inside closure at src\fifth.rs:62:5
 error: aborting due to previous error
 ```
 
-Woah. That's one heck of an error.
+Woah. Eso es one heck of an error.
 
 *"Yeah, look at that shit. You love to see it."*
 
@@ -197,15 +197,15 @@ Ok so what *is* [miri](https://github.com/rust-lang/miri)?
 > * Invalid use of uninitialized data
 > * Violation of intrinsic preconditions (an unreachable_unchecked being reached, calling copy_nonoverlapping with overlapping ranges, ...)
 > * Not sufficiently aligned memory accesses and references
-> * Violation of some basic type invariants (a bool that is not 0 or 1, for example, or an invalid enum discriminant)
+> * Violation of some basic type invariants (a bool that  no es 0 or 1, for example, or an invalid enum discriminant)
 > * Experimental: Violations of the Stacked Borrows rules governing aliasing for reference types
 > * Experimental: Data races (but no weak memory effects)
 >
-> On top of that, Miri will also tell you about memory leaks: when there is memory still allocated at the end of the execution, and that memory is not reachable from a global static, Miri will raise an error.
+> On top of that, Miri will also tell you about memory leaks: when there is memory still allocated at the end of the execution, and that memory  no es reachable from a global static, Miri will raise an error.
 >
 > ...
 >
-> However, be aware that Miri will not catch all cases of undefined behavior in your program, and cannot run all programs
+> Sin embargo, be aware that Miri  no catch all cases of undefined behavior in your program, and cannot run all programs
 
 TL;DR: it interprets your program and notices if you break the rules *at runtime* and Do An Undefined Behaviour. This is necessary because Undefined Behaviour is *generally* a thing that happens at runtime. If the issue could be found at compile time, the compiler would just make it an error!
 
@@ -245,4 +245,4 @@ error: Undefined Behavior: trying to reborrow for Unique at alloc84055, but pare
 
 Well I can see we made an error, but that's a confusing error message. What's the "borrow stack"?
 
-We'll try to figure that out in the next section.
+Vamos a try to figure that out in the next section.

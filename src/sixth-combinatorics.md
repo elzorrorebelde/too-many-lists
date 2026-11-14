@@ -1,4 +1,4 @@
-# Boring Combinatorics
+# Combinatoria Aburrida
 
 Ok, back to our regularly scheduled linked lists!
 
@@ -13,11 +13,11 @@ impl<T> Drop for LinkedList<T> {
 }
 ```
 
-We've got to fill in a bunch of really boring combinatoric implementations like front, front_mut, back, back_mut, iter, iter_mut, into_iter, ...
+Hemos got to fill in a bunch of really boring combinatoric implementations like front, front_mut, back, back_mut, iter, iter_mut, into_iter, ...
 
-You could do them with macros or whatever but honestly, that's a worse fate than copy-pasting. We're just going to do a lot of copy-pasting. I have *very carefully* crafted the previous push/pop implementations so that we should be able to *literally* just swap front and back and the code does/says the right thing! Hooray for painful experience! (It's so tempting to talk about "prev and next" for nodes, but I find it's really worth it to just consistently talk about "front" and "back" as much as possible to avoid mistakes.)
+You could do them with macros or whatever but honestly, that's a worse fate than copy-pasting. Estamos just going to do a lot of copy-pasting. I have *very carefully* crafted the previous push/pop implementations so that we should be able to *literally* just swap front and back and the code does/says the right thing! Hooray for painful experience! (Es so tempting to talk about "prev and next" for nodes, but I find it's really worth it to just consistently talk about "front" and "back" as much as possible to avoid mistakes.)
 
-Alright, first up, `front`:
+Muy bien, first up, `front`:
 
 ```rust ,ignore
 pub fn front(&self) -> Option<&T> {
@@ -38,7 +38,7 @@ pub fn front(&self) -> Option<&T> {
 }
 ```
 
-Maybe? It's kind of a wash for something this simple, and the previous section was all about how early returns are kinda spooky for us, so maybe we should prefer being a bit more explicit here (I'm sticking to the `map` implementation).  On to front_mut:
+Maybe? Es kind of a wash for something this simple, and the previous section was all about how early returns are kinda spooky for us, so maybe we should prefer being a bit more explicit here (Estoy sticking to the `map` implementation).  On to front_mut:
 
 ```rust ,ignore
 pub fn front_mut(&mut self) -> Option<&mut T> {
@@ -48,7 +48,7 @@ pub fn front_mut(&mut self) -> Option<&mut T> {
 }
 ```
 
-I'll just dump all the `back` versions at the end. 
+Voy a just dump all the `back` versions at the end. 
 
 Next up, iterators. Unlike all of our previous lists we've *finally* unlocked the ability to do [DoubleEndedIterator](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html), and if we're going for production quality we're gonna do [ExactSizeIterator](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) too.
 
@@ -186,7 +186,7 @@ impl<T> ExactSizeIterator for IntoIter<T> {
 
 Still a crapload of boiler plate, but at least it's *satisfying* boilerplate.
 
-Alright, here's all of our code with all the combinatorics filled in:
+Muy bien, here's all of our code with all the combinatorics filled in:
 
 ```rust
 use std::ptr::NonNull;

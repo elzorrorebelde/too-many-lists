@@ -1,8 +1,8 @@
-# Testing Cursors
+# Probando Cursores
 
 Time to find out how many horribly embarassing mistakes I made in the previous section!
 
-Oh god we made our API unlike both std and the old impl. Alright well I'm just gonna hastily cobble together something from both of them. Yeah let's "borrow" these tests from std:
+Oh god we made our API unlike both std and the old impl. Alright well Estoy just gonna hastily cobble together something from both of them. Yeah let's "borrow" these tests from std:
 
 ```rust ,ignore
     #[test]
@@ -166,7 +166,7 @@ failures:
 test result: FAILED. 12 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
-I'll admit, I had some hubris here and was hoping I nailed it. This is why we write tests (but maybe I just did a bad job of porting the tests..?).
+Voy a admit, I had some hubris here and was hoping I nailed it. This is why we write tests (but maybe I just did a bad job of porting the tests..?).
 
 What's the first failure?
 
@@ -202,7 +202,7 @@ pub fn peek_next(&mut self) -> Option<&mut T> {
 }
 ```
 
-...Yeah this is just wrong. If `self.cur` is None, we aren't just supposed to give up, we need to check `self.list.front` too, because we're on the ghost! So we just need to add an or_else to the chain:
+...Yeah this is just wrong. If `self.cur` is None, we no son just supposed to give up, we need to check `self.list.front` too, because we're on the ghost! So we just need to add an or_else to the chain:
 
 ```rust ,ignore
 pub fn peek_next(&mut self) -> Option<&mut T> {
@@ -287,7 +287,7 @@ test result: FAILED. 13 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out;
 
 Yesss. Ok one more failure to go... oh.
 
-Did you notice the part where I commented out some code for testing remove_current? Yeah I wasn't paying attention to the fact that this test is stateful. Let's just create a new list with the state the remove_current part would have left us in:
+Did you notice the part where I commented out some code for testing remove_current? Yeah I no era paying attention to the fact that this test is stateful. Vamos a just create a new list with the state the remove_current part would have left us in:
 
 ```rust ,ignore
 let mut m: LinkedList<u32> = LinkedList::new();
@@ -326,7 +326,7 @@ test src\lib.rs - assert_properties::iter_mut_invariant (line 803) - compile fai
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
 ```
 
-Heyyyy look at thaaat... ok now I'm getting paranoid. Let's properly fill in check_links and test it under miri:
+Heyyyy look at thaaat... ok now Estoy getting paranoid. Vamos a properly fill in check_links and test it under miri:
 
 ```rust ,ignore
 fn check_links<T: Eq + std::fmt::Debug>(list: &LinkedList<T>) {
@@ -423,7 +423,7 @@ But, I am, So Very Tired.
 
 So. We win.
 
-Wait fuck. We're being production quality. Ok one last final boss: clippy.
+Wait fuck. Estamos being production quality. Ok one last final boss: clippy.
 
 ```text
 cargo clippy
@@ -482,11 +482,11 @@ warning: `linked-list` (lib) generated 4 warnings
 
 Alright clippy, let's do this.
 
-Complaint 1 (and 3): we use `while let Some(_) = ` instead of `while .is_some()`. The loop is empty so this truly doesn't matter but ok fine, clippy, I'll do things your way.
+Complaint 1 (and 3): we use `while let Some(_) = ` instead of `while .is_some()`. The loop is empty so this truly no matter but ok fine, clippy, Voy a do things your way.
 
-Complaint 2: We have an actual inherent into_iter method. Wait, what *checks std* ok, point to clippy. IntoIterator is in the prelude (and basically a lang item) so, we don't need an inherent version too.
+Complaint 2: We have an actual inherent into_iter method. Wait, what *checks std* ok, point to clippy. IntoIterator is in the prelude (and basically a lang item) so, we no need an inherent version too.
 
-Complaint 4: we copied a weird cargocult from std. *shrug* fine I'll remove it.
+Complaint 4: we copied a weird cargocult from std. *shrug* fine Voy a remove it.
 
 ```text
 cargo clippy

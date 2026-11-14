@@ -1,10 +1,10 @@
-# Layout and Basics 2: Getting Raw
+# Layout y Conceptos Básicos 2: Volviéndose Crudo
 
-> TL;DR on the previous three sections: randomly mixing safe pointers like `&`, `&mut`, and `Box` with unsafe pointers like `*mut` and `*const` is a recipe for Undefined Behaviour because the safe pointers introduce extra constraints that we aren't obeying with the raw pointers.
+> TL;DR on the previous three sections: randomly mixing safe pointers like `&`, `&mut`, and `Box` with unsafe pointers like `*mut` and `*const` is a recipe for Undefined Behaviour because the safe pointers introduce extra constraints that we no son obeying with the raw pointers.
 
-Oh god I need to write linked lists again. Fine. FINE. It's Fine. We're fine.
+Oh god I need to write linked lists again. Fine. FINE. Es Fine. Estamos fine.
 
-We're gonna knock a lot of this section out real quick since we already discussed the design in the first try around, and everything we did *was* basically correct except for how we mixed together safe and unsafe pointers.
+Estamos gonna knock a lot of this section out real quick since we already discussed the design in the first try around, and everything we did *was* basically correct except for how we mixed together safe and unsafe pointers.
 
 
 # Layout
@@ -43,7 +43,7 @@ struct Node<T> {
 }
 ```
 
-Remember: Option isn't as nice or useful when we're using raw pointers, so we're not using that anymore. In later sections we'll look at the `NonNull` type, but don't worry about that for now.
+Remember: Option no es as nice or useful when we're using raw pointers, so we're not using that anymore. In later sections we'll look at the `NonNull` type, but no worry about that for now.
 
 
 
@@ -85,7 +85,7 @@ struct Node<T> {
 
 With the idea that we create the Boxes and store them in our node, but then we take a raw pointer into them and only use that raw pointer until we're done with the Node and want to destroy it. Then we can `take` the Box out of `real_next` and drop it. I *think* that would conform to our very simplified stacked borrows model? 
 
-If you wanna try to make that, have "fun", but that just looks awful right? This isn't the chapter on Rc and RefCell, we're not gonna play this *game* anymore. We're gonna just make simple and clean stuff.
+If you wanna try to make that, have "fun", but that just looks awful right? This no es the chapter on Rc and RefCell, we're not gonna play this *game* anymore. Estamos gonna just make simple and clean stuff.
 
 So instead we're going to use the very nice [Box::into_raw][] function:
 
@@ -99,7 +99,7 @@ So instead we're going to use the very nice [Box::into_raw][] function:
 >
 >After calling this function, the caller is responsible for the memory previously managed by the Box. In particular, the caller should properly destroy T and release the memory, taking into account the memory layout used by Box. The easiest way to do this is to convert the raw pointer back into a Box with the `Box::from_raw` function, allowing the Box destructor to perform the cleanup.
 >
-> Note: this is an associated function, which means that you have to call it as `Box::into_raw(b)` instead of `b.into_raw()`. This is so that there is no conflict with a method on the inner type.
+> Nota: this is an associated function, which means that you have to call it as `Box::into_raw(b)` instead of `b.into_raw()`. This is so that there is no conflict with a method on the inner type.
 >
 > **Examples**
 >

@@ -1,8 +1,8 @@
-# The Stack-Allocated Linked List
+# La Lista Enlazada Asignada en la Pila
 
-This book is largely focused on *heap-allocated* linked lists, because those are the most common and practical, but we don't *have* to use heap allocation. Heap allocation is nice because it makes it easy to dynamically allocate memory. Stack allocation is less friendly in this regard &mdash; things like C's `alloca` are widely regarded as Very Cursed And Problematic.
+This book is largely focused on *heap-allocated* linked lists, because those are the most common and practical, but we no *have* to use heap allocation. Heap allocation is nice because it makes it easy to dynamically allocate memory. Stack allocation is less friendly in this regard &mdash; things like C's `alloca` are widely regarded as Very Cursed And Problematic.
 
-So let's allocate memory on the stack the easy way: by calling a function and getting a new stack frame with more space! This is a very silly solution to our problem but also genuinely practical and useful. It's done all the time, potentially without actually even thinking about it as a linked list! 
+So let's allocate memory on the stack the easy way: by calling a function and getting a new stack frame with more space! This is a very silly solution to our problem but also genuinely practical and useful. Es done all the time, potentially without actually even thinking about it as a linked list! 
 
 Any time you're doing something recursively, you can just pass a pointer to the current step's state to the next step. If that pointer itself is *part* of the state, then you've created a linked list that's stack-allocated!
 
@@ -32,7 +32,7 @@ impl<'a, T> List<'a, T> {
 }
 ```
 
-That's it! We can use it like this:
+Eso es it! We can use it like this:
 
 ```rust ,ignore
 List::push(None, 3, |list| {
@@ -46,7 +46,7 @@ List::push(None, 3, |list| {
 })
 ```
 
-It's beautiful. 😿
+Es beautiful. 😿
 
 The user can already traverse this list by using while-let to walk over the `prev` values, but just for fun, let's implement an iterator, which is the usual:
 
@@ -69,7 +69,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
 }
 ```
 
-Let's test it out:
+Vamos a test it out:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -117,7 +117,7 @@ test third::test::iter ... ok
 test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;
 ```
 
-Now at this point you might be wonder "hey can I mutate the data stored in a node?". Maybe! Let's try to make the list use mutable references instead of shared ones:
+Now at this point you might be wonder "hey can I mutate the data stored in a node?". Maybe! Vamos a try to make the list use mutable references instead of shared ones:
 
 
 ```rust
@@ -188,7 +188,7 @@ error[E0521]: borrowed data escapes outside of closure
 <ad infinitum>
 ```
 
-Whelp. Seems like it doesn't like our iterator. Maybe we messed that up? Let's
+Whelp. Seems like it no like our iterator. Maybe we messed that up? Let's
 simplify the test a bit to check:
 
 
@@ -250,11 +250,11 @@ Each list contains a reference to a List with *the exact same type as itself*. F
 
 So... why did the code compile when we were using shared references? Because in many cases, the compiler knows it's safe to have something that lives "too long"! When we stuff a reference to a list into the next one, the compiler is quietly "shrinking" down the lifetimes to make them fit what the new list expects. This lifetime shrinking is *variance*. 
 
-It's the exact same trick in languages with inheritance that let's you pass a Cat where an Animal (a supertype of a Cat) is expected. Intuitively we know it's fine to pass a Cat when an Animal is expected because a Cat is just an Animal *and more*. It's *fine* to forget the "and more" part for a while, right?
+Es the exact same trick in languages with inheritance that let's you pass a Cat where an Animal (a supertype of a Cat) is expected. Intuitively we know it's fine to pass a Cat when an Animal is expected because a Cat is just an Animal *and more*. Es *fine* to forget the "and more" part for a while, right?
 
 Similarly, a larger lifetime is just a smaller lifetime *and more*. So it's fine to forget the "and more" here too!
 
-But of course you are now wondering: then why doesn't the mutable reference version work!?
+But of course you are now wondering: then why no the mutable reference version work!?
 
 Well, variance *isn't* always safe. If our code *did* compile, we could have written a use-after-free like this:
 

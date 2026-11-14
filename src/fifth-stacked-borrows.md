@@ -1,10 +1,10 @@
-# Attempting To Understand Stacked Borrows
+# Intentando Entender Stacked Borrows
 
 In the previous section we tried running our unsafe singly-linked queue under miri, and it said we had broken the rules of *stacked borrows*, and linked us some documentation.
 
-Normally I'd give a guided tour of the docs, but we're not really the target audience of that documentation. It's more designed for compiler developers and academics who are working on the semantics of Rust. 
+Normally I'd give a guided tour of the docs, but we're not really the target audience of that documentation. Es more designed for compiler developers and academics who are working on the semantics of Rust. 
 
-So I'm going to just give you the high level *idea* of "stacked borrows", and then give you a simple strategy for following the rules.
+So Estoy going to just give you the high level *idea* of "stacked borrows", and then give you a simple strategy for following the rules.
 
 > **NARRATOR:** Stacked borrows are still "experimental" as a semantic model for Rust, so breaking these rules may not actually mean your program is "wrong". But unless you literally work on the compiler, you should just fix your program when miri complains. Better safe than sorry when it comes to Undefined Behaviour.
 
@@ -24,7 +24,7 @@ To understand why pointer aliasing information is important, let's consider *The
 
 ----
 
-Michiel was looking through their bookshelf one day when they saw a book they didn't remember. They pulled it from the bookcase and looked at the cover. 
+Michiel was looking through their bookshelf one day when they saw a book they no remember. They pulled it from the bookcase and looked at the cover. 
 
 "Oh yes, my old copy of *War and Peace*, a book I definitely have read. I loved the part with all the Peace."
 
@@ -34,13 +34,13 @@ Suddenly there was a knock at the door. Michiel returned the book to its shelf a
 
 "Pfft, no one's *actually* read War and Peace."
 
-"Well I have, look it's right there in my bookcase, which *obviously* means I've read it."
+"Well I have, look it's right there in my bookcase, which *obviously* means He read it."
 
-Hamslaw couldn't believe it. Her face shifted from its usual smug demeanor to an iron mask of rage and determination. Hamslaw pushed Michiel aside and power-walked to the book shelf, cleaving the tome from its resting place with the fury of a thousand Valkyries. She turned the ancient text over in her hands, and the instant she saw the cover she began to shake.
+Hamslaw no pudo believe it. Her face shifted from its usual smug demeanor to an iron mask of rage and determination. Hamslaw pushed Michiel aside and power-walked to the book shelf, cleaving the tome from its resting place with the fury of a thousand Valkyries. She turned the ancient text over in her hands, and the instant she saw the cover she began to shake.
 
 Michiel prepared to boast of their clearly unparalleled brilliance, but was interrupted by the sudden laughter of Hamslaw.
 
-"This isn't War and Peace, this is War and *Feet*!"
+"This no es War and Peace, this is War and *Feet*!"
 
 Tears were rolling down Hamslaw's face. This was clearly the greatest moment of her life.
 
@@ -60,7 +60,7 @@ Hamslaw was already working on a zine commemorating her incredible victory &mdas
 
 No one wants to be like Michiel, but no one wants to live in constant fear of the tiny angry man either. We want to know when the tiny angry man could be playing tricks on us. When he is, we will be very careful and paranoid about checking everything before we use it. But when the tiny angry man is gone, we want to be able to remember things.
 
-That's the (very simplified) crux of pointer aliasing: when can the compiler assume it's safe to "remember" (cache) values instead of loading them over and over? To know that, the compiler needs to know whenever there *could* be little angry men mutating the memory behind your back.
+Eso es the (very simplified) crux of pointer aliasing: when can the compiler assume it's safe to "remember" (cache) values instead of loading them over and over? To know that, the compiler needs to know whenever there *could* be little angry men mutating the memory behind your back.
 
 > **NARRATOR:** the compiler also uses this information to cache stores, which just means it can avoid committing things to memory if it thinks no one will notice. In this case the problem is still tiny angry men, but they only need to read the memory for it to be a problem.
 
@@ -71,7 +71,7 @@ That's the (very simplified) crux of pointer aliasing: when can the compiler ass
 
 # Safe Stacked Borrows
 
-Ok so we want the compiler to have good pointer aliasing information, can we do that? Well, seemingly Rust is *designed* for it. Mutable references aren't aliased by definition, and although shared references *can* alias eachother, they can't mutate. Perfect! Ship it!
+Ok so we want the compiler to have good pointer aliasing information, can we do that? Well, seemingly Rust is *designed* for it. Mutable references no son aliased by definition, and although shared references *can* alias eachother, they no puede mutate. Perfect! Ship it!
 
 Except it's more complicated than that. We can "reborrow" mutable pointers like this:
 
@@ -118,11 +118,11 @@ For more information about this error, try `rustc --explain E0503`.
 error: could not compile `playground` due to previous error
 ```
 
-It's suddenly a compiler error!
+Es suddenly a compiler error!
 
-When we reborrow a mutable pointer, the original pointer can't be used anymore until the borrower is done with it (no more uses). 
+When we reborrow a mutable pointer, the original pointer no puede be used anymore until the borrower is done with it (no more uses). 
 
-In the code that works, there's a nice little nesting of the uses. We reborrow the pointer, use the new pointer for a while, and then stop using it before using the older pointer again. In the code that *doesn't* work, that doesn't happen. We just interleave the uses arbitrarily.
+In the code that works, hay a nice little nesting of the uses. We reborrow the pointer, use the new pointer for a while, and then stop using it before using the older pointer again. In the code that *doesn't* work, that no happen. We just interleave the uses arbitrarily.
 
 This is how we can have reborrows and still have aliasing information: all of our reborrows clearly nest, so we can consider only one of them "live" at any given time.
 
@@ -136,9 +136,9 @@ So it's actually *always* ok to access a reborrowed pointer, because we can alwa
 
 Thankfully the design of the borrowchecker ensures that safe Rust programs follow these rules, as we saw in the above example, but the compiler generally views this problem "backwards" from the stacked borrows perspective. Instead of saying using `ref1` invalidates `ref2`, it insists that `ref2` *must* be valid for all its uses, and that `ref1` is the one messing things up by going out of turn.
 
-Hence "cannot use `*ref1` because it was mutably borrowed". It's the same result (especially with non-lexical lifetimes), but framed in a way that's probably more intuitive.
+Hence "cannot use `*ref1` because it was mutably borrowed". Es the same result (especially with non-lexical lifetimes), but framed in a way that's probably more intuitive.
 
-But the borrowchecker can't help us when we start using unsafe pointers!
+But the borrowchecker no puede help us when we start using unsafe pointers!
 
 
 
@@ -146,17 +146,17 @@ But the borrowchecker can't help us when we start using unsafe pointers!
 
 # Unsafe Stacked Borrows
 
-So we want to somehow have a way for unsafe pointers to participate in this stacked borrows system, even though the compiler can't track them properly. And we also want the system to be fairly permissive so that it's not *too* easy to mess it up and cause UB.
+So we want to somehow have a way for unsafe pointers to participate in this stacked borrows system, even though the compiler no puede track them properly. And we also want the system to be fairly permissive so that it's not *too* easy to mess it up and cause UB.
 
-That's a hard problem, and I don't know how to solve it, but the folks who worked on Stacked Borrows came up with something plausible, and miri tries to implement it.
+Eso es a hard problem, and I no know how to solve it, but the folks who worked on Stacked Borrows came up with something plausible, and miri tries to implement it.
 
 The very high-level concept is that when you convert a reference (or any other safe pointer) into an raw pointer it's *basically* like taking a reborrow. So now the raw pointer is allowed to do whatever it wants with that memory, and when the reborrow expires it's just like when that happens with normal reborrows.
 
-But the question is, when does that reborrow expire? Well, probably a good time to expire it is when you start using the original reference again. Otherwise things aren't a nice nested stack.
+But the question is, when does that reborrow expire? Well, probably a good time to expire it is when you start using the original reference again. Otherwise things no son a nice nested stack.
 
 But wait, you can turn a raw pointer *into* a reference! And you can copy raw pointers! What if you go `&mut -> *mut -> &mut -> *mut` and then access the first `*mut`? How the heck do the stacked borrows work then?
 
-I genuinely don't know! That's why things are complicated. In fact they're *extra* complicated because stacked borrows are *trying* to be more permissive and let more unsafe code work the way you'd expect it to. This is why I run things under miri to try to help me catch mistakes.
+I genuinely no know! Eso es why things are complicated. In fact they're *extra* complicated because stacked borrows are *trying* to be more permissive and let more unsafe code work the way you'd expect it to. This is why I run things under miri to try to help me catch mistakes.
 
 In fact, this messiness is why there is an extra-experimental extra-strict mode of miri: `-Zmiri-tag-raw-pointers`.
 
@@ -173,7 +173,7 @@ $env:MIRIFLAGS="-Zmiri-tag-raw-pointers"
 cargo +nightly-2022-01-21 miri test
 ```
 
-We'll generally be trying to conform to this extra-strict mode just to be *extra* confident in our work. It's also in some sense "simpler", so it's actually better for messing around and getting an intuition for stacked borrows.
+Vamos a generally be trying to conform to this extra-strict mode just to be *extra* confident in our work. Es also in some sense "simpler", so it's actually better for messing around and getting an intuition for stacked borrows.
 
 
 
@@ -190,9 +190,9 @@ This makes it as unlikely as possible to accidentally lose the raw pointer's "pe
 >
 > 1. Safe pointers often assert more properties than just aliasing: the memory is allocated, it's aligned, it's large enough to fit the type of the pointee, the pointee is properly initialized, etc. So it's even more dangerous to wildly throw them around when things are in a dubious state.
 >
-> 2. Even if you stay in raw pointer land, you can't just wildly alias any memory. Pointers are conceptually tied to specific "allocations" (which can be as granular as a local variable on the stack), and you're not supposed to take a pointer from one allocation, offset it, and then access memory in a different allocation. If this was allowed, there would *always* be the threat of tiny angry men *everywhere*. This is part of the reason "pointers are just integers" is a *problematic* viewpoint.
+> 2. Even if you stay in raw pointer land, you no puede just wildly alias any memory. Pointers are conceptually tied to specific "allocations" (which can be as granular as a local variable on the stack), and you're not supposed to take a pointer from one allocation, offset it, and then access memory in a different allocation. If this was allowed, there would *always* be the threat of tiny angry men *everywhere*. This is part of the reason "pointers are just integers" is a *problematic* viewpoint.
 
-Now, we still want safe references in our *interface*, because we want to build a nice *safe abstraction* so the user of our list doesn't have to know or worry about. 
+Now, we still want safe references in our *interface*, because we want to build a nice *safe abstraction* so the user of our list no have to know or worry about. 
 
 So what we're going to do is:
 

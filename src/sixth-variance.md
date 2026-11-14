@@ -1,6 +1,6 @@
-# Variance and PhantomData
+# Varianza y PhantomData
 
-It's going to be annoying to punt on this now and fix it later, so we're going to do the Hardcore Layout stuff now.
+Es going to be annoying to punt on this now and fix it later, so we're going to do the Hardcore Layout stuff now.
 
 There are five terrible horsemen of making unsafe Rust collections:
 
@@ -10,11 +10,11 @@ There are five terrible horsemen of making unsafe Rust collections:
 4. [The isize::MAX Allocation Rule](https://doc.rust-lang.org/nightly/nomicon/vec/vec-alloc.html)
 5. [Zero-Sized Types](https://doc.rust-lang.org/nightly/nomicon/vec/vec-zsts.html)
 
-Mercifully, the last 2 aren't going to be a problem for us. 
+Mercifully, the last 2 no son going to be a problem for us. 
 
 The third we *could* make into our problem but it's more trouble than it's worth -- if you've opted into a LinkedList you've already given up the battle on memory-effeciency 100-fold already.
 
-The second is something that I used to insist was really important and that std messes around with, but the defaults are safe, the ways to mess with it are unstable, and you need to try *so very hard* to ever notice the limitations of the defaults, so, don't worry about it.
+The second is something that I used to insist was really important and that std messes around with, but the defaults are safe, the ways to mess with it are unstable, and you need to try *so very hard* to ever notice the limitations of the defaults, so, no worry about it.
 
 That just leaves us with Variance. To be honest, you can probably punt on this one too, but I still have my pride as a Collections Person, so we're going to Do The Variance Thing.
 
@@ -41,7 +41,7 @@ fn take_two<T>(_val1: T, _val2: T) { }
 
 Yep, that compiles fine!
 
-Now let's have some fun and wrap it in, oh, I don't know, `std::cell::Cell`:
+Now let's have some fun and wrap it in, oh, I no know, `std::cell::Cell`:
 
 ```rust ,compilefail
 use std::cell::Cell;
@@ -70,7 +70,7 @@ error[E0623]: lifetime mismatch
   |                   ^^^^^ ...but data from `small` flows into `big` here
 ```
 
-Huh??? We didn't touch the lifetimes, why's the compiler angry now!?
+Huh??? We no touch the lifetimes, why's the compiler angry now!?
 
 Ah well, the lifetime "subtyping" stuff must be really simple, so it falls over if you wrap the references in anything, see look it breaks with Vec too:
 
@@ -90,7 +90,7 @@ fn take_two<T>(_val1: T, _val2: T) { }
      Running `target/debug/playground`
 ```
 
-See it doesn't compile eith-- wait what??? Vec is magic??????
+See it no compile eith-- wait what??? Vec is magic??????
 
 Well, yes. But also, no. The magic was inside us all along, and that magic is ✨*Variance*✨.
 
@@ -98,11 +98,11 @@ Read the [nomicon's chapter on subtyping](https://doc.rust-lang.org/nightly/nomi
 
 Things that are "like mutable references" are *invariant* which means they block subtyping from happening on their generic parameters. So for safety, `&mut T` is invariant over T, and `Cell<T>` is invariant over T because `&Cell<T>` is basically just `&mut T` (because of interior mutability).
 
-Almost everything that isn't invariant is *covariant*, and that just means that subtyping "passes through" it and continues to work normally (there are also contravariant types that make subtyping go backwards but they are really rare and no one likes them so I won't mention them again).
+Almost everything that no es invariant is *covariant*, and that just means that subtyping "passes through" it and continues to work normally (there are also contravariant types that make subtyping go backwards but they are really rare and no one likes them so I no mention them again).
 
-Collections generally contain a mutable pointer to their data, so you might expect them to be invariant too, but in fact, they don't need to be! Because of Rust's ownership system, `Vec<T>` is semantically equivalent to `T`, and that means it's safe for it to be covariant!
+Collections generally contain a mutable pointer to their data, so you might expect them to be invariant too, but in fact, they no need to be! Because of Rust's ownership system, `Vec<T>` is semantically equivalent to `T`, and that means it's safe for it to be covariant!
 
-Unfortunately, this definition is invariant:
+Desafortunadamente, this definition is invariant:
 
 ```rust
 pub struct LinkedList<T> {
@@ -120,17 +120,17 @@ struct Node<T> {
 }
 ```
 
-But how is Rust actually deciding the variance of things? Well in the good-old-days before 1.0 we messed around with just letting people specify the variance they wanted and... it was an absolute train-wreck! Subtyping and variance is really hard to wrap your head around, and core developers genuinely disagreed on basic terminology! So we moved to a "variance by example" approach: the compiler just looks at your fields and copies their variances. If there's any kind of disagreement, then invariance always wins, because that's safe.
+But how is Rust actually deciding the variance of things? Well in the good-old-days before 1.0 we messed around with just letting people specify the variance they wanted and... it was an absolute train-wreck! Subtyping and variance is really hard to wrap your head around, and core developers genuinely disagreed on basic terminology! So we moved to a "variance by example" approach: the compiler just looks at your fields and copies their variances. If hay any kind of disagreement, then invariance always wins, because that's safe.
 
 So what's in our type definitions that Rust is getting mad about? `*mut`!
 
-Raw pointers in Rust really just try to let you do whatever, but they have exactly one safety feature: because most people have no idea that variance and subtyping are a thing in Rust, and being *incorrectly* covariant would be horribly dangerous, `*mut T` is invariant, because there's a good chance it's being used "as" `&mut T`.
+Raw pointers in Rust really just try to let you do whatever, but they have exactly one safety feature: because most people have no idea that variance and subtyping are a thing in Rust, and being *incorrectly* covariant would be horribly dangerous, `*mut T` is invariant, because hay a good chance it's being used "as" `&mut T`.
 
 This is extremely annoying for Exactly Me as a person who has spent a lot of time writing collections in Rust. This is why when I made [std::ptr::NonNull](https://doc.rust-lang.org/std/ptr/struct.NonNull.html), I added this little piece of magic:
 
 > Unlike `*mut T`, `NonNull<T>` was chosen to be covariant over `T`. This makes it possible to use `NonNull<T>` when building covariant types, but introduces the risk of unsoundness if used in a type that shouldn’t actually be covariant.
 
-But hey, its interface is built around `*mut T`, what's the deal! Is it just magic?! Let's look:
+But hey, its interface is built around `*mut T`, what's the deal! Is it just magic?! Vamos a look:
 
 ```rust
 pub struct NonNull<T> {
@@ -146,7 +146,7 @@ impl<T> NonNull<T> {
 }
 ```
 
-NOPE. NO MAGIC HERE! NonNull just abuses the fact that `*const T` is covariant and stores that instead, casting back and forth between `*mut T` at the API boundary to make it "look like" it's storing a `*mut T`. That's the whole trick! That's how collections in Rust are covariant! And it's miserable! So I made the Good Pointer Type do it for you! You're welcome! Enjoy your subtyping footgun!
+NOPE. NO MAGIC HERE! NonNull just abuses the fact that `*const T` is covariant and stores that instead, casting back and forth between `*mut T` at the API boundary to make it "look like" it's storing a `*mut T`. Eso es the whole trick! Eso es how collections in Rust are covariant! And it's miserable! So I made the Good Pointer Type do it for you! You're welcome! Enjoy your subtyping footgun!
 
 The solution to all your problems is to use NonNull, and then if you want to have nullable pointers again, use `Option<NonNull<T>>`. Are we really going to bother doing that..?
 
@@ -188,12 +188,12 @@ pub struct LinkedList<T> {
 }
 ```
 
-In this case I don't think we *actually* need [PhantomData](https://doc.rust-lang.org/std/marker/struct.PhantomData.html), but any time you *do* use NonNull (or just raw pointers in general), you should always add it to be safe and make it clear to the compiler and others what you *think* you're doing.
+In this case I no think we *actually* need [PhantomData](https://doc.rust-lang.org/std/marker/struct.PhantomData.html), but any time you *do* use NonNull (or just raw pointers in general), you should always add it to be safe and make it clear to the compiler and others what you *think* you're doing.
 
 PhantomData is a way for us to give the compiler an extra "example" field that *conceptually* exists in your type but for various reasons (indirection, type erasure, ...) doesn't. In this case we're using NonNull because we're claiming our type behaves "as if" it stored a value T, so we add a PhantomData to make that explicit.
 
-The stdlib actually has other reasons to do this because it has access to the accursed [Drop Check overrides](https://doc.rust-lang.org/nightly/nomicon/dropck.html), but that feature has been reworked so many times that I don't actually know if the PhantomData thing *is* a thing for it anymore. I'm still going to cargo-cult it for all eternity, because Drop Check Magic is burned into my brain!
+The stdlib actually has other reasons to do this because it has access to the accursed [Drop Check overrides](https://doc.rust-lang.org/nightly/nomicon/dropck.html), but that feature has been reworked so many times that I no actually know if the PhantomData thing *is* a thing for it anymore. Estoy still going to cargo-cult it for all eternity, because Drop Check Magic is burned into my brain!
 
-(Node literally stores a T, so it doesn't have to do this, yay!)
+(Node literally stores a T, so it no have to do this, yay!)
 
 ...ok for real we're done with layout now! On to actual basic functionality!

@@ -1,6 +1,6 @@
-# Implementing Cursors
+# Implementando Cursores
 
-Ok so we're only going to bother with std's CursorMut because the immutable version isn't actually interesting. Just like my original design, it has a "ghost" element that contains None to indicate the start/end of the list, and you can "walk over it" to wrap around to the other side of the list. To implement it, we're going to need:
+Ok so we're only going to bother with std's CursorMut because the immutable version no es actually interesting. Just like my original design, it has a "ghost" element that contains None to indicate the start/end of the list, and you can "walk over it" to wrap around to the other side of the list. To implement it, we're going to need:
 
 * A pointer to the current node
 * A pointer to the list
@@ -12,9 +12,9 @@ Wait what's the index when we point at the "ghost"?
 
 Ok so quite reasonably `index` on a Cursor returns an `Option<usize>`. The std implementation does a bunch of junk to avoid storing it as an Option but... we're a linked list, it's fine. Also std has the cursor_front/cursor_back stuff which starts the cursor on the front/back elements, which feels intuitive, but then has to do something weird when the list is empty.
 
-You can implement that stuff if you want, but I'm going to cut down on all the repetitive gunk and corner cases and just make a bare `cursor_mut` method that starts at the ghost, and people can use move_next/move_prev to get the one they want (and then you can wrap that up as cursor_front if you really want).
+You can implement that stuff if you want, but Estoy going to cut down on all the repetitive gunk and corner cases and just make a bare `cursor_mut` method that starts at the ghost, and people can use move_next/move_prev to get the one they want (and then you can wrap that up as cursor_front if you really want).
 
-Let's get cracking:
+Vamos a get cracking:
 
 ```rust ,ignore
 pub struct CursorMut<'a, T> {
@@ -70,7 +70,7 @@ impl<'a, T> CursorMut<'a, T> {
 }
 ```
 
-So there's 4 interesting cases:
+So hay 4 interesting cases:
 
 * The normal case
 * The normal case, but we reach the ghost
@@ -104,7 +104,7 @@ pub fn move_prev(&mut self) {
 
 Next let's add some methods to look at the elements around the cursor: current, peek_next, and peek_prev. **A Very Important Note:** these methods must borrow our cursor by `&mut self`, and the results must be tied to that borrow. We cannot let the user get multiple copies of a mutable reference, and we cannot let them use any of our insert/remove/split/splice APIs while holding onto such a reference!
 
-Thankfully, this is the default assumption rust makes when you use lifetime elision, so, we will just do the right thing by default!
+Afortunadamente, this is the default assumption rust makes when you use lifetime elision, so, we will just do the right thing by default!
 
 ```rust ,ignore
 pub fn current(&mut self) -> Option<&mut T> {
@@ -130,7 +130,7 @@ pub fn peek_prev(&mut self) -> Option<&mut T> {
 }
 ```
 
-Head empty, Option methods and (omitted) compiler errors do all thinking now. I was skeptical about the `Option<NonNull>` stuff, but, god damn it really just lets me autopilot this code. I've spent way too much time writing array-based collections where you never get to use Option, wow this is nice! (`(*node.as_ptr())` is still miserable but, that's just Rust's raw pointers for you...)
+Head empty, Option methods and (omitted) compiler errors do all thinking now. I was skeptical about the `Option<NonNull>` stuff, but, god damn it really just lets me autopilot this code. He spent way too much time writing array-based collections where you never get to use Option, wow this is nice! (`(*node.as_ptr())` is still miserable but, that's just Rust's raw pointers for you...)
 
 Next we have a choice: we can either jump right to split and splice, the entire point of these APIs, or we can take a baby-step with single element insert/remove. I have a feeling we're just going to want to implement insert/remove in terms of split and splice so... let's just do those first and see where the cards fall (genuinely have no idea as I type this).
 
@@ -150,7 +150,7 @@ I see 4 potentially interesting cases for split_before:
 * The ghost case, where we return the whole list and become empty
 * The ghost case, but the list is empty, so do nothing and return the empty list
 
-Let's start with the corner cases. The third case I believe is just
+Vamos a start with the corner cases. The third case I believe is just
 
 ```rust
 mem::replace(self.list, LinkedList::new())
@@ -158,7 +158,7 @@ mem::replace(self.list, LinkedList::new())
 
 Right? We become empty, we return the whole list, and our fields were already None, so nothing to update. Nice. Oh hey, this also Does The Right Thing on the fourth case too!
 
-So now the normal cases... ok I'm going to need some ASCII diagrams for this. In the most general case, we have something like this:
+So now the normal cases... ok Estoy going to need some ASCII diagrams for this. In the most general case, we have something like this:
 
 ```text
 list.front -> A <-> B <-> C <-> D <- list.back
@@ -229,7 +229,7 @@ pub fn split_before(&mut self) -> LinkedList<T> {
 }
 ```
 
-Note that this if-let is handling the "normal case, but prev is the ghost" situation:
+Nótese que this if-let is handling the "normal case, but prev is the ghost" situation:
 
 ```rust ,ignore
 if let Some(prev) = prev {
@@ -245,11 +245,11 @@ If *you* want to, you can squash that all together and apply optimizations like:
 * fold the two accesses to `(*cur.as_ptr()).front` as just `(*cur.as_ptr()).front.take()` 
 * note that new_back is a noop, and just remove both
 
-As far as I can tell, everything else just incidentally Does The Right Thing otherwise. We'll see when we write tests! (copy-paste to make split_after)
+As far as I can tell, everything else just incidentally Does The Right Thing otherwise. Vamos a see when we write tests! (copy-paste to make split_after)
 
-I am done Making Mistakes and I am just going to try to write the most foolproof code I can. This is how I *actually* write collections: just break things down into trivial steps and cases until it can fit in my head and seems foolproof. Then write a ton of tests until I'm convinced I didn't manage to mess it up still.
+I am done Making Mistakes and I am just going to try to write the most foolproof code I can. This is how I *actually* write collections: just break things down into trivial steps and cases until it can fit in my head and seems foolproof. Then write a ton of tests until Estoy convinced I no manage to mess it up still.
 
-Because most of the collections work I've done is *extremely unsafe* I don't generally get to rely on the compiler catching mistakes, and miri didn't exist back in the day! So I just need to squint at a problem until my head hurts and try my hardest to Never Ever Ever Make A Mistake.
+Because most of the collections work He done is *extremely unsafe* I no generally get to rely on the compiler catching mistakes, and miri no exist back in the day! So I just need to squint at a problem until my head hurts and try my hardest to Never Ever Ever Make A Mistake.
 
 Don't write Unsafe Rust Code! Safe Rust is so much better!!!!
 
@@ -260,7 +260,7 @@ Don't write Unsafe Rust Code! Safe Rust is so much better!!!!
 
 Just one more boss to fight, splice_before and splice_after, which I expect to be the corner-casiest one of them all. The two functions *take in* a LinkedList and grafts its contents into outrs. Our list could be empty, their list could be empty, we've got ghosts to deal with... *sigh* let's just take it one step at a time with splice_before.
 
-* If their list is empty, we don't need to do anything. 
+* If their list is empty, we no need to do anything. 
 * If our list is empty, then our list just becomes their list.
 * If we're pointing at the ghost, then this appends to the back (change list.back)
 * If we're pointing at the first element (0), then this appends to the front (change list.front)
@@ -282,7 +282,7 @@ Becoming this:
 list.front -> A <-> 1 <-> 2 <-> B <-> C <- list.back
 ```
 
-Ok? Ok. Let's write that out... *TAKES A HUGE BREATH AND PLUNGES IN*:
+Ok? Ok. Vamos a write that out... *TAKES A HUGE BREATH AND PLUNGES IN*:
 
 ```rust ,ignore
     pub fn splice_before(&mut self, mut input: LinkedList<T>) {
@@ -335,7 +335,7 @@ Ok? Ok. Let's write that out... *TAKES A HUGE BREATH AND PLUNGES IN*:
     }
 ```
 
-Ok this one is genuinely horrendous, and really is feeling that `Option<NonNull>` pain now. But there's a lot of cleanups we can do. For one, we can pull this code out to the very end, because we always want to do it. I don't *love*  (although sometimes it's a noop, and setting `input.len` is more a matter of paranoia about future extensions to the code):
+Ok this one is genuinely horrendous, and really is feeling that `Option<NonNull>` pain now. But hay a lot of cleanups we can do. For one, we can pull this code out to the very end, because we always want to do it. I no *love*  (although sometimes it's a noop, and setting `input.len` is more a matter of paranoia about future extensions to the code):
 
 ```rust ,ignore
 self.list.len += input.len;
@@ -344,7 +344,7 @@ input.len = 0;
 
 > Use of moved value: `input`
 
-Ah, right, in the "we're empty" case we're moving the list. Let's replace that with a swap:
+Ah, right, in the "we're empty" case we're moving the list. Vamos a replace that with a swap:
 
 ```rust ,ignore
 // We're empty, become the input, remain on the ghost
@@ -421,7 +421,7 @@ Alright this still sucks, but mostly because of -- nope ok just spotted a bug:
     (*input.front.unwrap().as_ptr()).front = Some(back);
 ```
 
-We `take` input.front and then unwrap it on the next line! *sigh* and we do the same thing in the equivalent mirror case. We would have caught this instantly in tests, but, we're trying to be Perfect now, and I'm just kinda doing this live, and this is the exact moment where I saw it. This is what I get for not being my usual tedious self and doing things in phases. More explicit!
+We `take` input.front and then unwrap it on the next line! *sigh* and we do the same thing in the equivalent mirror case. We would have caught this instantly in tests, but, we're trying to be Perfect now, and Estoy just kinda doing this live, and this is the exact moment where I saw it. This is what I get for not being my usual tedious self and doing things in phases. More explicit!
 
 ```rust
 // We can either `take` the input's pointers or `mem::forget`
@@ -468,11 +468,11 @@ input.len = 0;
 // Input dropped here
 ```
 
-Alright now this, this I can tolerate. The only complaints I have are that we don't dedupe in_front/in_back (probably we could rejig our conditions but eh whatever). Really this is basically what you would write in C but with `Option<NonNull>` gunk making it tedious. I can live with that. Well no we should just make raw pointers better for this stuff. But, out of scope for this book.
+Alright now this, this I can tolerate. The only complaints I have are that we no dedupe in_front/in_back (probably we could rejig our conditions but eh whatever). Really this is basically what you would write in C but with `Option<NonNull>` gunk making it tedious. I can live with that. Well no we should just make raw pointers better for this stuff. But, out of scope for this book.
 
 Anyway, I am absolutely exhausted after that, so, `insert` and `remove` and all the other APIs can be left as an excercise to the reader. 
 
-Here's the final code for our Cursor with my attempt at copy-pasting the combinatorics. Did I get it right? I'll only find out when I write the next chapter and test this monstrosity!
+Here's the final code for our Cursor with my attempt at copy-pasting the combinatorics. Did I get it right? Voy a only find out when I write the next chapter and test this monstrosity!
 
 
 ```rust ,ignore

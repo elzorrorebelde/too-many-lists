@@ -1,6 +1,6 @@
-# Filling In Random Bits
+# Rellenando Bits Aleatorios
 
-Hey you said you wanted to be production-quality, didn't you? 
+Hey you said you wanted to be production-quality, no you? 
 
 Here's some more random gunk to toss in to be a "good" collection:
 
@@ -92,15 +92,15 @@ impl<T: Hash> Hash for LinkedList<T> {
 }
 ```
 
-I definitely wrote all of these from scratch, and didn't just copy the std impls. Because they're so interesting, and I definitely remember the subtleties of manually implementing Hash. Yeah, that's something I think about All The Time...
+I definitely wrote all of these from scratch, and no just copy the std impls. Because they're so interesting, and I definitely remember the subtleties of manually implementing Hash. Yeah, that's something I think about All The Time...
 
-Ok there's actually a few things worth noting here.
+Ok hay actually a few things worth noting here.
 
-First, a nasty namespace clash. For whatever reason std now has macros named Hash and Debug, and so if you don't have the traits imported, you'll get really cryptic errors about macros instead of the proper "missing trait".
+Primero, a nasty namespace clash. For whatever reason std now has macros named Hash and Debug, and so if you no have the traits imported, you'll get really cryptic errors about macros instead of the proper "missing trait".
 
-The other interesting thing to talk about is Hash itself. Do you see how we hash in `len`? That's actually really important! If collections don't hash in lengths, [they can make themselves vulnerable to prefix collisions](https://doc.rust-lang.org/std/hash/trait.Hash.html#prefix-collisions). For instance, `[]`, `[()]` and `[(), ()]` are all zero-sized types: without hashing in the length they will all hash to the same value. Making it too easy for hash collisions to accidentally or maliciously happen can result in serious sadness, so be careful!
+The other interesting thing to talk about is Hash itself. Do you see how we hash in `len`? Eso es actually really important! If collections no hash in lengths, [they can make themselves vulnerable to prefix collisions](https://doc.rust-lang.org/std/hash/trait.Hash.html#prefix-collisions). For instance, `[]`, `[()]` and `[(), ()]` are all zero-sized types: without hashing in the length they will all hash to the same value. Making it too easy for hash collisions to accidentally or maliciously happen can result in serious sadness, so be careful!
 
-Alright, here's our current code:
+Muy bien, here's our current code:
 
 ```rust
 use std::cmp::Ordering;

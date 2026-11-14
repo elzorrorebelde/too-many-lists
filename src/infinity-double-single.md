@@ -1,4 +1,4 @@
-# The Double Singly-Linked List
+# La Lista Doblemente Enlazada Simple
 
 We struggled with doubly-linked lists because they have tangled ownership
 semantics: no node strictly owns any other node. However we struggled

@@ -1,14 +1,14 @@
-# Send, Sync, and Compile Tests
+# Send, Sync y Pruebas de Compilación
 
 Ok actually we do have one more pair of traits to think about, but they're special. We have to deal with Rust's Holy Roman Empire: The Unsafe Opt-In Built-In Traits (OIBITs): [Send and Sync](https://doc.rust-lang.org/nomicon/send-and-sync.html), which are in fact opt-out and built-out (1 out of 3 is pretty good!).
 
 Like Copy, these traits have absolutely no code associated with them, and are just markers that your type has a particular property. Send says that your type is safe to send to another thread. Sync says your type is safe to share between threads (&Self: Send).
 
-The same argument for LinkedList being covariant applies here: generally normal collections which don't use fancy interior mutability tricks are safe to make Send and Sync.
+The same argument for LinkedList being covariant applies here: generally normal collections which no use fancy interior mutability tricks are safe to make Send and Sync.
 
 But I said they're *opt out*. So actually, are we already? How would we know?
 
-Let's add some new magic to our code: random private garbage that won't compile unless our types have the properties we expect:  
+Vamos a add some new magic to our code: random private garbage that no compile unless our types have the properties we expect:  
 
 ```rust ,ignore
 #[allow(dead_code)]
@@ -77,9 +77,9 @@ unsafe impl<'a, T: Send> Send for IterMut<'a, T> {}
 unsafe impl<'a, T: Sync> Sync for IterMut<'a, T> {}
 ```
 
-Note that we have to write *unsafe impl* here: these are *unsafe traits*! Unsafe code (like concurrency libraries) gets to rely on us only implementing these traits correctly! Since there's no actual code, the guarantee we're making is just that, yes, we are indeed safe to Send or Share between threads!
+Nótese que we have to write *unsafe impl* here: these are *unsafe traits*! Unsafe code (like concurrency libraries) gets to rely on us only implementing these traits correctly! Since hay no actual code, the guarantee we're making is just that, yes, we are indeed safe to Send or Share between threads!
 
-Don't just slap these on lightly, but I am a Certified Professional here to say: yep there's are totally fine. Note how we don't need to implement Send and Sync for IntoIter: it just contains LinkedList, so it auto-derives Send and Sync &mdash; I told you they were actually opt out! (You opt out with the hillarious syntax of `impl !Send for MyType {}`.)
+Don't just slap these on lightly, but I am a Certified Professional here to say: yep hay are totally fine. Note how we no need to implement Send and Sync for IntoIter: it just contains LinkedList, so it auto-derives Send and Sync &mdash; I told you they were actually opt out! (You opt out with the hillarious syntax of `impl !Send for MyType {}`.)
 
 ```text
 cargo build
@@ -89,9 +89,9 @@ cargo build
 
 Ok nice!
 
-...Wait, actually it would be really dangerous if stuff that *shouldn't* be these things wasn't. In particular, IterMut *definitely* shouldn't be covariant, because it's "like" `&mut T`. But how can we check that?
+...Wait, actually it would be really dangerous if stuff that *shouldn't* be these things wasn't. In particular, IterMut *definitely* no debería be covariant, because it's "like" `&mut T`. But how can we check that?
 
-With Magic! Well, actually, with rustdoc! Ok well we don't have to use rustdoc for this, but it's the funniest way to do it. See, if you write a doccomment and include a code block, then rustdoc will try to compile and run it, so we can use that to make fresh anonymous "programs" that don't affect the main one:
+With Magic! Well, actually, with rustdoc! Ok well we no have to use rustdoc for this, but it's the funniest way to do it. See, if you write a doccomment and include a code block, then rustdoc will try to compile and run it, so we can use that to make fresh anonymous "programs" that no affect the main one:
 
 
 ```rust ,ignore
@@ -155,7 +155,7 @@ test src\lib.rs - assert_properties::iter_mut_invariant (line 458) - compile fai
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
 ```
 
-Yay! I recommend always making the test without compile_fail so that you can confirm that it fails to compile *for the right reason*. For instance, that test will also fail (and therefore pass) if you forget the `use`, which, is not what we want! While it's conceptually appealing to be able to "require" a specific error from the compiler, this would be an absolute nightmare that would effectively make it a breaking change *for the compiler to produce better errors*. We want the compiler to get better, so, no you don't get to have that.
+Yay! I recommend always making the test without compile_fail so that you can confirm that it fails to compile *for the right reason*. For instance, that test will also fail (and therefore pass) if you forget the `use`, which,  no es what we want! While it's conceptually appealing to be able to "require" a specific error from the compiler, this would be an absolute nightmare that would effectively make it a breaking change *for the compiler to produce better errors*. We want the compiler to get better, so, no you no get to have that.
 
 (Oh wait, we can actually just specify the error code we want next to the compile_fail **but this only works on nightly and is a bad idea to rely on for the reasons stated above. It will be silently ignored on not-nightly.**)
 
@@ -168,7 +168,7 @@ Yay! I recommend always making the test without compile_fail so that you can con
     fn iter_mut_invariant() {}
 ```
 
-...also, did you notice the part where we actually made IterMut invariant? It was easy to miss, since I "just" copy-pasted Iter and dumped it at the end. It's the last line here:
+...also, did you notice the part where we actually made IterMut invariant? It was easy to miss, since I "just" copy-pasted Iter and dumped it at the end. Es the last line here:
 
 ```rust ,ignore
 pub struct IterMut<'a, T> {
@@ -179,7 +179,7 @@ pub struct IterMut<'a, T> {
 }
 ```
 
-Let's try removing that PhantomData:
+Vamos a try removing that PhantomData:
 
 ```text
  cargo build
@@ -193,7 +193,7 @@ error[E0392]: parameter `'a` is never used
    = help: consider removing `'a`, referring to it in a field, or using a marker such as `PhantomData`
 ```
 
-Ha! The compiler has our back and won't just let us *not* use the lifetime. Let's try using the *wrong* example instead:
+Ha! The compiler has our back and no just let us *not* use the lifetime. Vamos a try using the *wrong* example instead:
 
 ```rust ,ignore
     _boo: PhantomData<&'a T>,
@@ -228,5 +228,5 @@ failures:
 test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
 ```
 
-Eyyy!!! The system works! I love having tests that actually do their job, so that I don't have to be quite so horrified of looming mistakes!
+Eyyy!!! The system works! I love having tests that actually do their job, so that I no have to be quite so horrified of looming mistakes!
 
