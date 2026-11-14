@@ -1,8 +1,9 @@
-# Peek
+# Peek (Ojear)
 
-One thing we didn't even bother to implement last time was peeking. Let's go
-ahead and do that. All we need to do is return a reference to the element in
-the head of the list, if it exists. Sounds easy, let's try:
+Una cosa que ni siquiera nos molestamos en implementar la última vez fue el
+peek (ojear). Hagámoslo. Todo lo que necesitamos hacer es devolver una
+referencia al elemento en la cabeza de la lista, si existe. Suena fácil,
+intentemos:
 
 ```rust ,ignore
 pub fn peek(&self) -> Option<&T> {
@@ -31,12 +32,12 @@ error[E0507]: cannot move out of borrowed content
 
 ```
 
-*Sigh*. What now, Rust?
+*Suspira*. ¿Y ahora qué, Rust?
 
-Map takes `self` by value, which would move the Option out of the thing it's in.
-Previously this was fine because we had just `take`n it out, but now we actually
-want to leave it where it was. The *correct* way to handle this is with the
-`as_ref` method on Option, which has the following definition:
+Map toma `self` por valor, lo que movería el Option fuera de la cosa en la que
+está. Anteriormente esto estaba bien porque lo acabábamos de `take`r, pero
+ahora realmente queremos dejarlo donde estaba. La forma *correcta* de manejar
+esto es con el método `as_ref` en Option, que tiene la siguiente definición:
 
 ```rust ,ignore
 impl<T> Option<T> {
@@ -44,10 +45,11 @@ impl<T> Option<T> {
 }
 ```
 
-It demotes the `Option<T>` to an Option to a reference to its internals. We could
-do this ourselves with an explicit match but *ugh no*. It does mean that we
-need to do an extra dereference to cut through the extra indirection, but
-thankfully the `.` operator handles that for us.
+Degrada la `Option<T>` a un Option de una referencia a sus internos. Podríamos
+hacer esto nosotros mismos con un match explícito pero *ugh no*. Significa
+que necesitamos hacer una desreferencia extra para cortar a través de la
+indirección adicional, pero afortunadamente el operador `.` maneja eso por
+nosotros.
 
 
 ```rust ,ignore
@@ -64,9 +66,9 @@ cargo build
     Finished dev [unoptimized + debuginfo] target(s) in 0.32s
 ```
 
-Nailed it.
+Clavado.
 
-We can also make a *mutable* version of this method using `as_mut`:
+También podemos hacer una versión *mutable* de este método usando `as_mut`:
 
 ```rust ,ignore
 pub fn peek_mut(&mut self) -> Option<&mut T> {
@@ -83,7 +85,7 @@ pub fn peek_mut(&mut self) -> Option<&mut T> {
 
 EZ
 
-Don't forget to test it:
+No olvides probarlo:
 
 ```rust ,ignore
 #[test]
@@ -112,7 +114,10 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-That's nice, but we didn't really test to see if we could mutate that `peek_mut` return value, did we?  If a reference is mutable but nobody mutates it, have we really tested the mutability?  Let's try using `map` on this `Option<&mut T>` to put a profound value in:
+Eso está bien, pero realmente no probamos si podíamos mutar ese valor de
+retorno de `peek_mut`, ¿verdad? Si una referencia es mutable pero nadie la
+muta, ¿realmente hemos probado la mutabilidad? Intentemos usar `map` en este
+`Option<&mut T>` para poner un valor profundo:
 
 ```rust ,ignore
 #[test]
@@ -148,7 +153,13 @@ error[E0384]: cannot assign twice to immutable variable `value`
     |             ^^^^^^^^^^ cannot assign twice to immutable variable          ^~~~~
 ```
 
-The compiler is complaining that `value` is immutable, but we pretty clearly wrote `&mut value`; what gives? It turns out that writing the argument of the closure that way doesn't specify that `value` is a mutable reference. Instead, it creates a pattern that will be matched against the argument to the closure; `|&mut value|` means "the argument is a mutable reference, but just copy the value it points to into `value`, please."  If we just use `|value|`, the type of `value` will be `&mut i32` and we can actually mutate the head:
+El compilador se queja de que `value` es inmutable, pero claramente escribimos
+`&mut value`; ¿qué pasa? Resulta que escribir el argumento de la clausura de
+esa manera no especifica que `value` sea una referencia mutable. En su lugar,
+crea un patrón que se comparará con el argumento de la clausura;
+`|&mut value|` significa "el argumento es una referencia mutable, pero solo
+copia el valor al que apunta en `value`, por favor". Si solo usamos `|value|`,
+el tipo de `value` será `&mut i32` y podemos realmente mutar la cabeza:
 
 ```rust ,ignore
     #[test]
@@ -184,4 +195,4 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Much better!
+¡Mucho mejor!
