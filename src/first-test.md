@@ -1,16 +1,16 @@
-# Testing
+# Pruebas (Testing)
 
-Alright, so we've got `push` and `pop` written, now we can actually test out
-our stack! Rust and cargo support testing as a first-class feature, so this
-will be super easy. All we have to do is write a function, and annotate it with
-`#[test]`.
+Muy bien, tenemos `push` y `pop` escritos, ¡ahora podemos probar nuestra
+pila! Rust y cargo soportan pruebas como una característica de primera clase,
+así que será super fácil. Todo lo que tenemos que hacer es escribir una
+función, y anotarla con `#[test]`.
 
-Generally, we try to keep our tests next to the code that it's testing in the
-Rust community. However we usually make a new namespace for the tests, to
-avoid conflicting with the "real" code. Just as we used `mod` to specify that
-`first.rs` should be included in `lib.rs`, we can use `mod` to basically
-create a whole new file *inline*:
-
+Generalmente, tratamos de mantener nuestras pruebas cerca del código que están
+probando en la comunidad de Rust. Sin embargo, normalmente hacemos un nuevo
+espacio de nombres para las pruebas, para evitar conflictos con el código
+"real". Así como usamos `mod` para especificar que `first.rs` debería ser
+incluido en `lib.rs`, podemos usar `mod` para básicamente crear un archivo
+nuevo completo *en línea*:
 
 ```rust ,ignore
 // in first.rs
@@ -23,7 +23,7 @@ mod test {
 }
 ```
 
-And we invoke it with `cargo test`.
+Y lo invocamos con `cargo test`.
 
 ```text
 > cargo test
@@ -38,10 +38,11 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ; 0 filtered out
 ```
 
-Yay our do-nothing test passed! Let's make it not-do-nothing. We'll do that
-with the `assert_eq!` macro. This isn't some special testing magic. All it
-does is compare the two things you give it, and panic the program if they don't
-match. Yep, you indicate failure to the test harness by freaking out!
+¡Yupi, nuestra prueba que no hace nada pasó! Ahora hagamos que no sea una que
+no hace nada. Haremos eso con la macro `assert_eq!`. Esto no es magia especial
+de pruebas. Todo lo que hace es comparar las dos cosas que le das, y hacer
+que el programa entre en pánico si no coinciden. ¡Sí, le indicas fallo al
+sistema de pruebas volviéndote loco!
 
 ```rust ,ignore
 mod test {
@@ -88,8 +89,8 @@ error[E0433]: failed to resolve: use of undeclared type or module `List`
 
 ```
 
-Oops! Because we made a new module, we need to pull in List explicitly to use
-it.
+¡Ups! Como creamos un nuevo módulo, necesitamos importar List explícitamente
+para usarlo.
 
 ```rust ,ignore
 mod test {
@@ -119,14 +120,13 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ; 0 filtered out
 ```
 
-Yay!
+¡Yupi!
 
-What's up with that warning though...? We clearly use List in our test!
+¿Qué pasa con esa advertencia...? ¡Claramente usamos List en nuestra prueba!
 
-...but only when testing! To appease the compiler (and to be friendly to our
-consumers), we should indicate that the whole `test` module should only be
-compiled if we're running tests.
-
+...¡pero solo al probar! Para aplacar al compilador (y para ser amigables con
+nuestros consumidores), deberíamos indicar que todo el módulo `test` solo
+debería compilarse si estamos ejecutando pruebas.
 
 ```rust ,ignore
 #[cfg(test)]
@@ -136,4 +136,4 @@ mod test {
 }
 ```
 
-And that's everything for testing!
+¡Y eso es todo para las pruebas!
