@@ -1,9 +1,9 @@
-# Basics
+# Conceptos Básicos (Basics)
 
-We already know a lot of the basics of Rust now, so we can do a lot of the
-simple stuff again.
+Ya conocemos muchos de los conceptos básicos de Rust, así que podemos hacer
+muchas de las cosas simples otra vez.
 
-For the constructor, we can again just copy-paste:
+Para el constructor, podemos nuevamente copiar y pegar:
 
 ```rust ,ignore
 impl<T> List<T> {
@@ -13,25 +13,26 @@ impl<T> List<T> {
 }
 ```
 
-`push` and `pop` don't really make sense anymore. Instead we can provide
-`prepend` and `tail`, which provide approximately the same thing.
+`push` y `pop` ya no tienen mucho sentido. En su lugar podemos proporcionar
+`prepend` y `tail`, que proporcionan aproximadamente lo mismo.
 
-Let's start with prepending. It takes a list and an element, and returns a
-List. Like the mutable list case, we want to make a new node, that has the old
-list as its `next` value. The only novel thing is how to *get* that next value,
-because we're not allowed to mutate anything.
+Empecemos con prepend (anteponer). Toma una lista y un elemento, y devuelve
+una Lista. Como en el caso de la lista mutable, queremos hacer un nuevo nodo,
+que tenga la lista anterior como su valor `next`. Lo único novedoso es cómo
+*obtener* ese valor next, porque no se nos permite mutar nada.
 
-The answer to our prayers is the Clone trait. Clone is implemented by almost
-every type, and provides a generic way to get "another one like this one" that
-is logically disjoint, given only a shared reference. It's like a copy
-constructor in C++, but it's never implicitly invoked.
+La respuesta a nuestras oraciones es el trait Clone. Clone es implementado por
+casi todos los tipos, y proporciona una forma genérica de obtener "otro como
+este" que sea lógicamente disjunto, dado solo una referencia compartida. Es
+como un constructor de copia en C++, pero nunca se invoca implícitamente.
 
-Rc in particular uses Clone as the way to increment the reference count. So
-rather than moving a Box to be in the sublist, we just clone the head of the
-old list. We don't even need to match on the head, because Option exposes a
-Clone implementation that does exactly the thing we want.
+Rc en particular usa Clone como la forma de incrementar el contador de
+referencias. Así que en lugar de mover un Box para estar en la sublista,
+simplemente clonamos la cabeza de la lista anterior. Ni siquiera necesitamos
+hacer match en la cabeza, porque Option expone una implementación de Clone que
+hace exactamente lo que queremos.
 
-Alright, let's give it a shot:
+Muy bien, intentémoslo:
 
 ```rust ,ignore
 pub fn prepend(&self, elem: T) -> List<T> {
@@ -60,13 +61,13 @@ warning: field is never used: `next`
    |     ^^^^^^^^^^^^^
 ```
 
-Wow, Rust is really hard-nosed about actually using fields. It can tell no
-consumer can ever actually observe the use of these fields! Still, we seem good
-so far.
+Vaya, Rust es realmente estricto en cuanto a usar realmente los campos. ¡Puede
+decir que ningún consumidor puede realmente observar el uso de estos campos!
+Aún así, parece que vamos bien hasta ahora.
 
-`tail` is the logical inverse of this operation. It takes a list and returns the
-whole list with the first element removed. All that is is cloning the *second*
-element in the list (if it exists). Let's try this:
+`tail` es la inversa lógica de esta operación. Toma una lista y devuelve toda
+la lista con el primer elemento eliminado. Todo lo que es es clonar el
+*segundo* elemento en la lista (si existe). Probemos:
 
 ```rust ,ignore
 pub fn tail(&self) -> List<T> {
@@ -87,9 +88,9 @@ error[E0308]: mismatched types
               found type `std::option::Option<std::option::Option<std::rc::Rc<_>>>`
 ```
 
-Hrm, we messed up. `map` expects us to return a Y, but here we're returning an
-`Option<Y>`. Thankfully, this is another common Option pattern, and we can just
-use `and_then` to let us return an Option.
+Hrm, nos equivocamos. `map` espera que devolvamos una Y, pero aquí estamos
+devolviendo un `Option<Y>`. Afortunadamente, este es otro patrón común de
+Option, y podemos usar `and_then` para permitirnos devolver un Option.
 
 ```rust ,ignore
 pub fn tail(&self) -> List<T> {
@@ -102,10 +103,11 @@ pub fn tail(&self) -> List<T> {
 
 ```
 
-Great.
+Genial.
 
-Now that we have `tail`, we should probably provide `head`, which returns a
-reference to the first element. That's just `peek` from the mutable list:
+Ahora que tenemos `tail`, probablemente deberíamos proporcionar `head`, que
+devuelve una referencia al primer elemento. Eso es simplemente `peek` de la
+lista mutable:
 
 ```rust ,ignore
 pub fn head(&self) -> Option<&T> {
@@ -118,10 +120,9 @@ pub fn head(&self) -> Option<&T> {
 
 ```
 
-Nice.
+Bien.
 
-That's enough functionality that we can test it:
-
+Esa es suficiente funcionalidad para probarlo:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -169,9 +170,9 @@ test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Perfect!
+¡Perfecto!
 
-Iter is also identical to how it was for our mutable list:
+Iter también es idéntico a como era para nuestra lista mutable:
 
 ```rust ,ignore
 pub struct Iter<'a, T> {
@@ -227,9 +228,9 @@ test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Who ever said dynamic typing was easier?
+¿Quién dijo que la tipificación dinámica era más fácil?
 
-(chumps did)
+(los perdedores)
 
-Note that we can't implement IntoIter or IterMut for this type. We only have
-shared access to elements.
+Nótese que no podemos implementar IntoIter o IterMut para este tipo. Solo
+tenemos acceso compartido a los elementos.
