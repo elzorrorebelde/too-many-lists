@@ -1,14 +1,14 @@
-# Peeking
+# Ojeando (Peeking)
 
-Alright, we made it through `push` and `pop`. I'm not gonna lie, it got a
-bit emotional there. Compile-time correctness is a hell of a drug.
+Muy bien, sobrevivimos a `push` y `pop`. No voy a mentir, se puso un poco
+emocional allí. La corrección en tiempo de compilación es una droga poderosa.
 
-Let's cool off by doing something simple: let's just implement `peek_front`.
-That was always really easy before. Gotta still be easy, right?
+Relajémonos haciendo algo simple: implementemos `peek_front`. Eso siempre fue
+muy fácil antes. Tiene que seguir siendo fácil, ¿verdad?
 
-Right?
+¿Verdad?
 
-In fact, I think I can just copy-paste it!
+De hecho, ¡creo que puedo copiarlo y pegarlo!
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<&T> {
@@ -18,18 +18,18 @@ pub fn peek_front(&self) -> Option<&T> {
 }
 ```
 
-Wait. Not this time.
+Espera. Esta vez no.
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<&T> {
     self.head.as_ref().map(|node| {
-        // BORROW!!!!
+        // PRÉSTAMO (BORROW)!!!!
         &node.borrow().elem
     })
 }
 ```
 
-HAH.
+JA.
 
 ```text
 cargo build
@@ -45,55 +45,58 @@ error[E0515]: cannot return value referencing temporary value
    |             returns a value referencing data owned by the current function
 ```
 
-Ok I'm just burning my computer.
+Ok, solo estoy quemando mi computadora.
 
-This is exactly the same logic as our singly-linked stack. Why are things
-different. WHY.
+Esta es exactamente la misma lógica que nuestra pila enlazada individualmente.
+¿Por qué son diferentes las cosas? POR QUÉ.
 
-The answer is really the whole moral of this chapter: RefCells make everything
-sadness. Up until now, RefCells have just been a nuisance. Now they're going to
-become a nightmare.
+La respuesta es realmente toda la moraleja de este capítulo: RefCells hacen
+que todo sea tristeza. Hasta ahora, RefCells solo habían sido una molestia.
+Ahora se van a convertir en una pesadilla.
 
-So what's going on? To understand that, we need to go back to the definition of
-`borrow`:
+Entonces, ¿qué está pasando? Para entenderlo, necesitamos volver a la
+definición de `borrow`:
 
 ```rust ,ignore
 fn borrow<'a>(&'a self) -> Ref<'a, T>
 fn borrow_mut<'a>(&'a self) -> RefMut<'a, T>
 ```
 
-In the layout section we said:
+En la sección de diseño dijimos:
 
-> Rather than enforcing this statically, RefCell enforces them at runtime.
-> If you break the rules, RefCell will just panic and crash the program.
-> Why does it return these Ref and RefMut things? Well, they basically behave
-> like `Rc`s but for borrowing. Also they keep the RefCell borrowed until they go out
-> of scope. **We'll get to that later.**
+> En lugar de aplicarlo estáticamente, RefCell las aplica en tiempo de
+> ejecución. Si rompes las reglas, RefCell simplemente entrará en pánico y
+> bloqueará el programa. ¿Por qué devuelve estas cosas Ref y RefMut? Bueno,
+> básicamente se comportan como `Rc`s pero para préstamos (borrowing). También
+> mantienen el RefCell prestado hasta que salen del ámbito.
+> ***Llegaremos a eso más tarde.***
 
-It's later.
+Es más tarde.
 
-`Ref` and `RefMut` implement `Deref` and `DerefMut` respectively. So for most
-intents and purposes they behave *exactly* like `&T` and `&mut T`. However,
-because of how those traits work, the reference that's returned is connected
-to the lifetime of the Ref, and not the actual RefCell. This means that the Ref
-has to be sitting around as long as we keep the reference around.
+`Ref` y `RefMut` implementan `Deref` y `DerefMut` respectivamente. Así que
+para la mayoría de los propósitos se comportan *exactamente* como `&T` y
+`&mut T`. Sin embargo, debido a cómo funcionan esos traits, la referencia que
+se devuelve está conectada al tiempo de vida del Ref, y no al RefCell real.
+Esto significa que el Ref tiene que estar presente mientras mantengamos la
+referencia.
 
-This is in fact necessary for correctness. When a Ref gets dropped, it tells
-the RefCell that it's not borrowed anymore. So if we *did* manage to hold onto our
-reference longer than the Ref existed, we could get a RefMut while a reference
-was kicking around and totally break Rust's type system in half.
+Esto es de hecho necesario para la corrección. Cuando un Ref se suelta, le
+dice al RefCell que ya no está prestado. Así que si *lográramos* mantener
+nuestra referencia por más tiempo del que existió el Ref, podríamos obtener
+un RefMut mientras una referencia estuviera presente y romper totalmente el
+sistema de tipos de Rust por la mitad.
 
-So where does that leave us? We only want to return a reference, but we need
-to keep this Ref thing around. But as soon as we return the reference from
-`peek`, the function is over and the `Ref` goes out of scope.
+Entonces, ¿dónde nos deja eso? Solo queremos devolver una referencia, pero
+necesitamos mantener esta cosa Ref cerca. Pero tan pronto como devolvemos la
+referencia desde `peek`, la función termina y el `Ref` sale del ámbito.
 
 😖
 
-As far as I know, we're actually totally dead in the water here. You can't
-totally encapsulate the use of RefCells like that.
+Hasta donde sé, en realidad estamos totalmente muertos aquí. No puedes
+encapsular totalmente el uso de RefCells así.
 
-But... what if we just give up on totally hiding our implementation details?
-What if we returns Refs?
+Pero... ¿qué pasa si simplemente renunciamos a ocultar totalmente nuestros
+detalles de implementación? ¿Qué pasa si devolvemos Refs?
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<Ref<T>> {
@@ -119,7 +122,7 @@ help: possible candidates are found in other modules, you can import them into s
    |
 ```
 
-Blurp. Gotta import some stuff.
+Blurp. Tengo que importar algunas cosas.
 
 
 ```rust ,ignore
@@ -141,15 +144,15 @@ error[E0308]: mismatched types
               found type `std::option::Option<std::cell::Ref<'_, fourth::Node<T>>>`
 ```
 
-Hmm... that's right. We have a `Ref<Node<T>>`, but we want a `Ref<T>`. We could
-abandon all hope of encapsulation and just return that. We could also make
-things even more complicated and wrap `Ref<Node<T>>` in a new type to only
-expose access to an `&T`.
+Hmm... es cierto. Tenemos un `Ref<Node<T>>`, pero queremos un `Ref<T>`.
+Podríamos abandonar toda esperanza de encapsulación y simplemente devolver
+eso. También podríamos hacer las cosas aún más complicadas y envolver
+`Ref<Node<T>>` en un nuevo tipo para exponer solo acceso a un `&T`.
 
-Both of those options are *kinda* lame.
+Ambas opciones son *algo* malas.
 
-Instead, we're going to go deeper down. Let's
-have some *fun*. Our source of fun is *this beast*:
+En su lugar, vamos a ir más profundo. Divirtámonos un poco. Nuestra fuente
+de diversión es *esta bestia*:
 
 ```rust ,ignore
 map<U, F>(orig: Ref<'b, T>, f: F) -> Ref<'b, U>
@@ -159,13 +162,13 @@ map<U, F>(orig: Ref<'b, T>, f: F) -> Ref<'b, U>
 
 > Make a new Ref for a component of the borrowed data.
 
-Yes: just like you can map over an Option, you can map over a Ref.
+Sí: así como puedes mapear sobre un Option, puedes mapear sobre un Ref.
 
-I'm sure someone somewhere is really excited because *monads* or whatever but
-I don't care about any of that. Also I don't think it's a proper monad since
-there's no None-like case, but I digress.
+Estoy seguro de que en algún lugar alguien está realmente emocionado por
+*mónadas* o lo que sea, pero no me importa nada de eso. Tampoco creo que sea
+una mónada propiamente dicha ya que no hay un caso tipo None, pero divago.
 
-It's cool and that's all that matters to me. *I need this*.
+Es genial y eso es todo lo que me importa. *Necesito esto*.
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<Ref<T>> {
@@ -181,8 +184,9 @@ pub fn peek_front(&self) -> Option<Ref<T>> {
 
 Awww yissss
 
-Let's make sure this is working by munging up the test from our stack. We need
-to do some munging to deal with the fact that Refs don't implement comparisons.
+Asegurémonos de que esto funciona adaptando el test de nuestra pila.
+Necesitamos hacer algunos ajustes para lidiar con el hecho de que los Refs
+no implementan comparaciones.
 
 ```rust ,ignore
 #[test]
@@ -217,4 +221,4 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Great!
+¡Genial!

@@ -1,8 +1,8 @@
-# Symmetric Junk
+# Cosas Simétricas (Symmetric Junk)
 
-Alright let's get all that combinatoric symmetry over with.
+Muy bien, acabemos con toda esa simetría combinatoria de una vez.
 
-All we have to do is some basic text replacement:
+Todo lo que tenemos que hacer es un reemplazo de texto básico:
 
 ```text
 tail <-> head
@@ -10,7 +10,7 @@ next <-> prev
 front -> back
 ```
 
-Oh, also we need to add `_mut` variants for peeking.
+Oh, también necesitamos añadir variantes `_mut` para peek.
 
 ```rust ,ignore
 use std::cell::{Ref, RefCell, RefMut};
@@ -66,7 +66,7 @@ pub fn peek_front_mut(&mut self) -> Option<RefMut<T>> {
 }
 ```
 
-And massively flesh out our tests:
+Y ampliemos masivamente nuestras pruebas:
 
 
 ```rust ,ignore
@@ -142,8 +142,9 @@ fn peek() {
 }
 ```
 
-Are there some cases we're not testing? Probably. The combinatoric space
-has really blown up here. Our code is at very least not *obviously wrong*.
+¿Hay algunos casos que no estamos probando? Probablemente. El espacio
+combinatorio realmente ha explotado aquí. Nuestro código al menos no es
+*obviamente incorrecto*.
 
 ```text
 > cargo test
@@ -166,4 +167,4 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Nice. Copy-pasting is the best kind of programming.
+Bien. Copiar y pegar es el mejor tipo de programación.
