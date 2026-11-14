@@ -1,9 +1,9 @@
 # Pop
 
-Like `push`, `pop` wants to mutate the list. Unlike `push`, we actually
-want to return something. But `pop` also has to deal with a tricky corner
-case: what if the list is empty? To represent this case, we use the trusty
-`Option` type:
+Al igual que `push`, `pop` quiere mutar la lista. A diferencia de `push`,
+realmente queremos devolver algo. Pero `pop` también tiene que lidiar con un
+caso límite complicado: ¿qué pasa si la lista está vacía? Para representar
+este caso, usamos el confiable tipo `Option`:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -11,18 +11,19 @@ pub fn pop(&mut self) -> Option<i32> {
 }
 ```
 
-`Option<T>` is an enum that represents a value that may exist. It can either be
-`Some(T)` or `None`. We could make our own enum for this like we did for
-Link, but we want our users to be able to understand what the heck our return
-type is, and Option is so ubiquitous that *everyone* knows it. In fact, it's so
-fundamental that it's implicitly imported into scope in every file, as well
-as its variants `Some` and `None` (so we don't have to say `Option::None`).
+`Option<T>` es un enum que representa un valor que puede existir. Puede ser
+`Some(T)` o `None`. Podríamos crear nuestro propio enum para esto como hicimos
+con Link, pero queremos que nuestros usuarios puedan entender qué demonios es
+nuestro tipo de retorno, y Option es tan ubicuo que *todo el mundo* lo sabe.
+De hecho, es tan fundamental que se importa implícitamente en el ámbito de
+cada archivo, así como sus variantes `Some` y `None` (para que no tengamos que
+decir `Option::None`).
 
-The pointy bits on `Option<T>` indicate that Option is actually *generic* over
-T. That means that you can make an Option for *any* type!
+Los picos en `Option<T>` indican que Option es en realidad *genérico* sobre
+T. ¡Eso significa que puedes hacer un Option para *cualquier* tipo!
 
-So uh, we have this `Link` thing, how do we figure out if it's Empty or has
-More? Pattern matching with `match`!
+Así que eh, tenemos este `Link`, ¿cómo averiguamos si está Empty o tiene
+More? ¡Pattern matching con `match`!
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -52,11 +53,12 @@ error[E0308]: mismatched types
               found type `()`
 ```
 
-Whoops, `pop` has to return a value, and we're not doing that yet. We *could*
-return `None`, but in this case it's probably a better idea to return
-`unimplemented!()`, to indicate that we aren't done implementing the function.
-`unimplemented!()` is a macro (`!` indicates a macro) that panics the program
-when we get to it (\~crashes it in a controlled manner).
+Ups, `pop` tiene que devolver un valor, y todavía no lo estamos haciendo.
+Podríamos devolver `None`, pero en este caso probablemente es mejor devolver
+`unimplemented!()`, para indicar que no hemos terminado de implementar la
+función. `unimplemented!()` es una macro (`!` indica una macro) que entra en
+pánico (panic) en el programa cuando llegamos a ella (~lo bloquea de forma
+controlada).
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -72,15 +74,16 @@ pub fn pop(&mut self) -> Option<i32> {
 }
 ```
 
-Unconditional panics are an example of a [diverging function][diverging].
-Diverging functions never return to the caller, so they may be used in places
-where a value of any type is expected. Here, `unimplemented!()` is being
-used in place of a value of type `Option<T>`.
+Los pánicos incondicionales son un ejemplo de una [función divergente][diverging].
+Las funciones divergentes nunca retornan a quien las llamó, por lo que pueden
+usarse en lugares donde se espera un valor de cualquier tipo. Aquí,
+`unimplemented!()` se está usando en lugar de un valor de tipo `Option<T>`.
 
-Note also that we don't need to write `return` in our program. The last
-expression (basically line) in a function is implicitly its return value. This
-lets us express really simple things a bit more concisely. You can always
-explicitly return early with `return` like any other C-like language.
+Nótese también que no necesitamos escribir `return` en nuestro programa. La
+última expresión (básicamente línea) en una función es implícitamente su
+valor de retorno. Esto nos permite expresar cosas realmente simples de forma
+más concisa. Siempre puedes retornar explícitamente con `return` como en
+cualquier otro lenguaje tipo C.
 
 ```text
 > cargo build
@@ -104,16 +107,17 @@ note: move occurs because `node` has type `std::boxed::Box<first::Node>`, which 
    |                        ^^^^
 ```
 
-Come on Rust, get off our back! As always, Rust is hella mad at us. Thankfully,
-this time it's also giving us the full scoop! By default, a pattern match will
-try to move its contents into the new branch, but we can't do this because we
-don't own self by-value here.
+¡Vamos Rust, déjanos en paz! Como siempre, Rust está super enfadado con
+nosotros. Afortunadamente, esta vez también nos está dando la información
+completa. Por defecto, un pattern match intentará mover sus contenidos a la
+nueva rama, pero no podemos hacer esto porque no poseemos self por valor aquí.
 
 ```text
 help: consider borrowing here: `&self.head`
 ```
 
-Rust says we should add a reference to our `match` to fix that. 🤷‍♀️ Let's try it:
+Rust dice que deberíamos añadir una referencia a nuestro `match` para
+arreglarlo. 🤷‍♀️ Probemos:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -155,10 +159,10 @@ warning: field is never used: `next`
    |     ^^^^^^^^^^
 ```
 
-Hooray, compiling again! Now let's figure out that logic. We want to make an
-Option, so let's make a variable for that. In the Empty case we need to return
-None. In the More case we need to return `Some(i32)`, and change the head of
-the list. So, let's try to do basically that?
+Hurra, ¡compila otra vez! Ahora resolvamos esa lógica. Queremos hacer un
+Option, así que creemos una variable para eso. En el caso Empty necesitamos
+devolver None. En el caso More necesitamos devolver `Some(i32)`, y cambiar la
+cabeza de la lista. Así que, ¿intentemos hacer básicamente eso?
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -187,31 +191,31 @@ error[E0507]: cannot move out of borrowed content
 
 ```
 
-*head*
+*cabeza*
 
-*desk*
+*escritorio*
 
-We're trying to move out of `node` when all we have is a shared reference to it.
+Estamos intentando mover algo de `node` cuando todo lo que tenemos es una
+referencia compartida a él.
 
-We should probably step back and think about what we're trying to do. We want
-to:
+Deberíamos dar un paso atrás y pensar qué estamos intentando hacer. Queremos:
 
-* Check if the list is empty.
-* If it's empty, just return None
-* If it's *not* empty
-    * remove the head of the list
-    * remove its `elem`
-    * replace the list's head with its `next`
-    * return `Some(elem)`
+* Comprobar si la lista está vacía.
+* Si está vacía, simplemente devolver None.
+* Si *no* está vacía
+    * eliminar la cabeza de la lista
+    * eliminar su `elem`
+    * reemplazar la cabeza de la lista con su `next`
+    * devolver `Some(elem)`
 
-The key insight is we want to *remove* things, which means we want to get the
-head of the list *by value*. We certainly can't do that through the shared
-reference we get through `&self.head`. We also "only" have a mutable reference
-to `self`, so the only way we can move stuff is to *replace it*. Looks like we're doing
-the Empty dance again!
+La idea clave es que queremos *eliminar* cosas, lo que significa que queremos
+obtener la cabeza de la lista *por valor*. Ciertamente no podemos hacerlo a
+través de la referencia compartida que obtenemos con `&self.head`. También
+"solo" tenemos una referencia mutable a `self`, así que la única forma de
+mover cosas es *reemplazarlas*. ¡Parece que estamos haciendo el baile de Empty
+otra vez!
 
-Let's try that:
-
+Probemos:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -237,17 +241,17 @@ cargo build
 
 O M G
 
-It compiled without *any* warnings!!!!!
+¡Compiló sin *ninguna* advertencia!
 
-Actually I'm going to apply my own personal lint here: we made this `result`
-value to return, but actually we didn't need to do that at all! Just as a
-function evaluates to its last expression, every block also evaluates to
-its last expression. Normally we supress this behaviour with semi-colons,
-which instead makes the block evaluate to the empty tuple, `()`. This is
-actually the value that functions which don't declare a return value -- like
-`push` -- return.
+En realidad, voy a aplicar mi propia regla aquí: creamos este valor `result`
+para devolverlo, pero en realidad no necesitábamos hacer eso en absoluto.
+Así como una función se evalúa a su última expresión, cada bloque también se
+evalúa a su última expresión. Normalmente suprimimos este comportamiento con
+punto y coma, que en su lugar hace que el bloque se evalúe a la tupla vacía,
+`()`. Este es en realidad el valor que devuelven las funciones que no declaran
+un valor de retorno — como `push`.
 
-So instead, we can write `pop` as:
+Así que, en su lugar, podemos escribir `pop` como:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -261,9 +265,9 @@ pub fn pop(&mut self) -> Option<i32> {
 }
 ```
 
-Which is a bit more concise and idiomatic. Note that the Link::Empty branch
-completely lost its braces, because we only have one expression to
-evaluate. Just a nice shorthand for simple cases.
+Que es un poco más conciso e idiomático. Nótese que la rama Link::Empty ha
+perdido completamente sus llaves, porque solo tenemos una expresión que
+evaluar. Solo una abreviatura útil para casos simples.
 
 ```text
 cargo build
@@ -271,8 +275,7 @@ cargo build
    Finished dev [unoptimized + debuginfo] target(s) in 0.22s
 ```
 
-Nice, still works!
-
+Bien, ¡sigue funcionando!
 
 
 [ownership]: first-ownership.html
