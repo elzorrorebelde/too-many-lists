@@ -1,6 +1,6 @@
-# The Final Code
+# El Código Final
 
-Alright, 6000 words later, here's all the code we managed to actually write:
+Muy bien, 6000 palabras después, aquí está todo el código que logramos escribir:
 
 ```rust
 use std::mem;
@@ -89,5 +89,5 @@ mod test {
 }
 ```
 
-Geez. 80 lines, and half of it was tests! Well, I did say this first one was
-going to take a while!
+Caramba. ¡80 líneas, y la mitad eran pruebas! Bueno, ya dije que esta primera
+iba a tomar un tiempo.
