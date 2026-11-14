@@ -1,14 +1,16 @@
-# A Bad but Safe Doubly-Linked Deque
+# Una Doble Cola Mala Pero Segura Doblemente Enlazada
 
-Now that we've seen Rc and heard about interior mutability, this gives an
-interesting thought... maybe we *can* mutate through an Rc. And if *that's*
-the case, maybe we can implement a *doubly-linked* list totally safely!
+Ahora que hemos visto Rc y oído hablar de la mutabilidad interior, esto
+plantea un pensamiento interesante... quizás *podemos* mutar a través de un
+Rc. Y si ese *es* el caso, quizás podamos implementar una lista
+*doblemente* enlazada totalmente segura.
 
-In the process we'll become familiar with *interior mutability*, and probably
-learn the hard way that safe doesn't mean *correct*. Doubly-linked lists are
-hard, and I always make a mistake somewhere.
+En el proceso nos familiarizaremos con la *mutabilidad interior (interior
+mutability)*, y probablemente aprenderemos por las malas que seguro no
+significa *correcto*. Las listas doblemente enlazadas son difíciles, y siempre
+cometo un error en alguna parte.
 
-Let's add a new file called `fourth.rs`:
+Añadamos un nuevo archivo llamado `fourth.rs`:
 
 ```rust ,ignore
 // in lib.rs
@@ -19,7 +21,8 @@ pub mod third;
 pub mod fourth;
 ```
 
-This will be another clean-room operation, though as usual we'll probably find
-some logic that applies verbatim again.
+Esta será otra operación en sala limpia, aunque como de costumbre
+probablemente encontraremos alguna lógica que se aplica textualmente otra vez.
 
-Disclaimer: this chapter is basically a demonstration that this is a very bad idea.
+Descargo de responsabilidad: este capítulo es básicamente una demostración de
+que esta es una muy mala idea.

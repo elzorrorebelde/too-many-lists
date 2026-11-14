@@ -1,32 +1,34 @@
-# Layout
+# Diseño (Layout)
 
-The key to our design is the `RefCell` type. The heart of
-RefCell is a pair of methods:
+La clave de nuestro diseño es el tipo `RefCell`. El corazón de
+RefCell es un par de métodos:
 
 ```rust ,ignore
 fn borrow(&self) -> Ref<'_, T>;
 fn borrow_mut(&self) -> RefMut<'_, T>;
 ```
 
-The rules for `borrow` and `borrow_mut` are exactly those of `&` and `&mut`:
-you can call `borrow` as many times as you want, but `borrow_mut` requires
-exclusivity.
+Las reglas para `borrow` y `borrow_mut` son exactamente las de `&` y `&mut`:
+puedes llamar a `borrow` tantas veces como quieras, pero `borrow_mut` requiere
+exclusividad.
 
-Rather than enforcing this statically, RefCell enforces them at runtime.
-If you break the rules, RefCell will just panic and crash the program.
-Why does it return these Ref and RefMut things? Well, they basically behave
-like `Rc`s but for borrowing. They also keep the RefCell borrowed until they go out
-of scope. We'll get to that later.
+En lugar de aplicarlo estáticamente, RefCell las aplica en tiempo de
+ejecución. Si rompes las reglas, RefCell simplemente entrará en pánico y
+bloqueará el programa. ¿Por qué devuelve estas cosas Ref y RefMut? Bueno,
+básicamente se comportan como `Rc`s pero para préstamos (borrowing). También
+mantienen el RefCell prestado hasta que salen del ámbito. Llegaremos a eso
+más tarde.
 
-Now with Rc and RefCell we can become... an incredibly verbose pervasively
-mutable garbage collected language that can't collect cycles! Y-yaaaaay...
+Ahora con Rc y RefCell podemos convertirnos en... un lenguaje increíblemente
+verboso, pervasiveamente mutable, con recolector de basura, que no puede
+recolectar ciclos. ¡V-viva...
 
-Alright, we want to be *doubly-linked*. This means each node has a pointer to
-the previous and next node. Also, the list itself has a pointer to the
-first and last node. This gives us fast insertion and removal on *both*
-ends of the list.
+Muy bien, queremos ser *doblemente enlazados*. Esto significa que cada nodo
+tiene un puntero al nodo anterior y al siguiente. Además, la lista misma tiene
+un puntero al primer y último nodo. Esto nos da inserción y eliminación rápida
+en *ambos* extremos de la lista.
 
-So we probably want something like:
+Así que probablemente queremos algo como:
 
 ```rust ,ignore
 use std::rc::Rc;
@@ -82,4 +84,5 @@ warning: field is never used: `prev`
    |     ^^^^^^^^^^^^^
 ```
 
-Hey, it built! Lots of dead code warnings, but it built! Let's try to use it.
+Oye, ¡compiló! ¡Muchas advertencias de código muerto, pero compiló!
+Intentemos usarlo.
