@@ -1,17 +1,17 @@
-# A Bunch of Silly Lists
+# Un Montón de Listas Tontas
 
-Alright. That's it. We made all the lists.
+Muy bien. Eso es todo. Hicimos todas las listas.
 
-ahahahaha
+ajajajaja
 
 No
 
-There's always more lists.
+Siempre hay más listas.
 
-This chapter is a living document of the more ridiculous linked lists and how
-they interact with Rust.
+Este capítulo es un documento vivo de las listas enlazadas más ridículas y
+cómo interactúan con Rust.
 
-1. [The Double Single](infinity-double-single.md)
-2. [The Stack Allocated List](infinity-stack-allocated.md)
-3. The Self-Referential Arena List?
-4. The GhostCell List?
+1. [El Doble Single](infinity-double-single.md)
+2. [La Lista Asignada en la Pila](infinity-stack-allocated.md)
+3. ¿La Lista de Arena Autoreferencial?
+4. ¿La Lista GhostCell?

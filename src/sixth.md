@@ -1,61 +1,89 @@
-# A Production-Quality Unsafe Doubly-Linked Deque
+# Una Doble Cola Insegura de Producción Doblemente Enlazada
 
-We finally made it. My greatests nemesis: **[std::collections::LinkedList][linked-list], the Doubly-Linked Deque**. 
+Finalmente lo logramos. Mi gran némesis: **[std::collections::LinkedList][linked-list], la Doble Cola Doblemente Enlazada**.
 
-The one that I tried and failed to destroy.
+La que intenté destruir y fallé.
 
-Our story begins as 2014 was coming to a close and we were rapidly approaching the release of Rust 1.0, Rust's first stable release. I had found myself in the role of caring for `std::collections`, or as we affectionately called it in those times, libcollections.
+Nuestra historia comienza cuando 2014 llegaba a su fin y nos acercábamos
+rápidamente al lanzamiento de Rust 1.0, la primera versión estable de Rust.
+Me había encontrado en el rol de cuidar de `std::collections`, o como lo
+llamábamos cariñosamente en esos tiempos, libcollections.
 
-libcollections had spent years as a dumping ground for everyone's Cute Ideas and Vaguely Useful Things. This was all well and good when Rust was a fledgling experimental language, but if my children were going to escape the nest and be stabilized, they would have to prove their worth.
+libcollections había pasado años como vertedero para las Ideas Lindas y Cosas
+Vagamente Útiles de todos. Esto estaba bien cuando Rust era un lenguaje
+experimental incipiente, pero si mis hijos iban a escapar del nido y ser
+estabilizados, tendrían que demostrar su valía.
 
-Until then I had encouraged and nurtured them all, but it was now time for them to face judgement for their failings.
+Hasta entonces los había alentado y nutrido a todos, pero ahora era hora de
+que enfrentaran el juicio por sus fallos.
 
-I sunk my claws into the bedrock and carved tombstones for my most foolish children. A grisly monument that I placed in the town square for all to see:
+Hundí mis garras en la roca base y tallé lápidas para mis hijos más tontos.
+Un monumento macabro que coloqué en la plaza del pueblo para que todos lo
+vieran:
 
 **[Kill TreeMap, TreeSet, TrieMap, TrieSet, LruCache and EnumSet](https://github.com/rust-lang/rust/pull/19955)**
 
-Their fates were sealed, for my word was absolute. The other collections were horrified by my brutality, but they were not yet safe from their mother's wrath. I soon returned with two more tombstones:
+Sus destinos estaban sellados, porque mi palabra era absoluta. Las otras
+colecciones estaban horrorizadas por mi brutalidad, pero aún no estaban a
+salvo de la ira de su madre. Pronto regresé con dos lápidas más:
 
 **[Deprecate BitSet and BitVec](https://github.com/rust-lang/rust/pull/26034)**
 
-The Bit twins were more cunning than their fallen comrades, but they lacked the strength to escape me. Most thought my work done, but I soon took one more: 
+Los gemelos Bit eran más astutos que sus camaradas caídos, pero les faltaba
+la fuerza para escaparme. La mayoría pensó que mi trabajo había terminado,
+pero pronto tomé una más:
 
 **[Deprecate VecMap](https://github.com/rust-lang/rust/pull/26734)**
 
-VecMap had tried to survive through stealth &mdash; it was so small and inoffensive! But that wasn't enough for the libcollections I saw in my vision of the future.
+VecMap había intentado sobrevivir mediante el sigilo &mdash; ¡era tan pequeño
+e inofensivo! Pero eso no era suficiente para el libcollections que veía en mi
+visión del futuro.
 
-I surveyed the land and saw what remained:
+Inspeccioné la tierra y vi lo que quedaba:
 
-* Vec and VecDeque - hearty and simple, the heart of computing.
-* HashMap and HashSet - powerful and wise, the brain of computing.
-* BTreeMap and BTreeSet - awkward but necessary, the liver of computing.
-* BinaryHeap - crafty and dextrous, the ankle of computing.
+* Vec y VecDeque — robustos y simples, el corazón de la computación.
+* HashMap y HashSet — poderosos y sabios, el cerebro de la computación.
+* BTreeMap y BTreeSet — torpes pero necesarios, el hígado de la computación.
+* BinaryHeap — astuto y diestro, el tobillo de la computación.
 
-I nodded in contentment. Simple and effective. My work was don&mdash;
+Asentí con satisfacción. Simple y efectivo. Mi trabajo estaba hech&mdash;
 
-No, [DList](https://github.com/rust-lang/rust/blob/0a84308ebaaafb8fd89b2fd7c235198e3ec21384/src/libcollections/dlist.rs), it can't be! I thought you died in that tragic garbage collection incident! The one which was definitely an accident and not intentional at all!
+No, ¡[DList](https://github.com/rust-lang/rust/blob/0a84308ebaaafb8fd89b2fd7c235198e3ec21384/src/libcollections/dlist.rs), no puede ser! ¡Pensé que habías muerto en ese trágico incidente de recolección de basura! ¡Ese que definitivamente fue un accidente y no intencional en absoluto!
 
-They had faked their death and taken on a new name, but it was still them: LinkedList, the shadowy and untrustworthy schemer of computing. 
+Habían fingido su muerte y adoptado un nuevo nombre, pero seguían siendo ellos: LinkedList, el maquinador sombrío y poco confiable de la computación.
 
-I spread word of their misdeeds to all that would hear me, but hearts were unmoved. LinkedList was a silver-tongued devil who had convinced everyone around me that it was some sort of fundamental and natural datastructure of computing. It had even convinced C++ that it was [*the* list](https://en.cppreference.com/w/cpp/container/list)!
+Difundí la palabra de sus fechorías a todos los que me escucharan, pero los
+corazones no se conmovieron. LinkedList era un diablo de lengua plateada que
+había convencido a todos a mi alrededor de que era una especie de estructura
+de datos fundamental y natural de la computación. ¡Incluso había convencido a
+C++ de que era [*la* lista](https://en.cppreference.com/w/cpp/container/list)!
 
-"How could you have a standard library without a *LinkedList*?"
+"¿Cómo podrías tener una biblioteca estándar sin un *LinkedList*?"
 
-Easily! Trivially!
+¡Fácilmente! ¡Triamente!
 
-"It's non-trivial unsafe code, so it makes sense to have it in the standard library!"
+"¡Es código inseguro no trivial, así que tiene sentido tenerlo en la biblioteca estándar!"
 
-So are GPU drivers and video codecs, libcollections is minimalist!
+¡También lo son los controladores de GPU y los códecs de video, y libcollections es minimalista!
 
-But alas, LinkedList had gathered too many allies and grown too strong while I was distracted with its kin.
+Pero lamentablemente, LinkedList había reunido demasiados aliados y se había
+vuelto demasiado fuerte mientras yo estaba distraído con sus parientes.
 
-I fled to my laboratory and tried to devise some sort of [evil clone](https://github.com/contain-rs/linked-list) or [enhanced cyborg replicant](https://github.com/contain-rs/blist) that could rival and destroy it, but my grant funding ran out because my research was "too murderously evil" or somesuch nonsense.
+Huí a mi laboratorio e intenté idear algún tipo de [clon maligno](https://github.com/contain-rs/linked-list) o [replicante cyborg mejorado](https://github.com/contain-rs/blist) que pudiera rivalizar y destruirlo, pero mi financiación se agotó porque mi investigación era "demasiado asesinamente malvada" o alguna tontería similar.
 
-LinkedList had won. I was defeated and forced into exile.
+LinkedList había ganado. Fui derrotado y forzado al exilio.
 
-But you're here now. You've come this far. Surely now you can understand the depths of LinkedList's debauchery! Come, I will you show you everything you need to know to help me destroy it once and for all &mdash; everything you need to know to implement an unsafe production-quality Doubly-Linked Deque.
+Pero estás aquí ahora. Has llegado hasta aquí. Seguramente ahora puedes
+entender las profundidades de la depravación de LinkedList. Ven, te mostraré
+todo lo que necesitas saber para ayudarme a destruirlo de una vez por todas
+&mdash; todo lo que necesitas saber para implementar una Doble Cola Doblemente
+Enlazada insegura de calidad de producción.
 
-How production-quality? Well we're going to completely rewrite my ancient Rust 1.0 linked-list crate, the one that is objectively better than the one in std. The one with Cursors on stable Rust, from 2015! Something the 2022 stdlib still doesn't have!
+¿Qué tan calidad de producción? Bueno, vamos a reescribir completamente mi
+antiguo crate de lista enlazada de Rust 1.0, el que es objetivamente mejor que
+el de std. ¡El que tiene Cursores en Rust estable, desde 2015! ¡Algo que la
+stdlib de 2022 todavía no tiene!
+
 
 
 
