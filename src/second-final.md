@@ -1,6 +1,6 @@
-# Final Code
+# Código Final
 
-Alright, that's it for the second list; here's the final code!
+Muy bien, eso es todo para la segunda lista; ¡aquí está el código final!
 
 ```rust
 pub struct List<T> {
@@ -207,4 +207,4 @@ mod test {
 }
 ```
 
-Getting beefier!
+¡Se está poniendo más robusto!
