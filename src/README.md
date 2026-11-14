@@ -1,309 +1,324 @@
-# Learn Rust With Entirely Too Many Linked Lists
+# Aprendiendo Rust Con Demasiadas Listas Enlazadas
 
-> Got any issues or want to check out all the final code at once?
-> [Everything's on Github!][github]
+> ¿Tienes algún problema o quieres ver todo el código final de una vez?
+> [¡Todo está en Github!][github]
 
-> **NOTE**: The current edition of this book is written against Rust 2018,
-> which was first released with rustc 1.31 (Dec 8, 2018). If your rust toolchain
-> is new enough, the Cargo.toml file that `cargo new` creates should contain the
-> line `edition = "2018"` (or if you're reading this in the far future, perhaps
-> some even larger number!). Using an older toolchain is possible, but unlocks
-> a secret **hardmode**, where you get extra compiler errors that go completely
-> unmentioned in the text of this book. Wow, sounds like fun!
+> **NOTA**: La edición actual de este libro está escrita para Rust 2018,
+> que se lanzó por primera vez con rustc 1.31 (8 de diciembre de 2018). Si tu
+> cadena de herramientas de Rust es suficientemente nueva, el archivo
+> `Cargo.toml` que `cargo new` crea debería contener la línea
+> `edition = "2018"` (o si estás leyendo esto en un futuro lejano, ¡quizás
+> un número aún mayor!). Usar una cadena de herramientas más antigua es posible,
+> pero desbloquea un **modo difícil** secreto, donde obtendrás errores extra del
+> compilador que no se mencionan en el texto de este libro. ¡Vaya, suena divertido!
 
-I fairly frequently get asked how to implement a linked list in Rust. The
-answer honestly depends on what your requirements are, and it's obviously not
-super easy to answer the question on the spot. As such I've decided to write
-this book to comprehensively answer the question once and for all.
+Con bastante frecuencia me preguntan cómo implementar una lista enlazada en Rust.
+La respuesta honestamente depende de cuáles sean tus requisitos, y obviamente no
+es muy fácil responder la pregunta en el momento. Por eso he decidido escribir
+este libro para responder la pregunta de forma exhaustiva de una vez por todas.
 
-In this series I will teach you basic and advanced Rust programming
-entirely by having you implement 6 linked lists. In doing so, you should
-learn:
+En esta serie te enseñaré programación básica y avanzada de Rust
+íntegramente haciéndote implementar 6 listas enlazadas. Al hacerlo, deberías
+aprender:
 
-* The following pointer types: `&`, `&mut`, `Box`, `Rc`, `Arc`, `*const`, `*mut`, `NonNull`(?)
-* Ownership, borrowing, inherited mutability, interior mutability, Copy
-* All The Keywords: struct, enum, fn, pub, impl, use, ...
-* Pattern matching, generics, destructors
-* Testing, installing new toolchains, using `miri`
-* Unsafe Rust: raw pointers, aliasing, stacked borrows, UnsafeCell, variance
+* Los siguientes tipos de punteros: `&`, `&mut`, `Box`, `Rc`, `Arc`, `*const`, `*mut`, `NonNull`(?)
+* Propiedad (ownership), préstamo (borrowing), mutabilidad heredada, mutabilidad interior, `Copy`
+* Todas las palabras clave: struct, enum, fn, pub, impl, use, ...
+* Pattern matching, genéricos, destructores
+* Pruebas, instalación de nuevas cadenas de herramientas, uso de `miri`
+* Rust inseguro: punteros crudos, aliasing, stacked borrows, `UnsafeCell`, varianza
 
-Yes, linked lists are so truly awful that you deal with all of these concepts in
-making them real.
+Sí, las listas enlazadas son tan verdaderamente horribles que terminas lidiando
+con todos estos conceptos al hacerlas reales.
 
-Everything's in the sidebar (may be collapsed on mobile), but for quick
-reference, here's what we're going to be making:
+Todo está en la barra lateral (puede estar colapsada en móvil), pero para
+referencia rápida, aquí está lo que vamos a hacer:
 
-1. [A Bad Singly-Linked Stack](first.md)
-2. [An Ok Singly-Linked Stack](second.md)
-3. [A Persistent Singly-Linked Stack](third.md)
-4. [A Bad But Safe Doubly-Linked Deque](fourth.md)
-5. [An Ok Unsafe Singly-Linked Queue](fifth.md)
-6. [A Production Unsafe Doubly-Linked Deque](sixth.md)
-7. [Bonus: A Bunch of Silly Lists](infinity.md)
+1. [Una Pila Mala Enlazada Individualmente](first.md)
+2. [Una Pila Aceptable Enlazada Individualmente](second.md)
+3. [Una Pila Persistente Enlazada Individualmente](third.md)
+4. [Una Doble Cola Mala Pero Segura Doblemente Enlazada](fourth.md)
+5. [Una Cola Aceptable Insegura Enlazada Individualmente](fifth.md)
+6. [Una Doble Cola Insegura de Producción Doblemente Enlazada](sixth.md)
+7. [Bonus: Un Montón de Listas Tontas](infinity.md)
 
-Just so we're all on the same page, I'll be writing out all the commands that I
-feed into my terminal. I'll also be using Rust's standard package manager, Cargo,
-to develop the project. Cargo isn't necessary to write a Rust program, but it's
-*so much* better than using rustc directly. If you just want to futz around you
-can also run some simple programs in the browser via [play.rust-lang.org][play].
+Solo para que estemos todos en la misma página, escribiré todos los comandos
+que introduzco en mi terminal. También usaré el gestor de paquetes estándar de Rust,
+Cargo, para desarrollar el proyecto. Cargo no es necesario para escribir un
+programa en Rust, pero es *mucho* mejor que usar rustc directamente. Si solo
+quieres jugar un poco también puedes ejecutar algunos programas simples en el
+navegador mediante [play.rust-lang.org][play].
 
-In later sections, we'll be using "rustup" to install extra Rust tooling.
-I strongly recommend [installing all of your Rust toolchains using rustup](https://www.rust-lang.org/tools/install).
+En secciones posteriores, usaremos "rustup" para instalar herramientas
+adicionales de Rust. Recomiendo encarecidamente
+[instalar todas tus cadenas de herramientas de Rust usando rustup](https://www.rust-lang.org/tools/install).
 
-Let's get started and make our project:
+Empecemos y creemos nuestro proyecto:
 
 ```text
 > cargo new --lib lists
 > cd lists
 ```
 
-We'll put each list in a separate file so that we don't lose any of our work.
+Pondremos cada lista en un archivo separado para no perder nada de nuestro trabajo.
 
-It should be noted that the *authentic* Rust learning experience involves
-writing code, having the compiler scream at you, and trying to figure out
-what the heck that means. I will be carefully ensuring that this occurs as
-frequently as possible. Learning to read and understand Rust's generally
-excellent compiler errors and documentation is *incredibly* important to
-being a productive Rust programmer.
+Cabe señalar que la experiencia *auténtica* de aprender Rust implica
+escribir código, que el compilador te grite, e intentar averiguar
+qué demonios significa eso. Me aseguraré cuidadosamente de que esto ocurra
+con la mayor frecuencia posible. Aprender a leer y entender los errores
+generalmente excelentes del compilador de Rust y su documentación es
+*increíblemente* importante para ser un programador productivo de Rust.
 
-Although actually that's a lie. In writing this I encountered *way* more
-compiler errors than I show. In particular, in the later chapters I won't be
-showing a lot of the random "I typed (copy-pasted) bad" errors that you
-expect to encounter in every language. This is a *guided tour* of having the
-compiler scream at us.
+Aunque en realidad eso es mentira. Mientras escribía esto encontré *muchos*
+más errores del compilador de los que muestro. En particular, en los capítulos
+posteriores no mostraré muchos de los errores aleatorios de "escribí mal
+(copié y pegué)" que esperas encontrar en cualquier lenguaje. Esto es un *tour
+guiado* de tener al compilador gritándonos.
 
-We're going to be going pretty slow, and I'm honestly not going to be very
-serious pretty much the entire time. I think programming should be fun, dang it!
-If you're the type of person who wants maximally information-dense, serious, and
-formal content, this book is not for you. Nothing I will ever make is for you.
-You are wrong.
+Iremos bastante lento, y honestamente no seré muy serio prácticamente todo
+el tiempo. ¡Creo que programar debería ser divertido, caramba!
+Si eres del tipo de persona que quiere contenido máximamente denso en
+información, serio y formal, este libro no es para ti. Nada de lo que
+haga será jamás para ti. Estás equivocado.
 
 
 
 
-# An Obligatory Public Service Announcement
+# Un Anuncio de Servicio Público Obligatorio
 
-Just so we're totally 100% clear: I hate linked lists. With
-a passion. Linked lists are terrible data structures. Now of course there's
-several great use cases for a linked list:
+Solo para que estemos total y absolutamente claros: odio las listas enlazadas. Con
+pasión. Las listas enlazadas son estructuras de datos terribles. Ahora bien, por
+supuesto hay varios casos de uso excelentes para una lista enlazada:
 
-* You want to do *a lot* of splitting or merging of big lists. *A lot*.
-* You're doing some awesome lock-free concurrent thing.
-* You're writing a kernel/embedded thing and want to use an intrusive list.
-* You're using a pure functional language and the limited semantics and absence
-  of mutation makes linked lists easier to work with.
-* ... and more!
+* Quieres hacer *mucho*分割 o fusión de listas grandes. *Mucho*.
+* Estás haciendo algo genial de concurrencia sin bloqueos (lock-free).
+* Estás escribiendo un núcleo/sistema embebido y quieres usar una lista intrusiva.
+* Estás usando un lenguaje puramente funcional y la semántica limitada y la
+  ausencia de mutación hacen que las listas enlazadas sean más fáciles de usar.
+* ... ¡y más!
 
-But all of these cases are *super rare* for anyone writing a Rust program. 99%
-of the time you should just use a Vec (array stack), and 99% of the other 1%
-of the time you should be using a VecDeque (array deque). These are blatantly
-superior data structures for most workloads due to less frequent allocation,
-lower memory overhead, true random access, and cache locality.
+Pero todos estos casos son *super raros* para cualquiera que escriba un programa
+en Rust. El 99% del tiempo deberías usar un `Vec` (array/pila), y el 99% del
+otro 1% del tiempo deberías usar un `VecDeque` (array/deque). Estas son
+estructuras de datos abiertamente superiores para la mayoría de las cargas de
+trabajo debido a una asignación de memoria menos frecuente, menor sobrecarga de
+memoria, acceso aleatorio real y localidad de caché.
 
-Linked lists are as *niche* and *vague* of a data structure as a trie. Few would
-balk at me claiming a trie is a niche structure that your average programmer
-could happily never learn in an entire productive career -- and yet linked lists
-have some bizarre celebrity status. We teach every undergrad how to write a
-linked list. It's the only niche collection
-[I couldn't kill from std::collections][rust-std-list]. It's
-[*the* list in C++][cpp-std-list]!
+Las listas enlazadas son una estructura de datos tan *especializada* y *vaga*
+como un trie. Pocos se sorprenderían si afirmara que un trie es una estructura
+especializada que un programador promedio podría felizmente nunca aprender en
+toda una carrera productiva — y sin embargo las listas enlazadas tienen un
+extraño estatus de celebridad. Enseñamos a cada estudiante a escribir una lista
+enlazada. Es la única colección especializada
+[que no pude eliminar de std::collections][rust-std-list]. Es
+[*la* lista en C++][cpp-std-list]!
 
-We should all as a community say *no* to linked lists as a "standard" data
-structure. It's a fine data structure with several great use cases, but those
-use cases are *exceptional*, not common.
+Deberíamos todos como comunidad decir *no* a las listas enlazadas como una
+estructura de datos "estándar". Es una estructura de datos fine con varios
+casos de uso excelentes, pero esos casos de uso son *excepcionales*, no comunes.
 
-Several people apparently read the first paragraph of this PSA and then stop
-reading. Like, literally they'll try to rebut my argument by listing one of the
-things in my list of *great use cases*. The thing right after the first
-paragraph!
+Varias personas aparentemente leen el primer párrafo de este PSA y luego dejan
+de leer. Como, literalmente intentan refutar mi argumento enumerando una de las
+cosas en mi lista de *casos de uso excelentes*. ¡Justo lo que viene después del
+primer párrafo!
 
-Just so I can link directly to a detailed argument, here are several attempts
-at counter-arguments I have seen, and my response to them. Feel free to skip
-to [the first chapter](first.md) if you just want to learn some Rust!
+Solo para poder enlazar directamente a un argumento detallado, aquí hay varios
+intentos de contraargumentos que he visto, y mi respuesta a ellos. Siéntete libre
+de saltar al [primer capítulo](first.md) si solo quieres aprender algo de Rust.
 
 
 
 
-## Performance doesn't always matter
+## El rendimiento no siempre importa
 
-Yes! Maybe your application is I/O-bound or the code in question is in some
-cold case that just doesn't matter. But this isn't even an argument for using
-a linked list. This is an argument for using *whatever at all*. Why settle for
-a linked list? Use a linked hash map!
+¡Sí! Quizás tu aplicación está limitada por E/S o el código en cuestión está en
+algún caso poco relevante que simplemente no importa. Pero esto ni siquiera es un
+argumento para usar una lista enlazada. Es un argumento para usar *lo que sea*.
+¿Por qué conformarte con una lista enlazada? ¡Usa un mapa hash enlazado!
 
-If performance doesn't matter, then it's *surely* fine to apply the natural
-default of an array.
+Si el rendimiento no importa, entonces *seguramente* está bien aplicar la opción
+natural por defecto de un array.
 
 
 
 
 
-## They have O(1) split-append-insert-remove if you have a pointer there
+## Tienen split-append-insert-remove O(1) si tienes un puntero allí
 
-Yep! Although as [Bjarne Stroustrup notes][bjarne] *this doesn't actually
-matter* if the time it takes to get that pointer completely dwarfs the
-time it would take to just copy over all the elements in an array (which is
-really quite fast).
+¡Sip! Aunque como [señala Bjarne Stroustrup][bjarne] *esto en realidad no
+importa* si el tiempo que toma obtener ese puntero supera por completo el
+tiempo que tomaría simplemente copiar todos los elementos en un array (que
+es realmente bastante rápido).
 
-Unless you have a workload that is heavily dominated by splitting and merging
-costs, the penalty *every other* operation takes due to caching effects and code
-complexity will eliminate any theoretical gains.
+A menos que tengas una carga de trabajo que esté fuertemente dominada por
+costos de dividir y fusionar, la penalización que *todas las demás*
+operaciones sufren debido a efectos de caché y complejidad del código
+eliminará cualquier ganancia teórica.
 
-*But yes, if you're profiling your application to spend a lot of time in
-splitting and merging, you may have gains in a linked list*.
+*Pero sí, si estás perfilando tu aplicación y esta pasa mucho tiempo en
+dividir y fusionar, puedes tener ganancias con una lista enlazada*.
 
 
 
 
 
-## I can't afford amortization
+## No puedo permitirme la amortización
 
-You've already entered a pretty niche space -- most can afford amortization.
-Still, arrays are amortized *in the worst case*. Just because you're using an
-array, doesn't mean you have amortized costs. If you can predict how many
-elements you're going to store (or even have an upper-bound), you can
-pre-reserve all the space you need. In my experience it's *very* common to be
-able to predict how many elements you'll need. In Rust in particular, all
-iterators provide a `size_hint` for exactly this case.
+Ya has entrado en un espacio bastante especializado — la mayoría puede
+permitirse la amortización. Aún así, los arrays se amortizan *en el peor caso*.
+Solo porque uses un array, no significa que tengas costos amortizados. Si puedes
+predecir cuántos elementos vas a almacenar (o incluso tener un límite superior),
+puedes pre-reservar todo el espacio que necesites. En mi experiencia es *muy*
+común poder predecir cuántos elementos necesitarás. En Rust en particular, todos
+los iteradores proporcionan un `size_hint` exactamente para este caso.
 
-Then `push` and `pop` will be truly O(1) operations. And they're going to be
-*considerably* faster than `push` and `pop` on linked list. You do a pointer
-offset, write the bytes, and increment an integer. No need to go to any kind of
-allocator.
+Entonces `push` y `pop` serán operaciones verdaderamente O(1). Y van a ser
+*considerablemente* más rápidas que `push` y `pop` en una lista enlazada.
+Haces un desplazamiento de puntero, escribes los bytes, e incrementas un
+entero. Sin necesidad de ir a ningún tipo de asignador.
 
-How's that for low latency?
+¿Qué tal para baja latencia?
 
-*But yes, if you can't predict your load, there are worst-case
-latency savings to be had!*
+*Pero sí, si no puedes predecir tu carga, ¡hay ahorros de latencia en el peor
+caso que puedes obtener!*
 
 
 
 
 
-## Linked lists waste less space
+## Las listas enlazadas desperdician menos espacio
 
-Well, this is complicated. A "standard" array resizing strategy is to grow
-or shrink so that at most half the array is empty. This is indeed a lot of
-wasted space. Especially in Rust, we don't automatically shrink collections
-(it's a waste if you're just going to fill it back up again), so the wastage
-can approach infinity!
+Bueno, esto es complicado. Una estrategia de "redimensionamiento" estándar de
+un array es crecer o encoger para que como máximo la mitad del array esté vacía.
+Esto es de hecho una gran cantidad de espacio desperdiciado. Especialmente en Rust,
+no encogemos colecciones automáticamente (es un desperdicio si solo vas a
+llenarlo de nuevo), por lo que el desperdicio puede acercarse al infinito.
 
-But this is a worst-case scenario. In the best-case, an array stack only has
-three pointers of overhead for the entire array. Basically no overhead.
+Pero esto es un escenario de peor caso. En el mejor caso, una pila con array
+solo tiene tres punteros de sobrecarga para todo el array. Básicamente sin
+sobrecarga.
 
-Linked lists on the other hand unconditionally waste space per element.
-A singly-linked list wastes one pointer while a doubly-linked list wastes
-two. Unlike an array, the relative wasteage is proportional to the size of
-the element. If you have *huge* elements this approaches 0 waste. If you have
-tiny elements (say, bytes), then this can be as much as 16x memory overhead
-(8x on 32-bit)!
+Las listas enlazadas, por otro lado, desperdician espacio incondicionalmente
+por elemento. Una lista enlazada individualmente desperdicia un puntero mientras
+que una doblemente enlazada desperdicia dos. A diferencia de un array, el
+desperdicio relativo es proporcional al tamaño del elemento. Si tienes elementos
+*enormes* esto se acerca al 0% de desperdicio. Si tienes elementos diminutos
+(digamos, bytes), entonces esto puede ser hasta 16 veces la sobrecarga de
+memoria (8 veces en 32 bits).
 
-Actually, it's more like 23x (11x on 32-bit) because padding will be added
-to the byte to align the whole node's size to a pointer.
+En realidad, es más como 23 veces (11 veces en 32 bits) porque se añadirá
+relleno (padding) al byte para alinear el tamaño total del nodo a un puntero.
 
-This is also assuming the best-case for your allocator: that allocating and
-deallocating nodes is being done densely and you're not losing memory to
-fragmentation.
+Esto también asume el mejor caso para tu asignador: que asignar y
+desasignar nodos se hace de forma densa y no estás perdiendo memoria por
+fragmentación.
 
-*But yes, if you have huge elements, can't predict your load, and have a
-decent allocator, there are memory savings to be had!*
+*Pero sí, si tienes elementos enormes, no puedes predecir tu carga, y tienes
+un asignador decente, ¡hay ahorros de memoria que puedes obtener!*
 
 
 
 
 
-## I use linked lists all the time in &lt;functional language&gt;
+## Uso listas enlazadas todo el tiempo en &lt;lenguaje funcional&gt;
 
-Great! Linked lists are super elegant to use in functional languages
-because you can manipulate them without any mutation, can describe them
-recursively, and also work with infinite lists due to the magic of laziness.
+¡Genial! Las listas enlazadas son super elegantes de usar en lenguajes
+funcionales porque puedes manipularlas sin ninguna mutación, puedes describirlas
+recursivamente, y también trabajar con listas infinitas gracias a la magia de la
+pereza (laziness).
 
-Specifically, linked lists are nice because they represent an iteration without
-the need for any mutable state. The next step is just visiting the next sublist.
+Específicamente, las listas enlazadas son agradables porque representan una
+iteración sin necesidad de ningún estado mutable. El siguiente paso es
+simplemente visitar la siguiente sublista.
 
-Rust mostly does this kind of thing with [iterators][]. They can be infinite 
-and you can map, filter, reverse, and concatenate them just like a functional list,
-and it will all be done just as lazily!
+Rust hace este tipo de cosas principalmente con [iteradores][iterators]. Pueden
+ser infinitos y puedes mapearlos, filtrarlos, invertirlos y concatenarlos como
+una lista funcional, ¡y todo se hará igual de perezosamente!
 
-Rust also lets you easily talk about sub-arrays with *[slices][]*. Your usual
-head/tail split in a functional language is [just `slice.split_at_mut(1)`][split].
-For a long time, Rust had an experimental system for pattern matching on
-slices which was super cool, but the feature was simplified when it was
-stabilized. Still, [basic slice patterns][slice-pats] are neat! And of course,
-slices can be turned into iterators!
+Rust también te permite hablar fácilmente de sub-arrays con *[rebanadas
+(slices)][slices]*. Tu división habitual cabeza/cola en un lenguaje funcional
+es [solo `slice.split_at_mut(1)`][split]. Durante mucho tiempo, Rust tuvo un
+sistema experimental para pattern matching en slices que era super genial,
+pero la característica se simplificó cuando se estabilizó. Aún así,
+[los patrones básicos de slices][slice-pats] son interesantes. Y por supuesto,
+¡los slices se pueden convertir en iteradores!
 
-*But yes, if you're limited to immutable semantics, linked lists can be very
-nice*.
+*Pero sí, si estás limitado a semántica inmutable, las listas enlazadas pueden ser
+muy agradables*.
 
-Note that I'm not saying that functional programming is necessarily weak or
-bad. However it *is* fundamentally semantically limited: you're largely only
-allowed to talk about how things *are*, and not how they should be *done*. This
-is actually a *feature*, because it enables the compiler to do tons of [exotic
-transformations][ghc] and potentially figure out the *best* way to do things
-without you having to worry about it. However this comes at the cost of being
-*able* to worry about it. There are usually escape hatches, but at some limit
-you're just writing procedural code again.
+Nótese que no estoy diciendo que la programación funcional sea necesariamente
+débil o mala. Sin embargo, *es* fundamentalmente limitada semánticamente: en
+gran medida solo se te permite hablar de cómo *son* las cosas, y no de cómo
+deberían *hacerse*. Esto es en realidad una *característica*, porque permite
+al compilador hacer toneladas de [transformaciones exóticas][ghc] y
+potencialmente encontrar la *mejor* manera de hacer las cosas sin que tengas
+que preocuparte. Sin embargo, esto tiene el costo de *poder* preocuparte por
+ello. Generalmente hay escapes, pero en algún límite solo estás escribiendo
+código procedural otra vez.
 
-Even in functional languages, you should endeavour to use the appropriate data
-structure for the job when you actually need a data structure. Yes,
-singly-linked lists are your primary tool for control flow, but they're a
-really poor way to actually store a bunch of data and query it.
+Incluso en lenguajes funcionales, deberías esforzarte por usar la estructura
+de datos apropiada para el trabajo cuando realmente necesitas una estructura
+de datos. Sí, las listas enlazadas individualmente son tu herramienta principal
+para el flujo de control, pero son una forma realmente pobre de almacenar un
+montón de datos y consultarlos.
 
 
-## Linked lists are great for building concurrent data structures!
+## ¡Las listas enlazadas son geniales para construir estructuras de datos concurrentes!
 
-Yes! Although writing a concurrent data structure is really a whole different
-beast, and isn't something that should be taken lightly. Certainly not something
-many people will even *consider* doing. Once one's been written, you're also not
-really choosing to use a linked list. You're choosing to use an MPSC queue or
-whatever. The implementation strategy is pretty far removed in this case!
+¡Sí! Aunque escribir una estructura de datos concurrente es realmente un animal
+completamente diferente, y no es algo que deba tomarse a la ligera. Ciertamente
+no es algo que mucha gente siquiera *considerará* hacer. Una vez que se ha
+escrito, tampoco estás realmente eligiendo usar una lista enlazada. Estás
+eligiendo usar una cola MPSC o lo que sea. ¡La estrategia de implementación
+está bastante lejos en este caso!
 
-*But yes, linked lists are the defacto heroes of the dark world of lock-free
-concurrency.*
+*Pero sí, las listas enlazadas son las heroínas de facto del oscuro mundo de la
+concurrencia sin bloqueos.*
 
 
 
 
-## Mumble mumble kernel embedded something something intrusive.
+## Mumble mumble kernel embebido algo algo intrusivo.
 
-It's niche. You're talking about a situation where you're not even using
-your language's *runtime*. Is that not a red flag that you're doing something
-strange?
+Es especializado. Estás hablando de una situación donde ni siquiera estás
+usando el *entorno de ejecución* de tu lenguaje. ¿No es esa una bandera roja
+de que estás haciendo algo extraño?
 
-It's also wildly unsafe.
+También es salvajemente inseguro.
 
-*But sure. Build your awesome zero-allocation lists on the stack.*
+*Pero claro. Construye tus increíbles listas de cero asignaciones en la pila.*
 
 
 
 
 
-## Iterators don't get invalidated by unrelated insertions/removals
+## Los iteradores no se invalidan por inserciones/eliminaciones no relacionadas
 
-That's a delicate dance you're playing. Especially if you don't have
-a garbage collector. I might argue that your control flow and ownership
-patterns are probably a bit too tangled, depending on the details.
+Esa es una danza delicada la que estás realizando. Especialmente si no tienes
+un recolector de basura. Podría argumentar que tus patrones de flujo de control
+y propiedad están probablemente un poco demasiado enredados, dependiendo de los
+detalles.
 
-*But yes, you can do some really cool crazy stuff with cursors.*
+*Pero sí, puedes hacer cosas realmente geniales y locas con cursores.*
 
 
 
 
 
-## They're simple and great for teaching!
+## ¡Son simples y geniales para enseñar!
 
-Well, yeah. You're reading a book dedicated to that premise.
-Well, singly-linked lists are pretty simple. Doubly-linked lists
-can get kinda gnarly, as we'll see.
+Bueno, sí. Estás leyendo un libro dedicado a esa premisa.
+Bueno, las listas enlazadas individualmente son bastante simples. Las listas
+doblemente enlazadas pueden ponerse bastante complicadas, como veremos.
 
 
 
 
-# Take a Breath
+# Toma un Respiro
 
-Ok. That's out of the way. Let's write a bajillion linked lists.
+Ok. Eso ya está fuera del camino. Escribamos un montón de listas enlazadas.
 
-[On to the first chapter!](first.md)
+[¡Al primer capítulo!](first.md)
 
 
 [rust-std-list]: https://doc.rust-lang.org/std/collections/struct.LinkedList.html
