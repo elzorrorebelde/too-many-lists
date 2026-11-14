@@ -1,7 +1,7 @@
 # IntoIter
 
-Collections are iterated in Rust using the *Iterator* trait. It's a bit more
-complicated than `Drop`:
+Las colecciones se iteran en Rust usando el trait *Iterator*. Es un poco más
+complicado que `Drop`:
 
 ```rust ,ignore
 pub trait Iterator {
@@ -10,29 +10,30 @@ pub trait Iterator {
 }
 ```
 
-The new kid on the block here is `type Item`. This is declaring that every
-implementation of Iterator has an *associated type* called Item. In this case,
-this is the type that it can spit out when you call `next`.
+Lo nuevo aquí es `type Item`. Esto declara que cada implementación de Iterator
+tiene un *tipo asociado* llamado Item. En este caso, este es el tipo que puede
+escupir cuando llamas a `next`.
 
-The reason Iterator yields `Option<Self::Item>` is because the interface
-coalesces the `has_next` and `get_next` concepts. When you have the next value,
-you yield
-`Some(value)`, and when you don't you yield `None`. This makes the
-API generally more ergonomic and safe to use and implement, while avoiding
-redundant checks and logic between `has_next` and `get_next`. Nice!
+La razón por la que Iterator produce `Option<Self::Item>` es porque la interfaz
+unifica los conceptos de `has_next` y `get_next`. Cuando tienes el siguiente
+valor, produces `Some(value)`, y cuando no, produces `None`. Esto hace que
+la API sea generalmente más ergonómica y segura de usar e implementar,
+evitando comprobaciones redundantes y lógica entre `has_next` y `get_next`.
+¡Bien!
 
-Sadly, Rust has nothing like a `yield` statement (yet), so we're going to have to
-implement the logic ourselves. Also, there's actually 3 different kinds of
-iterator each collection should endeavour to implement:
+Tristemente, Rust no tiene nada como una declaración `yield` (aún), así que
+vamos a tener que implementar la lógica nosotros mismos. También, hay en
+realidad 3 tipos diferentes de iterador que cada colección debería esforzarse
+por implementar:
 
-* IntoIter - `T`
-* IterMut - `&mut T`
-* Iter - `&T`
+* IntoIter — `T`
+* IterMut — `&mut T`
+* Iter — `&T`
 
-We actually already have all the tools to implement
-IntoIter using List's interface: just call `pop` over and over. As such, we'll
-just implement IntoIter as a newtype wrapper around List:
-
+En realidad ya tenemos todas las herramientas para implementar
+IntoIter usando la interfaz de List: solo llamar a `pop` una y otra vez. Como
+tal, implementaremos IntoIter como un envoltorio de nuevo tipo (newtype)
+alrededor de List:
 
 ```rust ,ignore
 // Tuple structs are an alternative form of struct,
@@ -54,7 +55,7 @@ impl<T> Iterator for IntoIter<T> {
 }
 ```
 
-And let's write a test:
+Y escribamos una prueba:
 
 ```rust ,ignore
 // --snip--
@@ -89,9 +90,9 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Nice!
+¡Bien!
 
-For the sake of curiosity, let's try to iterate twice over the list:
+Por curiosidad, intentemos iterar dos veces sobre la lista:
 
 ```rust ,ignore
 #[test]
@@ -134,7 +135,8 @@ note: this function takes ownership of the receiver `self`, which moves `list`
     |                      ^^^^
 ```
 
-This is the cost of `into_iter`. In order for `next` to return values and not
-references, to give ownership to the result to the caller, our `into_iter` had
-to take ownership of the list; which mean the list can't be used anymore. Which
-is exactly what we do in the next section.
+Este es el costo de `into_iter`. Para que `next` devuelva valores y no
+referencias, para dar propiedad del resultado a quien llama, nuestro
+`into_iter` tuvo que tomar posesión de la lista; lo que significa que la
+lista ya no se puede usar. Que es exactamente lo que hacemos en la siguiente
+sección.
