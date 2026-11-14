@@ -1,12 +1,13 @@
 # IterMut
 
-I'm gonna be honest, IterMut is WILD. Which in itself seems like a wild
-thing to say; surely it's identical to Iter!
+Voy a ser honesto, IterMut es SALVAJE. Lo cual en sí mismo parece una cosa
+salvaje de decir; ¡seguramente es idéntico a Iter!
 
-Semantically, yes, but the nature of shared and mutable references means
-that Iter is "trivial" while IterMut is Legit Wizard Magic.
+Semánticamente, sí, pero la naturaleza de las referencias compartidas y
+mutables significa que Iter es "trivial" mientras que IterMut es Magia de
+Hechicero Legítima.
 
-The key insight comes from our implementation of Iterator for Iter:
+La idea clave viene de nuestra implementación de Iterator para Iter:
 
 ```rust ,ignore
 impl<'a, T> Iterator for Iter<'a, T> {
@@ -16,7 +17,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
 }
 ```
 
-Which can be desugared to:
+Que se puede des-azucarar a:
 
 ```rust ,ignore
 impl<'a, T> Iterator for Iter<'a, T> {
@@ -26,9 +27,9 @@ impl<'a, T> Iterator for Iter<'a, T> {
 }
 ```
 
-The signature of `next` establishes *no* constraint between the lifetime
-of the input and the output! Why do we care? It means we can call `next`
-over and over unconditionally!
+¡La firma de `next` establece *ninguna* restricción entre el tiempo de vida
+de la entrada y la salida! ¿Por qué nos importa? Significa que podemos llamar
+a `next` una y otra vez incondicionalmente.
 
 
 ```rust ,ignore
@@ -36,23 +37,25 @@ let mut list = List::new();
 list.push(1); list.push(2); list.push(3);
 
 let mut iter = list.iter();
-let ref_to = iter.next().unwrap();
-let x = ref_to;
-let y = ref_to;
-let z = ref_to;
+let x = iter.next().unwrap();
+let y = iter.next().unwrap();
+let z = iter.next().unwrap();
 ```
 
-Cool!
+¡Genial!
 
-This is *definitely fine* for shared references because the whole point is that
-you can have tons of them at once. However mutable references *can't* coexist.
-The whole point is that they're exclusive.
+Esto es *definitivamente correcto* para referencias compartidas porque el
+sentido mismo es que puedes tener montones de ellas a la vez. Sin embargo, las
+referencias mutables *no pueden* coexistir. El sentido mismo es que son
+exclusivas.
 
-The end result is that it's notably harder to write IterMut using safe
-code (and we haven't gotten into what that even means yet...). Surprisingly,
-IterMut can actually be implemented for many structures completely safely!
+El resultado final es que es notablemente más difícil escribir IterMut usando
+código seguro (y todavía no hemos entrado en qué significa eso...).
+Sorprendentemente, ¡IterMut puede implementarse para muchas estructuras
+completamente de forma segura!
 
-We'll start by just taking the Iter code and changing everything to be mutable:
+Empezaremos simplemente tomando el código de Iter y cambiando todo para que
+sea mutable:
 
 ```rust ,ignore
 pub struct IterMut<'a, T> {
@@ -94,9 +97,10 @@ error[E0507]: cannot move out of borrowed content
     |         ^^^^^^^^^ cannot move out of borrowed content
 ```
 
-Ok looks like we've got two different errors here. The first one looks really clear
-though, it even tells us how to fix it! You can't upgrade a shared reference to a mutable
-one, so `iter_mut` needs to take `&mut self`. Just a silly copy-paste error.
+Ok, parece que tenemos dos errores diferentes aquí. El primero parece muy
+claro, ¡incluso nos dice cómo arreglarlo! No puedes mejorar una referencia
+compartida a una mutable, así que `iter_mut` necesita tomar `&mut self`. Solo
+un error tonto de copia-pega.
 
 ```rust ,ignore
 pub fn iter_mut(&mut self) -> IterMut<'_, T> {
@@ -104,34 +108,35 @@ pub fn iter_mut(&mut self) -> IterMut<'_, T> {
 }
 ```
 
-What about the other one?
+¿Y el otro?
 
-Oops! I actually accidentally made an error when writing the `iter` impl in
-the previous section, and we were just getting lucky that it worked!
+¡Ups! En realidad cometí un error accidentalmente al escribir la impl de
+`iter` en la sección anterior, y solo tuvimos suerte de que funcionara.
 
-We have just had our first run in with the magic of Copy. When we introduced [ownership][ownership] we
-said that when you move stuff, you can't use it anymore. For some types, this
-makes perfect sense. Our good friend Box manages an allocation on the heap for
-us, and we certainly don't want two pieces of code to think that they need to
-free its memory.
+Acabamos de tener nuestro primer encuentro con la magia de Copy. Cuando
+introdujimos la [propiedad (ownership)][ownership] dijimos que cuando mueves
+cosas, ya no puedes usarlas más. Para algunos tipos, esto tiene perfecto
+sentido. Nuestro buen amigo Box gestiona una asignación en el heap para
+nosotros, y ciertamente no queremos que dos piezas de código piensen que
+necesitan liberar su memoria.
 
-However for other types this is *garbage*. Integers have no
-ownership semantics; they're just meaningless numbers! This is why integers are
-marked as Copy. Copy types are known to be perfectly copyable by a bitwise copy.
-As such, they have a super power: when moved, the old value *is* still usable.
-As a consequence, you can even move a Copy type out of a reference without
-replacement!
+Sin embargo, para otros tipos esto es *basura*. Los enteros no tienen
+semántica de propiedad; son solo números sin significado. Por eso los enteros
+están marcados como Copy. Los tipos Copy se sabe que son perfectamente
+copiables mediante una copia a nivel de bits. Como tal, tienen un superpoder:
+cuando se mueven, el valor anterior *sigue* siendo usable. Como consecuencia,
+¡incluso puedes mover un tipo Copy fuera de una referencia sin reemplazo!
 
-All numeric primitives in Rust (i32, u64, bool, f32, char, etc...) are Copy.
-You can also declare any user-defined type to be Copy as well, as long as
-all its components are Copy.
+Todos los primitivos numéricos en Rust (i32, u64, bool, f32, char, etc...) son
+Copy. También puedes declarar cualquier tipo definido por el usuario como Copy,
+siempre que todos sus componentes sean Copy.
 
-Critically to why this code was working, shared references are also Copy!
-Because `&` is copy, `Option<&>` is *also* Copy. So when we did `self.next.map` it
-was fine because the Option was just copied. Now we can't do that, because
-`&mut` isn't Copy (if you copied an &mut, you'd have two &mut's to the same
-location in memory, which is forbidden). Instead, we should properly `take`
-the Option to get it.
+Críticamente para por qué este código funcionaba, ¡las referencias compartidas
+también son Copy! Como `&` es copy, `Option<&>` *también* es Copy. Así que
+cuando hicimos `self.next.map` estaba bien porque el Option simplemente se
+copiaba. Ahora no podemos hacer eso, porque `&mut` no es Copy (si copiaras un
+`&mut`, tendrías dos `&mut` a la misma ubicación en memoria, lo cual está
+prohibido). En su lugar, deberíamos usar `take` para obtenerlo apropiadamente.
 
 
 ```rust ,ignore
@@ -148,9 +153,9 @@ fn next(&mut self) -> Option<Self::Item> {
 
 ```
 
-Uh... wow. Holy shit! IterMut Just Works!
+Uh... vaya. ¡Santo cielo! ¡IterMut Simplemente Funciona!
 
-Let's test this:
+Probemos esto:
 
 
 ```rust ,ignore
@@ -189,31 +194,33 @@ test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Yep. It works.
+Síp. Funciona.
 
-Holy shit.
+Santo cielo.
 
-What.
+Qué.
 
-Ok I mean it actually *is* supposed to work, but there's usually something
-stupid that gets in the way! Let's be clear here:
+Ok, quiero decir que en realidad *se supone* que funciona, ¡pero normalmente
+hay algo estúpido que se interpone! Seamos claros:
 
-We have just implemented a piece of code that takes a singly-linked list, and
-returns a mutable reference to every single element in the list at most once.
-And it's statically verified to do that. And it's totally safe. And we didn't
-have to do anything wild.
+Acabamos de implementar una pieza de código que toma una lista enlazada
+individualmente, y devuelve una referencia mutable a cada elemento de la lista
+como máximo una vez. Y está verificada estáticamente para hacer eso. Y es
+totalmente segura. Y no tuvimos que hacer nada salvaje.
 
-That's kind of a big deal, if you ask me. There are a couple reasons why
-this works:
+Eso es algo importante, si me preguntas. Hay un par de razones por las que
+esto funciona:
 
-* We `take` the `Option<&mut>` so we have exclusive access to the mutable
-  reference. No need to worry about someone looking at it again.
-* Rust understands that it's ok to shard a mutable reference into the subfields
-  of the pointed-to struct, because there's no way to "go back up", and they're
-  definitely disjoint.
+* Usamos `take` en el `Option<&mut>` para tener acceso exclusivo a la
+  referencia mutable. No hay necesidad de preocuparse de que alguien la mire
+  de nuevo.
+* Rust entiende que está bien fragmentar una referencia mutable en los
+  subcampos del struct al que apunta, porque no hay forma de "volver arriba",
+  y están definitivamente separados.
 
-It turns out that you can apply this basic logic to get a safe IterMut for an
-array or a tree as well! You can even make the iterator DoubleEnded, so that
-you can consume the iterator from the front *and* the back at once! Woah!
+Resulta que puedes aplicar esta lógica básica para obtener un IterMut seguro
+para un array o un árbol también. ¡Incluso puedes hacer que el iterador sea
+DoubleEnded, para que puedas consumir el iterador desde el frente *y* desde
+atrás a la vez! ¡Guau!
 
 [ownership]: first-ownership.md
