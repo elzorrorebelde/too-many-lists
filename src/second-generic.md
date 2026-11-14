@@ -1,11 +1,11 @@
-# Making it all Generic
+# Haciéndolo Todo Genérico
 
-We've already touched a bit on generics with Option and Box. However so
-far we've managed to avoid declaring any new type that is actually generic
-over arbitrary elements.
+Ya hemos tocado un poco los genéricos con Option y Box. Sin embargo, hasta
+ahora hemos logrado evitar declarar cualquier tipo nuevo que sea realmente
+genérico sobre elementos arbitrarios.
 
-It turns out that's actually really easy. Let's make all of our types generic
-right now:
+Resulta que en realidad es muy fácil. Hagamos todos nuestros tipos genéricos
+ahora mismo:
 
 ```rust ,ignore
 pub struct List<T> {
@@ -20,10 +20,9 @@ struct Node<T> {
 }
 ```
 
-You just make everything a little more pointy, and suddenly your code is
-generic. Of course, we can't *just* do this, or else the compiler's going
-to be Super Mad.
-
+Solo haces que todo sea un poco más puntiagudo, y de repente tu código es
+genérico. Por supuesto, no podemos *simplemente* hacer esto, o el compilador
+va a estar Super Enfadado.
 
 ```text
 > cargo test
@@ -42,14 +41,13 @@ error[E0107]: wrong number of type arguments: expected 1, found 0
 
 ```
 
-The problem is pretty clear: we're talking about this `List` thing but that's not
-real anymore. Like Option and Box, we now always have to talk about
-`List<Something>`.
+El problema está bastante claro: estamos hablando de esta cosa `List` pero eso
+ya no es real. Como Option y Box, ahora siempre tenemos que hablar de
+`List<Algo>`.
 
-But what's the Something we use in all these impls? Just like List, we want our
-implementations to work with *all* the T's. So, just like List, let's make our
-`impl`s pointy:
-
+Pero ¿cuál es el Algo que usamos en todos estos impls? Al igual que List,
+queremos que nuestras implementaciones funcionen con *todos* los T. Así que,
+al igual que List, hagamos nuestros `impl`s puntiagudos:
 
 ```rust ,ignore
 impl<T> List<T> {
@@ -84,7 +82,7 @@ impl<T> Drop for List<T> {
 }
 ```
 
-...and that's it!
+...¡y eso es todo!
 
 
 ```text
@@ -100,9 +98,9 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-All of our code is now completely generic over arbitrary values of T. Dang,
-Rust is *easy*. I'd like to make a particular shout-out to `new` which didn't
-even change:
+Todo nuestro código es ahora completamente genérico sobre valores arbitrarios
+de T. Caramba, Rust es *fácil*. Me gustaría hacer una mención especial a `new`
+que ni siquiera cambió:
 
 ```rust ,ignore
 pub fn new() -> Self {
@@ -110,9 +108,10 @@ pub fn new() -> Self {
 }
 ```
 
-Bask in the Glory that is Self, guardian of refactoring and copy-pasta coding.
-Also of interest, we don't write `List<T>` when we construct an instance of
-list. That part's inferred for us based on the fact that we're returning it
-from a function that expects a `List<T>`.
+Contempla la Gloria que es Self, guardián de la refactorización y la
+programación copia-pega. También es interesante que no escribimos `List<T>`
+cuando construimos una instancia de lista. Esa parte se infiere por nosotros
+basándose en el hecho de que la estamos retornando desde una función que
+espera un `List<T>`.
 
-Alright, let's move on to totally new *behaviour*!
+Muy bien, pasemos a *comportamiento* totalmente nuevo.
