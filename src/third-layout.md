@@ -1,12 +1,12 @@
-# Layout
+# Diseño (Layout)
 
-Alright, back to the drawing board on layout.
+Muy bien, de vuelta al tablero de dibujo con el diseño.
 
-The most important thing about
-a persistent list is that you can manipulate the tails of lists basically
-for free:
+Lo más importante sobre una lista persistente es que puedes manipular las colas
+de las listas básicamente gratis:
 
-For instance, this isn't an uncommon workload to see with a persistent list:
+Por ejemplo, esta no es una carga de trabajo poco común con una lista
+persistente:
 
 ```text
 list1 = A -> B -> C -> D
@@ -14,7 +14,7 @@ list2 = tail(list1) = B -> C -> D
 list3 = push(list2, X) = X -> B -> C -> D
 ```
 
-But at the end we want the memory to look like this:
+Pero al final queremos que la memoria se vea así:
 
 ```text
 list1 -> A ---+
@@ -26,30 +26,35 @@ list2 ------> B -> C -> D
 list3 -> X ---+
 ```
 
-This just can't work with Boxes, because ownership of `B` is *shared*. Who
-should free it? If I drop list2, does it free B? With boxes we certainly would
-expect so!
+Esto simplemente no puede funcionar con Boxes, porque la propiedad de `B` es
+*compartida*. ¿Quién debería liberarlo? Si suelto list2, ¿libera B? ¡Con boxes
+ciertamente esperaríamos que sí!
 
-Functional languages &mdash; and indeed almost every other language &mdash; get away with
-this by using *garbage collection*. With the magic of garbage collection, B will
-be freed only after everyone stops looking at it. Hooray!
+Los lenguajes funcionales &mdash; y de hecho casi todos los demás lenguajes
+&mdash; se salen con la suya usando *recolección de basura (garbage
+collection)*. Con la magia de la recolección de basura, B se liberará solo
+después de que todos dejen de mirarlo. ¡Hurra!
 
-Rust doesn't have anything like the garbage collectors these languages have.
-They have *tracing* GC, which will dig through all the memory that's sitting
-around at runtime and figure out what's garbage automatically. Instead, all
-Rust has today is *reference counting*. Reference counting can be thought of
-as a very simple GC. For many workloads, it has significantly less throughput
-than a tracing collector, and it completely falls over if you manage to
-build cycles. But hey, it's all we've got! Thankfully, for our usecase we'll never run into cycles
-(feel free to try to prove this to yourself &mdash; I sure won't).
+Rust no tiene nada como los recolectores de basura que tienen estos lenguajes.
+Ellos tienen GC de *seguimiento (tracing)*, que excava a través de toda la
+memoria que está presente en tiempo de ejecución y descubre qué es basura
+automáticamente. En su lugar, todo lo que Rust tiene hoy es *conteo de
+referencias (reference counting)*. El conteo de referencias puede considerarse
+como un GC muy simple. Para muchas cargas de trabajo, tiene un rendimiento
+significativamente menor que un recolector de seguimiento, y falla
+completamente si consigues construir ciclos. ¡Pero bueno, es todo lo que
+tenemos! Afortunadamente, para nuestro caso de uso nunca nos encontraremos con
+ciclos (siéntete libre de intentar probar esto a ti mismo &mdash; yo seguro
+que no lo haré).
 
-So how do we do reference-counted garbage collection? `Rc`! Rc is just like
-Box, but we can duplicate it, and its memory will *only* be freed when *all*
-the Rc's derived from it are dropped. Unfortunately, this flexibility comes at
-a serious cost: we can only take a shared reference to its internals. This means
-we can't ever really get data out of one of our lists, nor can we mutate them.
+Entonces, ¿cómo hacemos recolección de basura por conteo de referencias?
+¡`Rc`! Rc es como Box, pero podemos duplicarlo, y su memoria *solo* se
+liberará cuando *todos* los Rc derivados de él se suelten.
+Desafortunadamente, esta flexibilidad tiene un costo serio: solo podemos tomar
+una referencia compartida a sus internos. Esto significa que nunca podremos
+realmente obtener datos de una de nuestras listas, ni mutarlas.
 
-So what's our layout gonna look like? Well, previously we had:
+Entonces, ¿cómo va a ser nuestro diseño? Bueno, anteriormente teníamos:
 
 ```rust ,ignore
 pub struct List<T> {
@@ -64,7 +69,7 @@ struct Node<T> {
 }
 ```
 
-Can we just change Box to Rc?
+¿Podemos simplemente cambiar Box a Rc?
 
 ```rust ,ignore
 // in third.rs
@@ -95,9 +100,9 @@ help: possible candidate is found in another module, you can import it into scop
   |
 ```
 
-Oh dang, sick burn. Unlike everything we used for our mutable lists, Rc is so
-lame that it's not even implicitly imported into every single Rust program.
-*What a loser*.
+Oh vaya, qué quemada. A diferencia de todo lo que usamos para nuestras listas
+mutables, Rc es tan poco importante que ni siquiera se importa implícitamente
+en cada programa de Rust. *Qué perdedor*.
 
 ```rust ,ignore
 use std::rc::Rc;
@@ -127,9 +132,9 @@ warning: field is never used: `next`
    |     ^^^^^^^^^^^^^
 ```
 
-Seems legit. Rust continues to be *completely* trivial to write. I bet we can just
-find-and-replace Box with Rc and call it a day!
+Parece legítimo. Rust continúa siendo *completamente* trivial de escribir.
+Apuesto a que podemos simplemente buscar y reemplazar Box por Rc y listo.
 
 ...
 
-No. No we can't.
+No. No podemos.
