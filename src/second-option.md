@@ -1,7 +1,7 @@
-# Using Option
+# Usando Option
 
-Particularly observant readers may have noticed that we actually reinvented
-a really bad version of Option:
+Los lectores particularmente observadores pueden haber notado que en realidad
+reinventamos una versión realmente mala de Option:
 
 ```rust ,ignore
 enum Link {
@@ -10,12 +10,13 @@ enum Link {
 }
 ```
 
-Link is just `Option<Box<Node>>`. Now, it's nice not to have to write
-`Option<Box<Node>>` everywhere, and unlike `pop`, we're not exposing this
-to the outside world, so maybe it's fine. However Option has some *really
-nice* methods that we've been manually implementing ourselves. Let's *not*
-do that, and replace everything with Options. First, we'll do it naively
-by just renaming everything to use Some and None:
+Link es simplemente `Option<Box<Node>>`. Ahora, está bien no tener que escribir
+`Option<Box<Node>>` en todas partes, y a diferencia de `pop`, no estamos
+exponiendo esto al mundo exterior, así que quizás está bien. Sin embargo,
+Option tiene algunos métodos *realmente buenos* que hemos estado implementando
+manualmente nosotros mismos. No hagamos *eso*, y reemplacémoslo todo con
+Options. Primero, lo haremos ingenuamente simplemente renombrando todo para
+usar Some y None:
 
 ```rust ,ignore
 use std::mem;
@@ -67,10 +68,11 @@ impl Drop for List {
 }
 ```
 
-This is marginally better, but the big wins will come from Option's methods.
+Esto es marginalmente mejor, pero las grandes victorias vendrán de los métodos
+de Option.
 
-First, `mem::replace(&mut option, None)` is such an incredibly
-common idiom that Option actually just went ahead and made it a method: `take`.
+Primero, `mem::replace(&mut option, None)` es un modismo tan
+increíblemente común que Option simplemente lo convirtió en un método: `take`.
 
 ```rust ,ignore
 pub struct List {
@@ -119,16 +121,17 @@ impl Drop for List {
 }
 ```
 
-Second, `match option { None => None, Some(x) => Some(y) }` is such an
-incredibly common idiom that it was called `map`. `map` takes a function to
-execute on the `x` in the `Some(x)` to produce the `y` in `Some(y)`. We could
-write a proper `fn` and pass it to `map`, but we'd much rather write what to
-do *inline*.
+Segundo, `match option { None => None, Some(x) => Some(y) }` es un modismo
+tan increíblemente común que se llamó `map`. `map` toma una función para
+ejecutar sobre la `x` en el `Some(x)` para producir la `y` en `Some(y)`.
+Podríamos escribir una `fn` apropiada y pasarla a `map`, pero preferiríamos
+escribir qué hacer *en línea (inline)*.
 
-The way to do this is with a *closure*. Closures are anonymous functions with
-an extra super-power: they can refer to local variables *outside* the closure!
-This makes them super useful for doing all sorts of conditional logic. The
-only place we do a `match` is in `pop`, so let's just rewrite that:
+La forma de hacer esto es con una *clausura (closure)*. Las clausuras son
+funciones anónimas con un superpoder extra: ¡pueden referirse a variables
+locales *fuera* de la clausura! Esto las hace super útiles para todo tipo
+de lógica condicional. El único lugar donde hacemos un `match` es en `pop`,
+así que reescribamos eso:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<i32> {
@@ -139,7 +142,7 @@ pub fn pop(&mut self) -> Option<i32> {
 }
 ```
 
-Ah, much better. Let's make sure we didn't break anything:
+Ah, mucho mejor. Asegurémonos de que no rompimos nada:
 
 ```text
 > cargo test
@@ -154,4 +157,4 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Great! Let's move on to actually improving the code's *behaviour*.
+¡Genial! Pasemos a mejorar realmente el *comportamiento* del código.
