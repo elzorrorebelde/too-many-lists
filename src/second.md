@@ -1,22 +1,22 @@
-# An Ok Singly-Linked Stack
+# Una Pila Aceptable Enlazada Individualmente
 
-In the previous chapter we wrote up a minimum viable singly-linked
-stack. However there's a few design decisions that make it kind of sucky.
-Let's make it less sucky. In doing so, we will:
+En el capítulo anterior escribimos una pila enlazada individualmente mínima
+viable. Sin embargo, hay algunas decisiones de diseño que la hacen algo
+mala. Hagámosla menos mala. Al hacerlo, vamos a:
 
-* Reinvent the wheel
-* Make our list able to handle any element type
-* Add peeking
-* Make our list iterable
+* Reinventar la rueda
+* Hacer que nuestra lista pueda manejar cualquier tipo de elemento
+* Añadir peek (ojear)
+* Hacer nuestra lista iterable
 
-And in the process we'll learn about
+Y en el proceso aprenderemos sobre
 
-* Advanced Option use
-* Generics
-* Lifetimes
-* Iterators
+* Uso avanzado de Option
+* Genéricos
+* Tiempos de vida (lifetimes)
+* Iteradores
 
-Let's add a new file called `second.rs`:
+Añadamos un nuevo archivo llamado `second.rs`:
 
 ```rust ,ignore
 // in lib.rs
@@ -25,4 +25,4 @@ pub mod first;
 pub mod second;
 ```
 
-And copy everything from `first.rs` into it.
+Y copiemos todo de `first.rs` en él.
