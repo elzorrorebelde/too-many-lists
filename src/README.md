@@ -114,7 +114,7 @@ enlazada. Es la única colección especializada
 [*la* lista en C++][cpp-std-list]!
 
 Deberíamos todos como comunidad decir *no* a las listas enlazadas como una
-estructura de datos "estándar". Es una estructura de datos fine con varios
+estructura de datos "estándar". Es una buena estructura de datos con varios
 casos de uso excelentes, pero esos casos de uso son *excepcionales*, no comunes.
 
 Varias personas aparentemente leen el primer párrafo de este PSA y luego dejan
