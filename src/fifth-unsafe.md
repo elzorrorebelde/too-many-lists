@@ -1,50 +1,54 @@
-# Unsafe Rust
+# Rust Inseguro (Unsafe Rust)
 
-This is a serious, big, complicated, and dangerous topic.
-It's so serious that I wrote [an entire other book][nom] on it.
+Este es un tema serio, grande, complicado y peligroso.
+Es tan serio que escribí [otro libro completo][nom] sobre ello.
 
-The long and the short of it is that *every* language is actually unsafe as soon
-as you allow calling into other languages, because you can just have C do
-arbitrarily bad things. Yes: Java, Python, Ruby, Haskell... everyone is wildly
-unsafe in the face of Foreign Function Interfaces (FFI).
+El resumen es que *todo* lenguaje es en realidad inseguro tan pronto como
+permites llamar a otros lenguajes, porque puedes hacer que C haga cosas
+arbitrariamente malas. Sí: Java, Python, Ruby, Haskell... todos son
+salvajemente inseguros frente a Interfaces de Funciones Extranjeras (FFI).
 
-Rust embraces this truth by splitting itself into two languages: Safe Rust, and
-Unsafe Rust. So far we've only worked with Safe Rust. It's completely 100%
-safe... except that it can FFI into Unsafe Rust.
+Rust abraza esta verdad dividiéndose en dos lenguajes: Rust Seguro y Rust
+Inseguro. Hasta ahora solo hemos trabajado con Rust Seguro. Es completamente
+100% seguro... excepto que puede hacer FFI a Rust Inseguro.
 
-Unsafe Rust is a *superset* of Safe Rust. It's completely the same as Safe Rust in all its
-semantics and rules, you're just allowed to do a few *extra* things that are
-wildly unsafe and can cause the dreaded Undefined Behaviour that haunts C.
+Rust Inseguro es un *superconjunto* de Rust Seguro. Es completamente igual a
+Rust Seguro en toda su semántica y reglas, solo que se te permiten hacer
+algunas cosas *extra* que son salvajemente inseguras y pueden causar el temido
+Comportamiento Indefinido (Undefined Behaviour) que acecha a C.
 
-Again, this is a really huge topic that has a lot of interesting corner cases.
-I *really* don't want to go really deep into it (well, I do. I did. [Read that
-book][nom]). That's ok, because with linked lists we can actually ignore almost
-all of it.
+De nuevo, este es un tema realmente enorme que tiene muchos casos
+interesantes. Realmente *no* quiero profundizar mucho en ello (bueno, sí
+quiero. Lo hice. [Lee ese libro][nom]). Está bien, porque con las listas
+enlazadas podemos ignorar casi todo eso.
 
-> **NARRATOR:** This was a lie, but it did seem true in 2015.
+> **NARRADOR:** Esto era mentira, pero parecía cierto en 2015.
 
-The main Unsafe tool we'll be using are *raw pointers*. Raw pointers are
-basically C's pointers. They have no inherent aliasing rules. They have no
-lifetimes. They can be null. They can be misaligned. They can be dangling. They can point to
-uninitialized memory. They can be cast to and from integers. They can be cast
-to point to a different type. Mutability? Cast it. Pretty much everything goes,
-and that means pretty much anything can go wrong.
+La principal herramienta Insegura que usaremos son los *punteros crudos (raw
+pointers)*. Los punteros crudos son básicamente los punteros de C. No tienen
+reglas de aliasing inherentes. No tienen tiempos de vida. Pueden ser nulos.
+Pueden estar desalineados. Pueden colgar. Pueden apuntar a memoria no
+inicializada. Pueden convertirse a y desde enteros. Pueden convertirse para
+apuntar a un tipo diferente. ¿Mutabilidad? Conviértelo. Casi todo vale, y eso
+significa que casi cualquier cosa puede salir mal.
 
-> **NARRATOR:** no inherent aliasing rules, eh? Ah, the innocence of youth.
+> **NARRADOR:** Sin reglas de aliasing inherentes, eh? Ah, la inocencia de la
+> juventud.
 
-This is some bad stuff and honestly you'll live a happier life never having
-to touch these. Unfortunately, we want to write linked lists, and linked lists
-are awful. That means we're going to have to use unsafe pointers.
+Esto es material malo y honestamente vivirías una vida más feliz sin tener que
+tocar esto nunca. Desafortunadamente, queremos escribir listas enlazadas, y las
+listas enlazadas son horribles. Eso significa que vamos a tener que usar
+punteros inseguros.
 
-There are two kinds of raw pointer: `*const T` and `*mut T`. These are meant to
-be `const T*` and `T*` from C, but we really don't care about what C thinks they
-mean that much. You can only dereference a `*const T` to an `&T`, but much like
-the mutability of a variable, this is just a lint against incorrect usage. At
-most it just means you have to cast the `*const` to a `*mut` first. Although if
-you don't actually have permission to mutate the referent of the pointer,
-you're gonna have a bad time.
+Hay dos tipos de puntero crudo: `*const T` y `*mut T`. Se supone que son
+`const T*` y `T*` de C, pero realmente no nos importa lo que C piense que
+significan. Solo puedes desreferenciar un `*const T` a un `&T`, pero al igual
+que la mutabilidad de una variable, esto es solo una advertencia contra uso
+incorrecto. Como mucho significa que tienes que convertir el `*const` a un
+`*mut` primero. Aunque si realmente no tienes permiso para mutar el referente
+del puntero, la vas a pasar mal.
 
-Anyway, we'll get a better feel for this as we write some code. For now,
-`*mut T == &unchecked mut T`!
+Como sea, entenderemos mejor esto mientras escribamos algo de código. Por
+ahora, `*mut T == &unchecked mut T`!
 
 [nom]: https://doc.rust-lang.org/nightly/nomicon/
