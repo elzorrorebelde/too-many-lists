@@ -1,0 +1,545 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Diseño (Layout) - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html" class="active"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#diseño-básico-de-datos" id="diseño-básico-de-datos">Diseño Básico de Datos</a></h1>
+<p>Muy bien, ¿qué es una lista enlazada? Bueno, básicamente es un montón de piezas de datos
+en el heap (¡cállense, gente del kernel!) que se apuntan entre sí en secuencia. Las listas
+enlazadas son algo con lo que los programadores procedurales no deberían ni acercarse,
+y lo que los programadores funcionales usan para todo. Parece justo, entonces, que
+preguntemos a los programadores funcionales por la definición de una lista enlazada. Probablemente
+te darán algo como la siguiente definición:</p>
+<pre><code class="language-haskell">List a = Empty | Elem a (List a)
+</code></pre>
+<p>Que se lee aproximadamente como &quot;Una Lista es o Vacía (Empty) o un Elemento seguido de una
+Lista&quot;. Esta es una definición recursiva expresada como un <em>tipo suma (sum type)</em>, que es un
+nombre elegante para &quot;un tipo que puede tener diferentes valores que pueden ser de diferentes
+tipos&quot;. ¡Rust llama a los tipos suma <code>enum</code>s! Si vienes de un lenguaje tipo C,
+este es exactamente el enum que conoces y amas, pero en sobremarcha. Así que
+transcribamos esta definición funcional a Rust.</p>
+<p>Por ahora evitaremos los genéricos para mantener las cosas simples. Solo soportaremos
+almacenar enteros signados de 32 bits:</p>
+<pre><code class="language-rust ignore">// in first.rs
+
+// pub dice que queremos que la gente fuera de este módulo pueda usar List
+pub enum List {
+    Empty,
+    Elem(i32, List),
+}
+</code></pre>
+<p><em>phew</em>, estoy agobiado. Compilemos eso:</p>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0072]: recursive type `first::List` has infinite size
+ --&gt; src/first.rs:4:1
+  |
+4 | pub enum List {
+  | ^^^^^^^^^^^^^ recursive type has infinite size
+5 |     Empty,
+6 |     Elem(i32, List),
+  |               ---- recursive without indirection
+  |
+  = help: insert indirection (e.g., a `Box`, `Rc`, or `&amp;`) at some point to make `first::List` representable
+</code></pre>
+<p>Bueno. No sé tú, pero yo ciertamente me siento traicionado por la comunidad de
+programación funcional.</p>
+<p>Si realmente revisamos el mensaje de error (después de superar todo el asunto de la
+traición), podemos ver que rustc nos está diciendo exactamente
+cómo resolver este problema:</p>
+<blockquote>
+<p>insert indirection (e.g., a <code>Box</code>, <code>Rc</code>, or <code>&amp;</code>) at some point to make <code>first::List</code> representable</p>
+</blockquote>
+<p>Muy bien, <code>box</code>. ¿Qué es eso? Busquemos <code>rust box</code>...</p>
+<blockquote>
+<p><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">std::boxed::Box - Rust</a></p>
+</blockquote>
+<p>Veamos...</p>
+<blockquote>
+<p><code>pub struct Box&lt;T&gt;(_);</code></p>
+<p>A pointer type for heap allocation.
+See the <a href="https://doc.rust-lang.org/std/boxed/">module-level documentation</a> for more.</p>
+</blockquote>
+<p><em>hace clic en el enlace</em></p>
+<blockquote>
+<p><code>Box&lt;T&gt;</code>, casually referred to as a 'box', provides the simplest form of heap allocation in Rust. Boxes provide ownership for this allocation, and drop their contents when they go out of scope.</p>
+<p>Examples</p>
+<p>Creating a box:</p>
+<p><code>let x = Box::new(5);</code></p>
+<p>Creating a recursive data structure:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug)]
+enum List&lt;T&gt; {
+    Cons(T, Box&lt;List&lt;T&gt;&gt;),
+    Nil,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<pre><code class="language-rust ignore">fn main() {
+    let list: List&lt;i32&gt; = List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));
+    println!(&quot;{:?}&quot;, list);
+}
+</code></pre>
+<p>This will print <code>Cons(1, Box(Cons(2, Box(Nil))))</code>.</p>
+<p>Recursive structures must be boxed, because if the definition of Cons looked like this:</p>
+<p><code>Cons(T, List&lt;T&gt;),</code></p>
+<p>It wouldn't work. This is because the size of a List depends on how many elements are in the list, and so we don't know how much memory to allocate for a Cons. By introducing a Box, which has a defined size, we know how big Cons needs to be.</p>
+</blockquote>
+<p>Vaya, uh. Esa es quizás la documentación más relevante y útil que he visto nunca.
+Literalmente lo primero en la documentación es <em>exactamente lo que estamos intentando
+escribir, por qué no funcionó, y cómo solucionarlo</em>.</p>
+<p>Caramba, la documentación mola.</p>
+<p>Ok, hagamos eso:</p>
+<pre><code class="language-rust ignore">pub enum List {
+    Empty,
+    Elem(i32, Box&lt;List&gt;),
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+
+   Finished dev [unoptimized + debuginfo] target(s) in 0.22s
+</code></pre>
+<p>¡Oye, compiló!</p>
+<p>...pero esta es en realidad una definición realmente tonta de Lista, por varias razones.</p>
+<p>Considera una lista con dos elementos:</p>
+<pre><code class="language-text">[] = Pila
+() = Heap
+
+[Elem A, ptr] -&gt; (Elem B, ptr) -&gt; (Empty, *basura*)
+</code></pre>
+<p>Hay dos problemas clave:</p>
+<ul>
+<li>Estamos asignando un nodo que solo dice &quot;No soy realmente un Nodo&quot;</li>
+<li>Uno de nuestros nodos no está asignado en el heap en absoluto.</li>
+</ul>
+<p>En superficie, estos dos parecen cancelarse mutuamente. Asignamos en el heap un
+nodo extra, pero uno de nuestros nodos no necesita estar en el heap.
+Sin embargo, considera el siguiente diseño potencial para nuestra lista:</p>
+<pre><code class="language-text">[ptr] -&gt; (Elem A, ptr) -&gt; (Elem B, *null*)
+</code></pre>
+<p>En este diseño ahora asignamos incondicionalmente nuestros nodos en el heap. La
+diferencia clave es la ausencia de la <em>basura</em> de nuestro primer diseño. ¿Qué es
+esta basura? Para entenderlo, necesitamos ver cómo se organiza un enum en la memoria.</p>
+<p>En general, si tenemos un enum como:</p>
+<pre><code class="language-rust ignore">enum Foo {
+    D1(T1),
+    D2(T2),
+    ...
+    Dn(Tn),
+}
+</code></pre>
+<p>Un Foo necesitará almacenar algún entero para indicar qué <em>variante</em> del enum
+representa (<code>D1</code>, <code>D2</code>, .. <code>Dn</code>). Esta es la <em>etiqueta (tag)</em> del enum. También
+necesitará suficiente espacio para almacenar el <em>más grande</em> de <code>T1</code>, <code>T2</code>, .. <code>Tn</code>
+(más algo de espacio extra para satisfacer los requisitos de alineación).</p>
+<p>La conclusión importante aquí es que aunque <code>Empty</code> es un solo bit de
+información, necesariamente consume suficiente espacio para un puntero y un elemento,
+porque tiene que estar preparado para convertirse en un <code>Elem</code> en cualquier momento.
+Por lo tanto, el primer diseño asigna en el heap un elemento extra que está lleno de basura,
+consumiendo un poco más de espacio que el segundo diseño.</p>
+<p>Que uno de nuestros nodos no esté asignado en absoluto es también, quizás
+sorprendentemente, <em>peor</em> que asignarlo siempre. Esto es porque nos da un diseño
+de nodo <em>no uniforme</em>. Esto no tiene un efecto apreciable en push y pop de nodos,
+pero sí tiene un efecto al dividir y fusionar listas.</p>
+<p>Considera dividir una lista en ambos diseños:</p>
+<pre><code class="language-text">diseño 1:
+
+[Elem A, ptr] -&gt; (Elem B, ptr) -&gt; (Elem C, ptr) -&gt; (Empty *basura*)
+
+dividir sacando C:
+
+[Elem A, ptr] -&gt; (Elem B, ptr) -&gt; (Empty *basura*)
+[Elem C, ptr] -&gt; (Empty *basura*)
+</code></pre>
+<pre><code class="language-text">diseño 2:
+
+[ptr] -&gt; (Elem A, ptr) -&gt; (Elem B, ptr) -&gt; (Elem C, *null*)
+
+dividir sacando C:
+
+[ptr] -&gt; (Elem A, ptr) -&gt; (Elem B, *null*)
+[ptr] -&gt; (Elem C, *null*)
+</code></pre>
+<p>La división del diseño 2 implica solo copiar el puntero de B a la pila y poner
+el valor antiguo a null. El diseño 1 en última instancia hace lo mismo, pero también
+tiene que copiar C del heap a la pila. Fusionar es el mismo proceso en reversa.</p>
+<p>Una de las pocas cosas agradables de una lista enlazada es que puedes construir el
+elemento en el propio nodo, y luego moverlo libremente entre listas sin
+moverlo nunca. Solo manipulas punteros y las cosas se &quot;mueven&quot;. El diseño 1
+tira esta propiedad por la borda.</p>
+<p>Muy bien, estoy razonablemente convencido de que el Diseño 1 es malo. ¿Cómo
+reescribimos nuestra Lista? Bueno, podríamos hacer algo como:</p>
+<pre><code class="language-rust ignore">pub enum List {
+    Empty,
+    ElemThenEmpty(i32),
+    ElemThenNotEmpty(i32, Box&lt;List&gt;),
+}
+</code></pre>
+<p>Espero que esto te parezca una idea aún peor. Sobre todo, esto realmente
+complica nuestra lógica, porque ahora hay un estado completamente inválido:
+<code>ElemThenNotEmpty(0, Box(Empty))</code>. También <em>sigue</em> sufriendo de asignación no
+uniforme de nuestros elementos.</p>
+<p>Sin embargo, tiene <em>una</em> propiedad interesante: evita totalmente asignar
+el caso Empty, reduciendo el número total de asignaciones en el heap en 1.
+Desafortunadamente, al hacerlo logra <em>desperdiciar aún más espacio</em>. Esto es
+porque el diseño anterior se aprovechaba de la <em>optimización de puntero nulo
+(null pointer optimization)</em>.</p>
+<p>Anteriormente vimos que cada enum tiene que almacenar una <em>etiqueta</em> para
+especificar qué variante del enum representan sus bits. Sin embargo, si tenemos
+un tipo especial de enum:</p>
+<pre><code class="language-rust ignore">enum Foo {
+    A,
+    B(ContainsANonNullPtr),
+}
+</code></pre>
+<p>la optimización de puntero nulo (null pointer optimization) entra en acción,
+que <em>elimina el espacio necesario para la etiqueta</em>. Si la variante es A, todo
+el enum se pone a <code>0</code>. De lo contrario, la variante es B. Esto funciona porque
+B nunca puede ser todo <code>0</code>, ya que contiene un puntero no nulo. ¡Genial!</p>
+<p>¿Se te ocurren otros enums y tipos que podrían hacer este tipo de optimización?
+¡En realidad hay muchos! Por eso Rust deja el diseño de los enum totalmente sin
+especificar. Hay algunas optimizaciones de diseño de enum más complicadas que
+Rust hará por nosotros, ¡pero la del puntero nulo es definitivamente la más
+importante! Significa que <code>&amp;</code>, <code>&amp;mut</code>, <code>Box</code>, <code>Rc</code>, <code>Arc</code>, <code>Vec</code>, y
+varios otros tipos importantes en Rust no tienen sobrecarga cuando se ponen
+en un <code>Option</code>. (Llegaremos a la mayoría de estos a su debido tiempo.)</p>
+<p>Entonces, ¿cómo evitamos la basura extra, asignamos uniformemente, <em>y</em>
+obtenemos esa dulce optimización de puntero nulo? Necesitamos separar mejor la
+idea de tener un elemento de asignar otra lista. Para hacer esto, tenemos que
+pensar un poco más como C: ¡con structs!</p>
+<p>Mientras que los enums nos permiten declarar un tipo que puede contener <em>uno</em> de
+varios valores, los structs nos permiten declarar un tipo que contiene <em>varios</em>
+valores a la vez. Vamos a dividir nuestra Lista en dos tipos: una Lista y un Nodo.</p>
+<p>Como antes, una Lista es o Vacía o tiene un elemento seguido de otra Lista.
+Al representar el caso &quot;tiene un elemento seguido de otra Lista&quot; mediante un
+tipo completamente separado, podemos elevar el Box a una posición más óptima:</p>
+<pre><code class="language-rust ignore">struct Node {
+    elem: i32,
+    next: List,
+}
+
+pub enum List {
+    Empty,
+    More(Box&lt;Node&gt;),
+}
+</code></pre>
+<p>Revisemos nuestras prioridades:</p>
+<ul>
+<li>La cola de una lista nunca asigna basura extra: ¡correcto!</li>
+<li>El <code>enum</code> está en la deliciosa forma optimizada por puntero nulo: ¡correcto!</li>
+<li>Todos los elementos se asignan uniformemente: ¡correcto!</li>
+</ul>
+<p>¡Muy bien! En realidad acabamos de construir exactamente el diseño que usamos
+para demostrar que nuestro primer diseño (tal como lo sugería la documentación
+oficial de Rust) era problemático.</p>
+<pre><code class="language-text">&gt; cargo build
+
+warning: private type `first::Node` in public interface (error E0446)
+ --&gt; src/first.rs:8:10
+  |
+8 |     More(Box&lt;Node&gt;),
+  |          ^^^^^^^^^
+  |
+  = note: #[warn(private_in_public)] on by default
+  = warning: this was previously accepted by the compiler but
+    is being phased out; it will become a hard error in a future release!
+</code></pre>
+<p>:(</p>
+<p>Rust está enfadado con nosotros otra vez. Marcamos el <code>List</code> como público (porque
+queremos que la gente pueda usarlo), pero no el <code>Node</code>. El problema es que los
+internos de un <code>enum</code> son totalmente públicos, y no se nos permite hablar
+públicamente de tipos privados. Podríamos hacer que todo <code>Node</code> sea totalmente
+público, pero generalmente en Rust preferimos mantener los detalles de
+implementación privados. Envolvamos <code>List</code> dentro de un struct, para
+poder ocultar los detalles de implementación:</p>
+<pre><code class="language-rust ignore">pub struct List {  // nuestro nuevo struct envoltorio
+    head: Link,
+}
+
+enum Link {  // previamente conocido como List
+    Empty,
+    More(Box&lt;Node&gt;),
+}
+
+struct Node {
+    elem: i32,
+    next: Link,
+}
+</code></pre>
+<p>Como <code>List</code> es un struct con un solo campo, su tamaño es el mismo que el de ese
+campo. ¡Yupis, abstracciones de costo cero!</p>
+<pre><code class="language-text">&gt; cargo build
+
+warning: field is never used: `head`
+ --&gt; src/first.rs:2:5
+  |
+2 |     head: Link,
+  |     ^^^^^^^^^^
+  |
+  = note: #[warn(dead_code)] on by default
+
+warning: variant is never constructed: `Empty`
+ --&gt; src/first.rs:6:5
+  |
+6 |     Empty,
+  |     ^^^^^
+
+warning: variant is never constructed: `More`
+ --&gt; src/first.rs:7:5
+  |
+7 |     More(Box&lt;Node&gt;),
+  |     ^^^^^^^^^^^^^^^
+
+warning: field is never used: `elem`
+  --&gt; src/first.rs:11:5
+   |
+11 |     elem: i32,
+   |     ^^^^^^^^^
+
+warning: field is never used: `next`
+  --&gt; src/first.rs:12:5
+   |
+12 |     next: Link,
+   |     ^^^^^^^^^^
+
+</code></pre>
+<p>¡Muy bien, compiló! Rust está bastante enfadado, porque por lo que puede ver,
+todo lo que hemos escrito es totalmente inútil: nunca usamos <code>head</code>, y nadie que
+use nuestra librería puede tampoco porque es privado. Transitivamente, eso
+significa que Link y Node también son inútiles. ¡Así que solucionemos eso!
+¡Implementemos algo de código para nuestra Lista!</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="first.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="first-new.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="first.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="first-new.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

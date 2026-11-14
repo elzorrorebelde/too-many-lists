@@ -1,0 +1,547 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Conceptos Básicos - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html" class="active"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#conceptos-básicos-basics" id="conceptos-básicos-basics">Conceptos Básicos (Basics)</a></h1>
+<blockquote>
+<p><strong>NARRADOR:</strong> Esta sección contiene un error fundamental latente, porque ese es precisamente el objetivo del libro. Sin embargo, cuando empezamos a usar <code>unsafe</code>, es posible hacer las cosas mal y aun así conseguir que todo compile y <em>parezca</em> funcionar. El error fundamental se identificará en la siguiente sección. ¡No uses realmente el contenido de esta sección en código de producción!</p>
+</blockquote>
+<p>Muy bien, volvamos a lo básico. ¿Cómo construimos nuestra lista?</p>
+<p>Antes hacíamos lo siguiente:</p>
+<pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
+    pub fn new() -&gt; Self {
+        List { head: None, tail: None }
+    }
+}
+</code></pre>
+<p>Pero ya no usamos <code>Option</code> para <code>tail</code>:</p>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0308]: mismatched types
+  --&gt; src/fifth.rs:15:34
+   |
+15 |         List { head: None, tail: None }
+   |                                  ^^^^ expected *-ptr, found 
+   |                                       enum `std::option::Option`
+   |
+   = note: expected type `*mut fifth::Node&lt;T&gt;`
+              found type `std::option::Option&lt;_&gt;`
+</code></pre>
+<p><em>Podríamos</em> usar un <code>Option</code>, pero, a diferencia de <code>Box</code>, <code>*mut</code> <em>puede</em> ser nulo. Esto significa que no puede beneficiarse de la optimización de puntero nulo. En su lugar, usaremos <code>null</code> para representar <code>None</code>.</p>
+<p>Entonces, ¿cómo obtenemos un puntero nulo? Hay varias formas, pero prefiero usar
+<code>std::ptr::null_mut()</code>. Si quieres, también puedes usar <code>0 as *mut _</code>, pero me
+parece demasiado <em>sucio</em>.</p>
+<pre><code class="language-rust ignore">use std::ptr;
+
+// defns...
+
+impl&lt;T&gt; List&lt;T&gt; {
+    pub fn new() -&gt; Self {
+        List { head: None, tail: ptr::null_mut() }
+    }
+}
+</code></pre>
+<pre><code class="language-text">cargo build
+
+warning: field is never used: `head`
+ --&gt; src/fifth.rs:4:5
+  |
+4 |     head: Link&lt;T&gt;,
+  |     ^^^^^^^^^^^^^
+  |
+  = note: #[warn(dead_code)] on by default
+
+warning: field is never used: `tail`
+ --&gt; src/fifth.rs:5:5
+  |
+5 |     tail: *mut Node&lt;T&gt;,
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: field is never used: `elem`
+  --&gt; src/fifth.rs:11:5
+   |
+11 |     elem: T,
+   |     ^^^^^^^
+
+warning: field is never used: `head`
+  --&gt; src/fifth.rs:12:5
+   |
+12 |     head: Link&lt;T&gt;,
+   |     ^^^^^^^^^^^^^
+</code></pre>
+<p><em>shh</em>, compilador, pronto los usaremos.</p>
+<p>Muy bien, volvamos a escribir <code>push</code>. Esta vez, en lugar de obtener un
+<code>Option&lt;&amp;mut Node&lt;T&gt;&gt;</code> después de insertar, obtendremos directamente un
+<code>*mut Node&lt;T&gt;</code> que apunte al contenido del <code>Box</code>. Sabemos que esto es correcto
+porque el contenido de un <code>Box</code> tiene una dirección estable, incluso si movemos
+el <code>Box</code>. Por supuesto, esto no es <em>safe</em>, porque si simplemente eliminamos el
+<code>Box</code>, tendremos un puntero a memoria liberada.</p>
+<p>¿Cómo convertimos un puntero normal en un puntero crudo? ¡Coerciones! Si una
+variable se declara como puntero crudo, una referencia normal se convertirá en él:</p>
+<pre><code class="language-rust ignore">let raw_tail: *mut _ = &amp;mut *new_tail;
+</code></pre>
+<p>Ya tenemos toda la información necesaria. Podemos traducir nuestro código,
+aproximadamente, a la versión anterior basada en referencias:</p>
+<pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: T) {
+    let mut new_tail = Box::new(Node {
+        elem: elem,
+        next: None,
+    });
+
+    let raw_tail: *mut _ = &amp;mut *new_tail;
+
+    // .is_null checks for null, equivalent to checking for None
+    if !self.tail.is_null() {
+        // If the old tail existed, update it to point to the new tail
+        self.tail.next = Some(new_tail);
+    } else {
+        // Otherwise, update the head to point to it
+        self.head = Some(new_tail);
+    }
+
+    self.tail = raw_tail;
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0609]: no field `next` on type `*mut fifth::Node&lt;T&gt;`
+  --&gt; src/fifth.rs:31:23
+   |
+31 |             self.tail.next = Some(new_tail);
+   |             ----------^^^^
+   |             |
+   |             help: `self.tail` is a raw pointer; 
+   |             try dereferencing it: `(*self.tail).next`
+</code></pre>
+<p>¿Eh? Tenemos un puntero a un <code>Node</code>; ¿por qué no podemos acceder al campo <code>next</code>?</p>
+<p>Rust se pone un poco pesado cuando usas punteros crudos. Para acceder al
+contenido de un puntero crudo, exige que lo desreferenciemos manualmente, porque
+es una operación insegura. Hagámoslo:</p>
+<pre><code class="language-rust ignore">*self.tail.next = Some(new_tail);
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0609]: no field `next` on type `*mut fifth::Node&lt;T&gt;`
+  --&gt; src/fifth.rs:31:23
+   |
+31 |             *self.tail.next = Some(new_tail);
+   |             -----------^^^^
+   |             |
+   |             help: `self.tail` is a raw pointer; 
+   |             try dereferencing it: `(*self.tail).next`
+</code></pre>
+<p>Uuuugh operator precedence.</p>
+<pre><code class="language-rust ignore">(*self.tail).next = Some(new_tail);
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0133]: dereference of raw pointer is unsafe and requires 
+              unsafe function or block
+
+  --&gt; src/fifth.rs:31:13
+   |
+31 |             (*self.tail).next = Some(new_tail);
+   |             ^^^^^^^^^^^^^^^^^ dereference of raw pointer
+   |
+   = note: raw pointers may be NULL, dangling or unaligned; 
+     they can violate aliasing rules and cause data races: 
+     all of these are undefined behavior
+</code></pre>
+<p>ESTO. NO. DEBERÍA. SER. TAN. DIFÍCIL.</p>
+<p>¿Recuerdas que dije que Rust inseguro es como un lenguaje FFI para Rust seguro? El
+compilador quiere que delimitemos explícitamente dónde hacemos ese trabajo de FFI.
+Tenemos dos opciones. Primero, podemos marcar <em>toda</em> la función como <code>unsafe</code>,
+en cuyo caso se convierte en una función de Rust inseguro y solo se puede llamar
+dentro de un contexto <code>unsafe</code>. No es una buena opción, porque queremos que
+nuestra lista sea segura de usar. Segundo, podemos escribir un bloque <code>unsafe</code>
+dentro de la función para delimitar el límite de FFI. Esto declara que la
+función completa es segura. Hagamos eso:</p>
+<pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: T) {
+    let mut new_tail = Box::new(Node {
+        elem: elem,
+        next: None,
+    });
+
+    let raw_tail: *mut _ = &amp;mut *new_tail;
+
+    if !self.tail.is_null() {
+        // Hello Compiler, I Know I Am Doing Something Dangerous And
+        // I Promise To Be A Good Programmer Who Never Makes Mistakes.
+        unsafe {
+            (*self.tail).next = Some(new_tail);
+        }
+    } else {
+        self.head = Some(new_tail);
+    }
+
+    self.tail = raw_tail;
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+warning: field is never used: `elem`
+  --&gt; src/fifth.rs:11:5
+   |
+11 |     elem: T,
+   |     ^^^^^^^
+   |
+   = note: #[warn(dead_code)] on by default
+</code></pre>
+<p>Yay!</p>
+<p>Es bastante interesante que ese sea el <em>único</em> lugar en el que hemos tenido que
+escribir un bloque <code>unsafe</code> hasta ahora. Trabajamos con punteros crudos por todas
+partes; ¿qué ocurre?</p>
+<p>Resulta que Rust es un auténtico abogado puntilloso con las reglas cuando se
+trata de <code>unsafe</code>. Y es razonable: queremos maximizar el conjunto de programas
+de Rust seguro, porque son programas en los que podemos confiar mucho más. Para
+conseguirlo, Rust delimita cuidadosamente una superficie mínima de inseguridad.
+Fíjate en que, en todos los demás lugares donde hemos trabajado con punteros
+crudos, solo los hemos <em>asignado</em> o hemos observado si eran nulos.</p>
+<p>Si nunca desreferencias realmente un puntero crudo, <em>esas operaciones son
+completamente seguras</em>. ¡Solo estás leyendo y escribiendo un entero! La única
+forma de meterte en problemas con un puntero crudo es desreferenciarlo. Por eso
+Rust considera insegura <em>únicamente</em> esa operación; todo lo demás es seguro.</p>
+<p>Genial. Puntilloso. Pero técnicamente correcto.</p>
+<blockquote>
+<p><strong>NARRADOR:</strong> En algún lugar al otro lado del mundo, una ingeniera de hardware
+siente un escalofrío por la espalda: alguien debe de estar insistiendo otra vez
+en que los punteros no son más que enteros. Mira su propuesta para un nuevo
+sistema de autenticación de punteros por hardware y derrama una sola lágrima.
+El ingeniero del compilador de al lado no siente nada: hace mucho que aprendió
+a llevar siempre un jersey grueso.</p>
+</blockquote>
+<p>Que solo algunas operaciones con punteros sean <em>realmente</em> inseguras plantea
+un problema interesante: aunque se supone que debemos delimitar el alcance de
+la inseguridad con el bloque <code>unsafe</code>, este depende de un estado establecido
+fuera del bloque. ¡Incluso fuera de la función!</p>
+<p>A esto lo llamo <em>contaminación</em> insegura. En cuanto usas <code>unsafe</code> en un módulo,
+todo el módulo queda contaminado de inseguridad. Hay que escribirlo todo
+correctamente para garantizar que se mantienen todas las invariantes del código
+inseguro.</p>
+<p>Esta contaminación es manejable gracias a la <em>privacidad</em>. Fuera de nuestro
+módulo, todos los campos de nuestras estructuras son completamente privados,
+así que nadie puede alterar nuestro estado de forma arbitraria. Mientras ninguna
+combinación de las API expuestas provoque problemas, desde el punto de vista de
+un observador externo todo nuestro código es seguro. Y, en realidad, esto no es
+distinto del caso de FFI. A nadie le importa que una biblioteca matemática de
+Python ejecute código C por debajo, siempre que exponga una interfaz segura.</p>
+<p>En cualquier caso, pasemos a <code>pop</code>, que es prácticamente idéntico a la versión
+basada en referencias:</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;T&gt; {
+    self.head.take().map(|head| {
+        let head = *head;
+        self.head = head.next;
+
+        if self.head.is_none() {
+            self.tail = ptr::null_mut();
+        }
+
+        head.elem
+    })
+}
+</code></pre>
+<p>De nuevo vemos un caso en el que la seguridad depende del estado. Si no ponemos
+a <code>null</code> el puntero <code>tail</code> en <em>esta</em> función, no veremos ningún problema. Sin
+embargo, las llamadas posteriores a <code>push</code> empezarán a escribir en el <code>tail</code>
+colgante.</p>
+<p>Vamos a probarlo:</p>
+<pre><code class="language-rust ignore">#[cfg(test)]
+mod test {
+    use super::List;
+    #[test]
+    fn basics() {
+        let mut list = List::new();
+
+        // Check empty list behaves right
+        assert_eq!(list.pop(), None);
+
+        // Populate list
+        list.push(1);
+        list.push(2);
+        list.push(3);
+
+        // Check normal removal
+        assert_eq!(list.pop(), Some(1));
+        assert_eq!(list.pop(), Some(2));
+
+        // Push some more just to make sure nothing's corrupted
+        list.push(4);
+        list.push(5);
+
+        // Check normal removal
+        assert_eq!(list.pop(), Some(3));
+        assert_eq!(list.pop(), Some(4));
+
+        // Check exhaustion
+        assert_eq!(list.pop(), Some(5));
+        assert_eq!(list.pop(), None);
+
+        // Check the exhaustion case fixed the pointer right
+        list.push(6);
+        list.push(7);
+
+        // Check normal removal
+        assert_eq!(list.pop(), Some(6));
+        assert_eq!(list.pop(), Some(7));
+        assert_eq!(list.pop(), None);
+    }
+}
+</code></pre>
+<p>Esta es simplemente la prueba de la pila, pero con los resultados esperados de
+<code>pop</code> invertidos. También añadí algunos pasos al final para asegurarme de que no
+se produzca el caso de corrupción del puntero <code>tail</code> en <code>pop</code>.</p>
+<pre><code class="language-text">cargo test
+
+running 12 tests
+test fifth::test::basics ... ok
+test first::test::basics ... ok
+test fourth::test::basics ... ok
+test fourth::test::peek ... ok
+test second::test::basics ... ok
+test fourth::test::into_iter ... ok
+test second::test::into_iter ... ok
+test second::test::iter ... ok
+test second::test::iter_mut ... ok
+test second::test::peek ... ok
+test third::test::basics ... ok
+test third::test::iter ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured
+</code></pre>
+<p>Gold Star!</p>
+<blockquote>
+<p><strong>NARRATOR:</strong> Here it comes...</p>
+</blockquote>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="fifth-unsafe.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="fifth-miri.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="fifth-unsafe.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="fifth-miri.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

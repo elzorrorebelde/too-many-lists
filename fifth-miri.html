@@ -1,0 +1,434 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Miri - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html" class="active"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#miri" id="miri">Miri</a></h1>
+<p><em>ríe nerviosamente</em> Esto de <code>unsafe</code> es muy fácil; no sé por qué todo el mundo dice lo contrario. Nuestro programa funciona perfectamente.</p>
+<blockquote>
+<p><strong>NARRATOR:</strong> 🙂</p>
+</blockquote>
+<p>...right?</p>
+<blockquote>
+<p><strong>NARRATOR:</strong> 🙂</p>
+</blockquote>
+<p>Bueno, ahora estamos escribiendo código <code>unsafe</code>, así que el compilador no puede ayudarnos a detectar errores de la misma manera. Puede que las pruebas <em>simplemente</em> hayan funcionado, pero que en realidad estén haciendo algo no determinista. Algo parecido al comportamiento indefinido.</p>
+<p>Pero ¿qué podemos hacer? Hemos forzado las ventanas y escapado del aula de <code>rustc</code>. Ahora nadie puede ayudarnos.</p>
+<p>...Espera, ¿quién es esa persona de aspecto sospechoso en el callejón?</p>
+<p><em>«Oye, chico, ¿quieres interpretar código Rust?»</em></p>
+<p>Wh- no? Why,</p>
+<p><em>«Es una locura, puede comprobar que la ejecución dinámica real de tu programa cumple la semántica del modelo de memoria de Rust. Te vuela la cabeza...»</em></p>
+<p>What?</p>
+<p><em>«Comprueba si provocas comportamiento indefinido.»</em></p>
+<p>Supongo que podría probar un intérprete <em>una sola vez</em>.</p>
+<p><em>«Tienes <code>rustup</code> instalado, ¿verdad?»</em></p>
+<p>Claro que sí, ¡es <em>la</em> herramienta para mantener actualizada la cadena de herramientas de Rust!</p>
+<pre><code class="language-text">&gt; rustup +nightly-2022-01-21 component add miri
+
+info: syncing channel updates for 'nightly-2022-01-21-x86_64-pc-windows-msvc'
+info: latest update on 2022-01-21, rust version 1.60.0-nightly (777bb86bc 2022-01-20)
+info: downloading component 'cargo'
+info: downloading component 'clippy'
+info: downloading component 'rust-docs'
+info: downloading component 'rust-std'
+info: downloading component 'rustc'
+info: downloading component 'rustfmt'
+info: installing component 'cargo'
+info: installing component 'clippy'
+info: installing component 'rust-docs'
+info: installing component 'rust-std'
+info: installing component 'rustc'
+info: installing component 'rustfmt'
+info: downloading component 'miri'
+info: installing component 'miri'
+</code></pre>
+<p>¿Qué acabas de instalar en mi ordenador?</p>
+<p><em>«Lo bueno»</em></p>
+<blockquote>
+<p><strong>NARRADOR:</strong> Hay algunas cosas extrañas con las versiones de la cadena de herramientas:</p>
+<p>La herramienta que estamos instalando, <code>miri</code>, trabaja estrechamente con los
+componentes internos de <code>rustc</code>, por lo que solo está disponible en cadenas
+de herramientas <code>nightly</code>.</p>
+<p><code>+nightly-2022-01-21</code> indica a <code>rustup</code> que queremos instalar <code>miri</code> con la
+cadena <code>nightly</code> de Rust de esa fecha. Especifico una fecha concreta porque a
+veces <code>miri</code> se queda atrás y no se puede compilar con algunas versiones
+<code>nightly</code>. <code>rustup</code> descargará automáticamente la cadena que especifiquemos
+con <code>+</code> si todavía no está instalada.</p>
+<p>2022-01-21 es una versión <code>nightly</code> que sé que admite <code>miri</code>, como puedes
+comprobar en <a href="https://rust-lang.github.io/rustup-components-history/">esta página de estado</a>.
+También puedes usar simplemente <code>+nightly</code> si te sientes afortunado.</p>
+<p>Cada vez que invoquemos <code>miri</code> mediante <code>cargo miri</code>, usaremos esta sintaxis
+<code>+</code> para indicar la cadena en la que instalamos <code>miri</code>. Si no quieres tener que
+especificarla cada vez, puedes usar <a href="https://rust-lang.github.io/rustup/overrides.html"><code>rustup override set</code></a>.</p>
+</blockquote>
+<pre><code class="language-text">&gt; cargo +nightly-2022-01-21 miri test
+
+I will run `&quot;cargo.exe&quot; &quot;install&quot; &quot;xargo&quot;` to install
+a recent enough xargo. Proceed? [Y/n]
+</code></pre>
+<p>¿¡PERO QUÉ DEMONIOS ES XARGO!?</p>
+<p><em>«Todo va bien, no te preocupes.»</em></p>
+<pre><code class="language-text">&gt; y
+
+    Updating crates.io index
+  Installing xargo v0.3.24
+...
+    Finished release [optimized] target(s) in 10.65s
+  Installing C:\Users\ninte\.cargo\bin\xargo-check.exe
+  Installing C:\Users\ninte\.cargo\bin\xargo.exe
+   Installed package `xargo v0.3.24` (executables `xargo-check.exe`, `xargo.exe`)
+
+I will run `&quot;rustup&quot; &quot;component&quot; &quot;add&quot; &quot;rust-src&quot;` to install 
+the `rust-src` component for the selected toolchain. Proceed? [Y/n]
+</code></pre>
+<p>UH???</p>
+<p><em>«¿A quién no le gusta tener una copia del código fuente de Rust?»</em></p>
+<pre><code class="language-text">&gt; y
+
+info: downloading component 'rust-src'
+info: installing component 'rust-src'
+</code></pre>
+<p><em>«Sí, ya está listo; aquí viene lo bueno.»</em></p>
+<pre><code class="language-text">   Compiling lists v0.1.0 (C:\Users\ninte\dev\tmp\lists)
+    Finished test [unoptimized + debuginfo] target(s) in 0.25s
+     Running unittests (lists-5cc11d9ee5c3e924.exe)
+
+error: Undefined Behavior: trying to reborrow for Unique at alloc84055, 
+       but parent tag &lt;209678&gt; does not have an appropriate item in 
+       the borrow stack
+
+   --&gt; \lib\rustlib\src\rust\library\core\src\option.rs:846:18
+    |
+846 |             Some(x) =&gt; Some(f(x)),
+    |                  ^ trying to reborrow for Unique at alloc84055, 
+    |                    but parent tag &lt;209678&gt; does not have an 
+    |                    appropriate item in the borrow stack
+    |
+    = help: this indicates a potential bug in the program: 
+      it performed an invalid operation, but the rules it 
+      violated are still experimental
+    = help: see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md 
+      for further information
+
+    = note: inside `std::option::Option::&lt;std::boxed::Box&lt;fifth::Node&lt;i32&gt;&gt;&gt;::map::&lt;i32, [closure@src\fifth.rs:31:30: 40:10]&gt;` at \lib\rustlib\src\rust\library\core\src\option.rs:846:18
+
+note: inside `fifth::List::&lt;i32&gt;::pop` at src\fifth.rs:31:9
+   --&gt; src\fifth.rs:31:9
+    |
+31  | /         self.head.take().map(|head| {
+32  | |             let head = *head;
+33  | |             self.head = head.next;
+34  | |
+...   |
+39  | |             head.elem
+40  | |         })
+    | |__________^
+note: inside `fifth::test::basics` at src\fifth.rs:74:20
+   --&gt; src\fifth.rs:74:20
+    |
+74  |         assert_eq!(list.pop(), Some(1));
+    |                    ^^^^^^^^^^
+note: inside closure at src\fifth.rs:62:5
+   --&gt; src\fifth.rs:62:5
+    |
+61  |       #[test]
+    |       ------- in this procedural macro expansion
+62  | /     fn basics() {
+63  | |         let mut list = List::new();
+64  | |
+65  | |         // Check empty list behaves right
+...   |
+96  | |         assert_eq!(list.pop(), None);
+97  | |     }
+    | |_____^
+ ...
+error: aborting due to previous error
+</code></pre>
+<p>Vaya. Ese es un error monumental.</p>
+<p><em>«Sí, mira eso. Da gusto verlo.»</em></p>
+<p>¿Gracias?</p>
+<p><em>«Toma también esta botella de estradiol; la necesitarás más adelante.»</em></p>
+<p>¿Por qué?</p>
+<p><em>«Estás a punto de empezar a pensar en modelos de memoria, créeme.»</em></p>
+<blockquote>
+<p><strong>NARRADOR:</strong> La misteriosa persona se transformó entonces en un zorro y salió corriendo por un agujero de la pared. El autor se quedó mirando al vacío durante varios minutos mientras intentaba asimilar todo lo que acababa de ocurrir.</p>
+</blockquote>
+<hr />
+<p>El misterioso zorro del callejón tenía razón en algo más que en lo relacionado con mi género: <code>miri</code> es realmente la leche.</p>
+<p>De acuerdo, ¿qué <em>es</em> <a href="https://github.com/rust-lang/miri">miri</a>?</p>
+<blockquote>
+<p>Un intérprete experimental de la representación intermedia de nivel medio de Rust (MIR). Puede ejecutar binarios y conjuntos de pruebas de proyectos de Cargo y detectar ciertas clases de comportamiento indefinido, por ejemplo:</p>
+<ul>
+<li>Accesos a memoria fuera de los límites y uso después de liberar memoria.</li>
+<li>Uso incorrecto de datos no inicializados.</li>
+<li>Incumplimiento de precondiciones intrínsecas (alcanzar <code>unreachable_unchecked</code>, llamar a <code>copy_nonoverlapping</code> con rangos solapados, ...).</li>
+<li>Accesos y referencias a memoria con una alineación insuficiente.</li>
+<li>Incumplimiento de algunas invariantes básicas de los tipos (por ejemplo, un <code>bool</code> que no sea 0 o 1, o un discriminante de <code>enum</code> no válido).</li>
+<li>Experimental: incumplimientos de las reglas de préstamos apilados que gobiernan el aliasing de los tipos de referencia.</li>
+<li>Experimental: carreras de datos (pero no efectos de memoria débil).</li>
+</ul>
+<p>Además, <code>Miri</code> también te informará de las fugas de memoria: si queda memoria asignada al final de la ejecución y esa memoria no es accesible desde un <code>static</code> global, <code>Miri</code> emitirá un error.</p>
+<p>...</p>
+<p>Sin embargo, ten en cuenta que <code>Miri</code> no detecta todos los casos de comportamiento indefinido de tu programa y no puede ejecutar todos los programas.</p>
+</blockquote>
+<p>En resumen: interpreta tu programa y detecta si infringe las reglas <em>en tiempo de ejecución</em> y provoca comportamiento indefinido. Esto es necesario porque el comportamiento indefinido suele producirse en tiempo de ejecución. Si el problema pudiera detectarse al compilar, ¡el compilador simplemente lo convertiría en un error!</p>
+<p>Si conoces herramientas como <code>ubsan</code> y <code>tsan</code>, esto es algo parecido, pero todo junto y de forma más extrema.</p>
+<hr />
+<p>Ahora <code>miri</code> cuelga fuera de la ventana del aula con un cuchillo. Un cuchillo didáctico.</p>
+<p>Si queremos que <code>miri</code> compruebe nuestro trabajo, podemos pedirle que interprete nuestro conjunto de pruebas con</p>
+<pre><code class="language-text">&gt; cargo +nightly-2022-01-21 miri test
+</code></pre>
+<p>Now let's take a closer look at what they carved into our desk:</p>
+<pre><code class="language-text">error: Undefined Behavior: trying to reborrow for Unique at alloc84055, but parent tag &lt;209678&gt; does not have an appropriate item in the borrow stack
+
+   --&gt; \lib\rustlib\src\rust\library\core\src\option.rs:846:18
+    |
+846 |             Some(x) =&gt; Some(f(x)),
+    |                  ^ trying to reborrow for Unique at alloc84055, 
+    |                    but parent tag &lt;209678&gt; does not have an 
+    |                    appropriate item in the borrow stack
+    |
+
+    = help: this indicates a potential bug in the program: it 
+      performed an invalid operation, but the rules it 
+      violated are still experimental
+    
+    = help: see 
+      https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md 
+      for further information
+</code></pre>
+<p>Veo que hemos cometido un error, pero es un mensaje bastante confuso. ¿Qué es la «pila de préstamos»?</p>
+<p>Intentaremos averiguarlo en la siguiente sección.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="fifth-basics.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="fifth-stacked-borrows.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="fifth-basics.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="fifth-stacked-borrows.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

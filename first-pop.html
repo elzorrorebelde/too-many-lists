@@ -1,0 +1,470 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Pop - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html" class="active"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#pop" id="pop">Pop</a></h1>
+<p>Al igual que <code>push</code>, <code>pop</code> quiere mutar la lista. A diferencia de <code>push</code>,
+realmente queremos devolver algo. Pero <code>pop</code> también tiene que lidiar con un
+caso límite complicado: ¿qué pasa si la lista está vacía? Para representar
+este caso, usamos el confiable tipo <code>Option</code>:</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    // TODO
+}
+</code></pre>
+<p><code>Option&lt;T&gt;</code> es un enum que representa un valor que puede existir. Puede ser
+<code>Some(T)</code> o <code>None</code>. Podríamos crear nuestro propio enum para esto como hicimos
+con Link, pero queremos que nuestros usuarios puedan entender qué demonios es
+nuestro tipo de retorno, y Option es tan ubicuo que <em>todo el mundo</em> lo sabe.
+De hecho, es tan fundamental que se importa implícitamente en el ámbito de
+cada archivo, así como sus variantes <code>Some</code> y <code>None</code> (para que no tengamos que
+decir <code>Option::None</code>).</p>
+<p>Los picos en <code>Option&lt;T&gt;</code> indican que Option es en realidad <em>genérico</em> sobre
+T. ¡Eso significa que puedes hacer un Option para <em>cualquier</em> tipo!</p>
+<p>Así que eh, tenemos este <code>Link</code>, ¿cómo averiguamos si está Empty o tiene
+More? ¡Pattern matching con <code>match</code>!</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    match self.head {
+        Link::Empty =&gt; {
+            // TODO
+        }
+        Link::More(node) =&gt; {
+            // TODO
+        }
+    };
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0308]: mismatched types
+  --&gt; src/first.rs:27:30
+   |
+27 |     pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+   |            ---               ^^^^^^^^^^^ expected enum `std::option::Option`, found ()
+   |            |
+   |            this function's body doesn't return
+   |
+   = note: expected type `std::option::Option&lt;i32&gt;`
+              found type `()`
+</code></pre>
+<p>Ups, <code>pop</code> tiene que devolver un valor, y todavía no lo estamos haciendo.
+Podríamos devolver <code>None</code>, pero en este caso probablemente es mejor devolver
+<code>unimplemented!()</code>, para indicar que no hemos terminado de implementar la
+función. <code>unimplemented!()</code> es una macro (<code>!</code> indica una macro) que entra en
+pánico (panic) en el programa cuando llegamos a ella (~lo bloquea de forma
+controlada).</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    match self.head {
+        Link::Empty =&gt; {
+            // TODO
+        }
+        Link::More(node) =&gt; {
+            // TODO
+        }
+    };
+    unimplemented!()
+}
+</code></pre>
+<p>Los pánicos incondicionales son un ejemplo de una <a href="https://doc.rust-lang.org/nightly/book/ch19-04-advanced-types.html#the-never-type-that-never-returns">función divergente</a>.
+Las funciones divergentes nunca retornan a quien las llamó, por lo que pueden
+usarse en lugares donde se espera un valor de cualquier tipo. Aquí,
+<code>unimplemented!()</code> se está usando en lugar de un valor de tipo <code>Option&lt;T&gt;</code>.</p>
+<p>Nótese también que no necesitamos escribir <code>return</code> en nuestro programa. La
+última expresión (básicamente línea) en una función es implícitamente su
+valor de retorno. Esto nos permite expresar cosas realmente simples de forma
+más concisa. Siempre puedes retornar explícitamente con <code>return</code> como en
+cualquier otro lenguaje tipo C.</p>
+<pre><code class="language-text">&gt; cargo build
+
+error[E0507]: cannot move out of borrowed content
+  --&gt; src/first.rs:28:15
+   |
+28 |         match self.head {
+   |               ^^^^^^^^^
+   |               |
+   |               cannot move out of borrowed content
+   |               help: consider borrowing here: `&amp;self.head`
+...
+32 |             Link::More(node) =&gt; {
+   |                        ---- data moved here
+   |
+note: move occurs because `node` has type `std::boxed::Box&lt;first::Node&gt;`, which does not implement the `Copy` trait
+  --&gt; src/first.rs:32:24
+   |
+32 |             Link::More(node) =&gt; {
+   |                        ^^^^
+</code></pre>
+<p>¡Vamos Rust, déjanos en paz! Como siempre, Rust está super enfadado con
+nosotros. Afortunadamente, esta vez también nos está dando la información
+completa. Por defecto, un pattern match intentará mover sus contenidos a la
+nueva rama, pero no podemos hacer esto porque no poseemos self por valor aquí.</p>
+<pre><code class="language-text">help: consider borrowing here: `&amp;self.head`
+</code></pre>
+<p>Rust dice que deberíamos añadir una referencia a nuestro <code>match</code> para
+arreglarlo. 🤷‍♀️ Probemos:</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    match &amp;self.head {
+        Link::Empty =&gt; {
+            // TODO
+        }
+        Link::More(node) =&gt; {
+            // TODO
+        }
+    };
+    unimplemented!()
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+
+warning: unused variable: `node`
+  --&gt; src/first.rs:32:24
+   |
+32 |             Link::More(node) =&gt; {
+   |                        ^^^^ help: consider prefixing with an underscore: `_node`
+   |
+   = note: #[warn(unused_variables)] on by default
+
+warning: field is never used: `elem`
+  --&gt; src/first.rs:13:5
+   |
+13 |     elem: i32,
+   |     ^^^^^^^^^
+   |
+   = note: #[warn(dead_code)] on by default
+
+warning: field is never used: `next`
+  --&gt; src/first.rs:14:5
+   |
+14 |     next: Link,
+   |     ^^^^^^^^^^
+</code></pre>
+<p>Hurra, ¡compila otra vez! Ahora resolvamos esa lógica. Queremos hacer un
+Option, así que creemos una variable para eso. En el caso Empty necesitamos
+devolver None. En el caso More necesitamos devolver <code>Some(i32)</code>, y cambiar la
+cabeza de la lista. Así que, ¿intentemos hacer básicamente eso?</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    let result;
+    match &amp;self.head {
+        Link::Empty =&gt; {
+            result = None;
+        }
+        Link::More(node) =&gt; {
+            result = Some(node.elem);
+            self.head = node.next;
+        }
+    };
+    result
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+   Compiling lists v0.1.0 (/Users/ADesires/dev/temp/lists)
+error[E0507]: cannot move out of borrowed content
+  --&gt; src/first.rs:35:29
+   |
+35 |                 self.head = node.next;
+   |                             ^^^^^^^^^ cannot move out of borrowed content
+
+</code></pre>
+<p><em>cabeza</em></p>
+<p><em>escritorio</em></p>
+<p>Estamos intentando mover algo de <code>node</code> cuando todo lo que tenemos es una
+referencia compartida a él.</p>
+<p>Deberíamos dar un paso atrás y pensar qué estamos intentando hacer. Queremos:</p>
+<ul>
+<li>Comprobar si la lista está vacía.</li>
+<li>Si está vacía, simplemente devolver None.</li>
+<li>Si <em>no</em> está vacía
+<ul>
+<li>eliminar la cabeza de la lista</li>
+<li>eliminar su <code>elem</code></li>
+<li>reemplazar la cabeza de la lista con su <code>next</code></li>
+<li>devolver <code>Some(elem)</code></li>
+</ul>
+</li>
+</ul>
+<p>La idea clave es que queremos <em>eliminar</em> cosas, lo que significa que queremos
+obtener la cabeza de la lista <em>por valor</em>. Ciertamente no podemos hacerlo a
+través de la referencia compartida que obtenemos con <code>&amp;self.head</code>. También
+&quot;solo&quot; tenemos una referencia mutable a <code>self</code>, así que la única forma de
+mover cosas es <em>reemplazarlas</em>. ¡Parece que estamos haciendo el baile de Empty
+otra vez!</p>
+<p>Probemos:</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    let result;
+    match mem::replace(&amp;mut self.head, Link::Empty) {
+        Link::Empty =&gt; {
+            result = None;
+        }
+        Link::More(node) =&gt; {
+            result = Some(node.elem);
+            self.head = node.next;
+        }
+    };
+    result
+}
+</code></pre>
+<pre><code class="language-text">cargo build
+
+   Finished dev [unoptimized + debuginfo] target(s) in 0.22s
+</code></pre>
+<p>O M G</p>
+<p>¡Compiló sin <em>ninguna</em> advertencia!</p>
+<p>En realidad, voy a aplicar mi propia regla aquí: creamos este valor <code>result</code>
+para devolverlo, pero en realidad no necesitábamos hacer eso en absoluto.
+Así como una función se evalúa a su última expresión, cada bloque también se
+evalúa a su última expresión. Normalmente suprimimos este comportamiento con
+punto y coma, que en su lugar hace que el bloque se evalúe a la tupla vacía,
+<code>()</code>. Este es en realidad el valor que devuelven las funciones que no declaran
+un valor de retorno — como <code>push</code>.</p>
+<p>Así que, en su lugar, podemos escribir <code>pop</code> como:</p>
+<pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
+    match mem::replace(&amp;mut self.head, Link::Empty) {
+        Link::Empty =&gt; None,
+        Link::More(node) =&gt; {
+            self.head = node.next;
+            Some(node.elem)
+        }
+    }
+}
+</code></pre>
+<p>Que es un poco más conciso e idiomático. Nótese que la rama Link::Empty ha
+perdido completamente sus llaves, porque solo tenemos una expresión que
+evaluar. Solo una abreviatura útil para casos simples.</p>
+<pre><code class="language-text">cargo build
+
+   Finished dev [unoptimized + debuginfo] target(s) in 0.22s
+</code></pre>
+<p>Bien, ¡sigue funcionando!</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="first-push.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="first-test.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="first-push.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="first-test.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

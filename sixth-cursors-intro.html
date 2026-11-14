@@ -1,0 +1,326 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Una Introducción a los Cursores - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html" class="active"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#una-introducción-a-los-cursores" id="una-introducción-a-los-cursores">Una Introducción a los Cursores</a></h1>
+<p>¡¡¡Vale!!! Ahora tenemos una <code>LinkedList</code> a la altura de la implementación 1.0 de <code>std</code>. Lo que, por supuesto, significa que nuestra <code>LinkedList</code> <em>sigue siendo completamente inútil</em>. Hemos pagado la enorme penalización de rendimiento de implementar una <code>Deque</code> como lista enlazada, <strong>y todavía no tenemos ninguna de las API que la harían realmente útil</strong>.</p>
+<p>Así nos va frente a los «casos de uso estrella» de las listas enlazadas:</p>
+<ul>
+<li>🚫 Poder hacer <a href="https://docs.rs/linked-hash-map/latest/linked_hash_map/">cosas intrusivas extrañas</a></li>
+<li>🚫 Poder hacer <a href="https://doc.rust-lang.org/std/sync/mpsc/">cosas extrañas sin bloqueo</a></li>
+<li>🚫 Poder almacenar <a href="https://doc.rust-lang.org/nomicon/exotic-sizes.html#dynamically-sized-types-dsts">tipos de tamaño dinámico</a></li>
+<li>🌟 <code>push</code>/<code>pop</code> en O(1) sin <a href="https://en.wikipedia.org/wiki/Amortized_analysis">amortización</a> (si estás dispuesto a creer que <code>malloc</code> es O(1))</li>
+<li>🚫 Dividir listas en O(1)</li>
+<li>🚫 Intercalar listas en O(1)</li>
+</ul>
+<p>Bueno... 1 de 6 es... ¡mejor que nada! ¿Ves por qué quería sacar esta cosa de <code>std</code>?</p>
+<p>No vamos a hacer que nuestra lista admita cosas «extrañas», porque todo eso es específico de cada dominio y bastante improvisado. Pero lo de dividir e intercalar listas sí es algo que podemos hacer.</p>
+<p>Pero aquí está el problema: <em>alcanzar</em> el elemento k<sup>ésimo</sup> de una <code>LinkedList</code> tarda O(k), así que ¿cómo podemos hacer <em>posibles</em> divisiones y fusiones arbitrarias en O(1)? El truco consiste en no tener una API como <code>split_at(index)</code>, sino en crear un sistema que permita al usuario iterar con estado hasta una posición de la lista y hacer modificaciones O(1) en ese punto.</p>
+<p>Oye, ¡ya tenemos iteradores! ¿Podemos usarlos para esto? Más o menos... pero una de sus superpoderes se interpone. Quizá recuerdes que la forma en que escribimos los tiempos de vida de los iteradores por referencia hace que las referencias que devuelven <em>no</em> estén vinculadas al iterador. Esto nos permite llamar repetidamente a <code>next</code> y conservar los elementos:</p>
+<pre><code class="language-rust ignore">let mut list = ...;
+let iter = list.iter_mut();
+let elem1 = list.next();
+let elem2 = list.next();
+
+if elem1 == elem2 { ... }
+</code></pre>
+<p>Si las referencias devueltas tomaran prestado el iterador, este código no funcionaría en absoluto. ¡El compilador se quejaría de la segunda llamada a <code>next</code>! Esta flexibilidad es estupenda, pero nos impone algunas restricciones implícitas:</p>
+<ul>
+<li>
+<p>Los iteradores por referencia mutable nunca pueden retroceder y devolver de nuevo un elemento, porque el usuario podría obtener dos <code>&amp;mut</code> del mismo elemento, infringiendo reglas fundamentales del lenguaje.</p>
+</li>
+<li>
+<p>Los iteradores por referencia no pueden tener métodos adicionales que puedan modificar la colección subyacente de una forma que invalide una referencia ya devuelta.</p>
+</li>
+</ul>
+<p>¡Desafortunadamente, ambas cosas son <em>exactamente</em> lo que queremos que haga nuestra API de <code>LinkedList</code>! Por tanto, no podemos usar simplemente iteradores; necesitamos algo nuevo: los <em>cursores</em>.</p>
+<p>Los cursores son como la pequeña barra parpadeante <code>|</code> que aparece al editar texto en un ordenador. Son una posición dentro de una secuencia (el texto) que puedes desplazar con las teclas de dirección; cada vez que escribes, la edición sucede en ese punto.</p>
+<p>Mira: si</p>
+<p>pulso</p>
+<p>Intro,</p>
+<p>todo el</p>
+<p>texto</p>
+<p>se parte por la mitad.</p>
+<p>Perdona, estás detrás de mí observando cómo escribo esto, ¿verdad? Así que tiene todo el sentido, ¿no? ¿Verdad?</p>
+<p>Ahora bien, si alguna vez tuviste la desgracia de usar un teclado con una tecla «Insert» y llegaste a pulsarla, sabrás que técnicamente hay dos interpretaciones de los cursores: pueden situarse entre elementos (caracteres) o <em>sobre</em> los elementos. Estoy bastante seguro de que nadie ha pulsado «Insert» a propósito en su vida y de que existe únicamente como Botón del Sufrimiento, así que resulta obvio cuál es la opción Mejor y Correcta: ¡los cursores se sitúan entre los elementos!</p>
+<p>Una lógica inexpugnable, ¿verdad? No creo que nadie pueda llevarme la contraria.</p>
+<p>¿Perdona? ¿Hubo una <a href="https://github.com/rust-lang/rfcs/blob/master/text/2570-linked-list-cursors.md">RFC en 2018 para añadir cursores a la <code>LinkedList</code> de Rust</a>?</p>
+<blockquote>
+<p>With a Cursor one can seek back and forth through a list and get the current element. With a CursorMut One can seek back and forth and get mutable references to elements, and it can insert and delete elements before and behind the current element (along with performing several list operations such as splitting and splicing).</p>
+</blockquote>
+<p><em>Current element</em>? This cursor is <em>on</em> elements, not between them! ¡No puedo creer que no aceptaran mi argumento totalmente irrefutable! Así que puedes usar el <code>Cursor</code> de <code>std</code>... espera, ¿estamos en <a href="https://doc.rust-lang.org/1.71.0/std/collections/linked_list/struct.CursorMut.html">2023 y <code>Cursor</code> sigue marcado como inestable en Rust 1.71</a>?</p>
+<p>Hey wait:</p>
+<blockquote>
+<p>Cursors always rest between two elements in the list, and index in a logically circular way. To accommodate this, there is a &quot;ghost&quot; non-element that yields None between the head and tail of the list.</p>
+</blockquote>
+<p>HEY WAIT. This is the opposite of what the RFC says??? But wait all the docs on the methods still refer to &quot;current&quot; elements... wait hold on, where have I seen this ghost stuff before. Oh wait, no I do that in <a href="https://docs.rs/linked-list/0.0.3/linked_list/struct.Cursor.html">my old linked-list fork</a> where I prototyped?</p>
+<blockquote>
+<p>Cursors always rest between two elements in the list, and index in a logically circular way. To accomadate this, there is a &quot;ghost&quot; non-element that yields None between the head and tail of the List.</p>
+</blockquote>
+<p>Un momento, ¿qué demonios? Esto no es una broma: ahora mismo estoy intentando leer la documentación de verdad. ¿Acaso <code>std</code> propuso mediante una RFC un diseño distinto del que presenté en 2015, pero después copió y pegó la documentación de mi prototipo? ¿<code>std</code> se está burlando de mí por escribir un libro sobre cuánto odio <code>LinkedList</code>? Sí, construí aquel prototipo para demostrar el concepto y conseguir que me dejaran añadirlo a <code>std</code> para que <code>LinkedList</code> dejara de ser inútil, pero... ¿qué demonios?</p>
+<p>Ok you know what, clearly std is blessing my design as the objectively superior one, so we're going to do my design. Also that's nice because this entire chapter is me actually literally rewriting that library from scratch, so not changing the API sounds Good To Me!</p>
+<p>Here's the full top-level docs I wrote:</p>
+<blockquote>
+<p>A Cursor is like an iterator, except that it can freely seek back-and-forth, and can safely mutate the list during iteration. This is because the lifetime of its yielded references are tied to its own lifetime, instead of just the underlying list. This means cursors cannot yield multiple elements at once.</p>
+<p>Cursors always rest between two elements in the list, and index in a logically circular way. To accomadate this, there is a &quot;ghost&quot; non-element that yields None between the head and tail of the List.</p>
+<p>When created, cursors start between the ghost and the front of the list. That is, next will yield the front of the list, and prev will yield None. Calling prev again will yield the tail.</p>
+</blockquote>
+<p>Qué bonito. Aunque concluimos que todo lo del «nodo centinela» daba más problemas de los que resolvía, acabaremos teniendo una semántica que «finge» que hay un nodo centinela para que el cursor pueda rodear la lista y llegar al otro extremo.</p>
+<p><em>Skims over my old APIs some more</em></p>
+<pre><code class="language-rust ignore">fn splice(&amp;mut self, other: &amp;mut LinkedList&lt;T&gt;)
+</code></pre>
+<blockquote>
+<p>Inserts the entire list's contents right after the cursor.</p>
+</blockquote>
+<p>Oh yeah, this is coming back to me. I wrote this when I was really mad about combinatoric explosion, and was trying to come up with a way for there to only be one copy of each operation. Unfortunately this is... semantically problematic. See, when the user wants to splice one list into another, they might want the cursor to end up <em>before</em> the splice or <em>after it</em>. The inserted list can be arbitrarily large, so it's a genuine issue for us to only allow for one and expect the user to walk over the entire inserted list!</p>
+<p>Al final tendremos que rediseñar esto desde cero. ¿Qué necesita nuestro tipo <code>Cursor</code>? Necesita:</p>
+<ul>
+<li>point &quot;between&quot; two elements</li>
+<li>as a nice little feature, keep track of what &quot;index&quot; is next</li>
+<li>update the list itself to modify front/back/len. </li>
+</ul>
+<p>How do you point between two elements? Well, you don't. You just point at the &quot;next&quot; element. So, yeah even though we're exposing &quot;cursor goes in-between&quot; semantics, we're really implementing it as &quot;cursor is on&quot;, and just pretending everything happens before or after that point.</p>
+<p>¡Pero hay una razón! El caso de uso de <code>splice</code> quiere permitir que el usuario elija si termina antes o después de la lista, pero esto es... <em>horriblemente</em> complicado de expresar con la API de <code>std</code>. They have splice_after and splice_before, but neither changes the cursor's position, so really you'd need splice_after_before and splice_after_after...</p>
+<p>Espera, estoy diciendo una tontería. En la API de <code>std</code> puedes elegir el nodo en el que quieres terminar y usar después <code>splice_after</code> o <code>splice_before</code>, según corresponda.</p>
+<p><em>squints</em></p>
+<p>Wait is the std API actually good.</p>
+<p><em>skims through the code</em></p>
+<p>Ok the std API is actually good.</p>
+<p>Alright screw it, we're going to <a href="https://github.com/rust-lang/rfcs/blob/master/text/2570-linked-list-cursors.md">implement the RFC</a>. Or at least the interesting parts of it.</p>
+<p>I have my quibbles with some of the terminology std uses, but cursors are always going to be a bit brain-melty: <code>iter().next_back()</code>  gets you <code>back()</code>, so that's good, but then each subsequent <code>next_back()</code> is actually bringing you <em>closer to the front</em> and indeed, every pointer we follow is a &quot;front&quot; pointer! If I think about this seeming-paradox too much it hurts my brain, so, I can certainly respect going for different terminology to avoid this.</p>
+<p>La API de <code>std</code> habla de operaciones «antes» (hacia el frente) y «después» (hacia atrás), y en lugar de <code>next</code> y <code>next_back</code> llama a las operaciones <code>move_next</code> y <code>move_prev</code>. Mmm. Está tomando parte de la terminología de los iteradores, pero al menos <code>next</code> no evoca el frente ni la parte trasera y ayuda a orientarse respecto a cómo se comportan los iteradores.</p>
+<p>We can work with this.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="sixth-send-sync.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="sixth-cursors-impl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="sixth-send-sync.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="sixth-cursors-impl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

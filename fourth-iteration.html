@@ -1,0 +1,399 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Iteración - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html" class="active"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#iteración" id="iteración">Iteración</a></h1>
+<p>Intentemos iterar este chico malo.</p>
+<h2><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h2>
+<p>IntoIter, como siempre, va a ser el más fácil. Solo envuelve la pila y
+llama a <code>pop</code>:</p>
+<pre><code class="language-rust ignore">pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
+
+impl&lt;T&gt; List&lt;T&gt; {
+    pub fn into_iter(self) -&gt; IntoIter&lt;T&gt; {
+        IntoIter(self)
+    }
+}
+
+impl&lt;T&gt; Iterator for IntoIter&lt;T&gt; {
+    type Item = T;
+    fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; {
+        self.0.pop_front()
+    }
+}
+</code></pre>
+<p>Pero tenemos un desarrollo interesante nuevo. Donde antes solo había
+un orden de iteración &quot;natural&quot; para nuestras listas, un Deque es
+inherentemente bidireccional. ¿Qué tiene de especial el orden de adelante
+hacia atrás? ¿Qué pasa si alguien quiere iterar en la otra dirección?</p>
+<p>Rust realmente tiene una respuesta para esto: <code>DoubleEndedIterator</code>.
+DoubleEndedIterator <em>hereda</em> de Iterator (lo que significa que todos los
+DoubleEndedIterator son Iterators) y requiere un nuevo método: <code>next_back</code>.
+Tiene la misma firma exacta que <code>next</code>, pero se supone que debe producir
+elementos desde el otro extremo. La semántica de DoubleEndedIterator es
+super conveniente para nosotros: el iterador se convierte en un deque.
+Puedes consumir elementos desde el frente y el fondo hasta que los dos
+extremos converjan, momento en el cual el iterador está vacío.</p>
+<p>Al igual que Iterator y <code>next</code>, resulta que <code>next_back</code> no es realmente
+diferente de simplemente llamar a <code>pop_back</code>. Pero necesitamos ponerlo
+detrás de un trait para que la maquinaria de <code>for</code> loops, <code>map</code>, <code>filter</code>,
+etc., puedan usarlo.</p>
+<pre><code class="language-rust ignore">impl&lt;T&gt; DoubleEndedIterator for IntoIter&lt;T&gt; {
+    fn next_back(&amp;mut self) -&gt; Option&lt;T&gt; {
+        self.0.pop_back()
+    }
+}
+</code></pre>
+<pre><code class="language-text">&gt; cargo build
+</code></pre>
+<p>Awww yeah.</p>
+<p>Probémoslo:</p>
+<pre><code class="language-rust ignore">#[test]
+fn into_iter() {
+    let mut list = List::new();
+    list.push_front(1); list.push_front(2); list.push_front(3);
+
+    let mut iter = list.into_iter();
+    assert_eq!(iter.next(), Some(3));
+    assert_eq!(iter.next_back(), Some(1));
+    assert_eq!(iter.next(), Some(2));
+    assert_eq!(iter.next_back(), None);
+    assert_eq!(iter.next(), None);
+}
+</code></pre>
+<pre><code class="language-text">cargo test
+
+     Running target/debug/lists-5c71138492ad4b4a
+
+running 11 tests
+test first::test::basics ... ok
+test fourth::test::basics ... ok
+test fourth::test::into_iter ... ok
+test second::test::basics ... ok
+test second::test::into_iter ... ok
+test fourth::test::peek ... ok
+test second::test::iter_mut ... ok
+test second::test::iter ... ok
+test second::test::peek ... ok
+test third::test::iter ... ok
+test third::test::basics ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
+
+</code></pre>
+<p>¡Sí!</p>
+<h2><a class="header" href="#iter-e-itermut" id="iter-e-itermut">Iter e IterMut</a></h2>
+<p>¿Podríamos implementar <code>Iter</code> para nuestra doble cola segura?</p>
+<p>Será bastante menos sencillo. Tenemos que devolver referencias inmutables a
+los elementos de la lista, pero internamente usamos <code>RefCell</code>, así que los
+usuarios tendrían que trabajar con <code>Ref</code> para obtener esa inmutabilidad.</p>
+<p>En realidad, no podemos ocultar ese detalle. Hemos creado una abstracción que
+se filtra: los consumidores de nuestra API tendrían que conocer <code>Ref</code>,
+<code>RefCell</code> y <code>RefMut</code> para iterar sobre nuestra doble cola segura.</p>
+<p>Podríamos intentar almacenar un <code>Ref</code> dentro del iterador:</p>
+<pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt;(Option&lt;Ref&lt;'a, Node&lt;T&gt;&gt;&gt;);
+
+impl&lt;T&gt; List&lt;T&gt; {
+    pub fn iter(&amp;self) -&gt; Iter&lt;T&gt; {
+        Iter(self.head.as_ref().map(|head| head.borrow()))
+    }
+}
+</code></pre>
+<p>A primera vista parece razonable. El problema aparece al implementar <code>next</code>:
+para devolver el elemento actual y conservar el siguiente nodo necesitamos
+separar un <code>Ref</code> en dos préstamos distintos. <code>Ref::map</code> solo puede transformar
+el préstamo completo, y el siguiente préstamo queda ligado al <code>Ref</code> que
+intentamos consumir:</p>
+<pre><code class="language-rust ignore">impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
+    type Item = Ref&lt;'a, T&gt;;
+
+    fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; {
+        self.0.take().map(|node_ref| {
+            self.0 = node_ref.next.as_ref().map(|head| head.borrow());
+            Ref::map(node_ref, |node| &amp;node.elem)
+        })
+    }
+}
+</code></pre>
+<p>La función que parece adecuada existe y se llama <a href="https://doc.rust-lang.org/std/cell/struct.Ref.html#method.map_split"><code>map_split</code></a>:</p>
+<pre><code class="language-rust ignore">pub fn map_split&lt;U, V, F&gt;(orig: Ref&lt;'b, T&gt;, f: F) -&gt; (Ref&lt;'b, U&gt;, Ref&lt;'b, V&gt;) where
+    F: FnOnce(&amp;T) -&gt; (&amp;U, &amp;V),
+    U: ?Sized,
+    V: ?Sized,
+</code></pre>
+<p>Pero tampoco resuelve el problema. Cada vez que avanzamos por la lista nos
+adentramos en otro <code>RefCell</code>, así que acabaríamos necesitando conservar una
+pila de <code>Ref</code> para representar todos los préstamos pendientes. Cuando dejamos
+de mirar un elemento, tendríamos que reducir el contador de préstamos de todos
+los <code>RefCell</code> anteriores.</p>
+<p>Podríamos intentar salir de los <code>RefCell</code> usando los <code>Rc</code>. Si el iterador
+clonara el <code>Rc</code> completo, obtendríamos un identificador propietario hacia el
+interior de la lista:</p>
+<pre><code class="language-rust ignore">pub struct Iter&lt;T&gt;(Option&lt;Rc&lt;Node&lt;T&gt;&gt;&gt;);
+
+impl&lt;T&gt; List&lt;T&gt; {
+    pub fn iter(&amp;self) -&gt; Iter&lt;T&gt; {
+        Iter(self.head.as_ref().map(|head| head.clone()))
+    }
+}
+</code></pre>
+<p>Pero ¿qué devolveríamos entonces? ¿<code>&amp;T</code>? ¿<code>Ref&lt;T&gt;</code>? Ninguna de las dos
+opciones funciona: el iterador ya no tiene un tiempo de vida y ambas referencias
+necesitan uno declarado de antemano. Podríamos buscar una forma de transformar
+el <code>Rc&lt;Node&lt;T&gt;&gt;</code> en un <code>Rc&lt;T&gt;</code> mediante una abstracción como
+<a href="https://crates.io/crates/owning_ref"><code>owning_ref</code></a>, pero eso introduce otro problema: la invalidación del
+iterador.</p>
+<p>Hasta ahora éramos inmunes a la invalidación porque <code>Iter</code> tomaba prestada la
+lista y la mantenía inmutable. Si el iterador devolviera <code>Rc</code>, no tomaría
+prestada la lista, de modo que el usuario podría llamar a <code>push</code> y <code>pop</code> al
+mismo tiempo que conserva punteros hacia ella. Insertar elementos sería
+relativamente inocuo, pero eliminar el nodo al que apunta el iterador acabaría
+provocando un fallo al intentar recuperar el <code>Rc</code> con <code>try_unwrap</code>.</p>
+<p>Eso es interesante: podemos tener punteros propietarios hacia el interior de
+la lista y modificarla a la vez, y todo funciona hasta que intentamos eliminar
+un nodo observado por el iterador. Incluso entonces no obtenemos punteros
+colgantes: el programa falla de forma determinista. Sin embargo, tener que
+resolver la invalidación además de mapear <code>Rc</code> parece una mala solución.</p>
+<p><code>Rc&lt;RefCell&gt;</code> nos ha fallado finalmente. La mutabilidad interior es estupenda
+para escribir <em>aplicaciones</em> seguras, pero no tanto para escribir <em>bibliotecas</em>
+seguras con una API limpia. Podríamos hacer que funcionara si expusiéramos
+<code>Node</code> por todas partes, e incluso podríamos crear varios <code>IterMut</code> cuya
+exclusión mutua se comprobara en tiempo de ejecución, pero eso sería una API
+terrible.</p>
+<p>Así que abandonamos <code>Iter</code> e <code>IterMut</code> en esta implementación. Se podrían
+hacer, pero el coste en complejidad y ergonomía no merece la pena. Pasemos a la
+siguiente lista para sentirnos un poco mejor.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="fourth-symmetry.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="fourth-final.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="fourth-symmetry.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="fourth-final.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

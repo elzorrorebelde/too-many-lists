@@ -1,0 +1,371 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Stacked Borrows - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html" class="active"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#intentando-entender-stacked-borrows" id="intentando-entender-stacked-borrows">Intentando Entender Stacked Borrows</a></h1>
+<p>En la sección anterior intentamos ejecutar nuestra cola enlazada simple insegura bajo <code>miri</code>, y nos indicó que habíamos infringido las reglas de los <em>préstamos apilados</em> y nos enlazó documentación.</p>
+<p>Normalmente haría un recorrido guiado por la documentación, pero no somos realmente su público objetivo. Está más bien pensada para desarrolladores del compilador y académicos que trabajan en la semántica de Rust.</p>
+<p>Así que solo voy a explicar la <em>idea</em> general de los «préstamos apilados» y después ofreceré una estrategia sencilla para seguir las reglas.</p>
+<blockquote>
+<p><strong>NARRADOR:</strong> Los préstamos apilados siguen siendo «experimentales» como modelo semántico de Rust, así que infringir estas reglas no significa necesariamente que tu programa esté «mal». Pero, a menos que trabajes literalmente en el compilador, deberías arreglar el programa cuando <code>miri</code> se queje. Más vale prevenir que lamentar cuando se trata de comportamiento indefinido.</p>
+</blockquote>
+<h1><a class="header" href="#la-motivación-aliasing-de-punteros" id="la-motivación-aliasing-de-punteros">La motivación: aliasing de punteros</a></h1>
+<p>Antes de explicar <em>qué</em> reglas hemos infringido, será útil entender <em>por qué</em> existen. Hay varios problemas que las motivan, pero creo que el más importante es el <em>aliasing de punteros</em>.</p>
+<p>Decimos que dos punteros tienen <em>aliasing</em> cuando se solapan las zonas de memoria a las que apuntan. Igual que alguien que «usa un alias» puede ser llamado por dos nombres distintos, esa zona de memoria solapada puede estar referenciada por dos punteros diferentes. Esto puede causar problemas.</p>
+<p>El compilador utiliza la información sobre el aliasing de punteros para optimizar los accesos a memoria, así que si esa información es <em>incorrecta</em>, el programa se compilará mal y hará cosas absurdas.</p>
+<blockquote>
+<p><strong>NARRADOR:</strong> En la práctica, el aliasing tiene más que ver con los accesos a memoria que con los punteros en sí, y solo importa realmente cuando uno de los accesos es mutable. Se hace hincapié en los punteros porque son un elemento cómodo al que asociar reglas.</p>
+</blockquote>
+<p>Para entender por qué es importante la información sobre el aliasing de punteros, consideremos <em>la parábola del hombrecillo enfadado</em>.</p>
+<hr />
+<p>Un día, Michiel estaba mirando su estantería cuando vio un libro que no recordaba. Lo sacó de la estantería y miró la portada.</p>
+<p>«Ah, sí, mi viejo ejemplar de <em>Guerra y paz</em>, un libro que sin duda he leído. Me encantó la parte de toda la paz.»</p>
+<p>Suddenly there was a knock at the door. Michiel returned the book to its shelf and opened the door -- it was their sworn nemesis <strong>Hamslaw</strong>. As Hamslaw prepared a devastating remark about Michiel's clearly inferior codegolfing skills, they sensed an opening: </p>
+<p>&quot;Hey Hamslaw, have you ever read War and Peace?&quot;</p>
+<p>&quot;Pfft, no one's <em>actually</em> read War and Peace.&quot;</p>
+<p>&quot;Well I have, look it's right there in my bookcase, which <em>obviously</em> means He read it.&quot;</p>
+<p>Hamslaw no podía creérselo. Su rostro pasó de la habitual suficiencia a una máscara de hierro llena de rabia y determinación. Apartó a Michiel y caminó decididamente hasta la estantería, arrancando el tomo de su sitio con la furia de mil valquirias. Dio la vuelta al texto antiguo entre sus manos y, en cuanto vio la portada, empezó a temblar.</p>
+<p>Michiel prepared to boast of their clearly unparalleled brilliance, but was interrupted by the sudden laughter of Hamslaw.</p>
+<p>«¡Esto no es <em>Guerra y paz</em>, es <em>Guerra y pies</em>!»</p>
+<p>Tears were rolling down Hamslaw's face. This was clearly the greatest moment of her life.</p>
+<p>&quot;N-no! I just looked at it!&quot;</p>
+<p>They grabbed the book from Hamslaw and checked the cover. Indeed, the word &quot;Peace&quot; had been scratched out and replaced with &quot;Feet&quot;. Michiel was mortified. This was clearly the worst moment of their life.</p>
+<p>They fell to their knees and stared blankly at the bookcase. How could this have happened? They had checked the cover only a moment ago!</p>
+<p>And then they saw a bit of motion in the bookcase. It was a tiny man. A tiny man with the angriest scowl Michiel had ever seen. The tiny man flipped Michiel off and mouthed the words &quot;no one will believe you&quot; and disappeared back between the books.</p>
+<p>Michiel's plan <em>had</em> been perfect, but they had failed to account for the possibility of a tiny angry man with a sharpie and the desire for destruction. They thought they knew what the cover of the book said, and they thought that no one could have possibly changed it. But alas, they were wrong.</p>
+<p>Hamslaw was already working on a zine commemorating her incredible victory — Michiel's reputation at the local Internet Cafe would never recover.</p>
+<hr />
+<p>No one wants to be like Michiel, but no one wants to live in constant fear of the tiny angry man either. We want to know when the tiny angry man could be playing tricks on us. When he is, we will be very careful and paranoid about checking everything before we use it. But when the tiny angry man is gone, we want to be able to remember things.</p>
+<p>Ese es el meollo (muy simplificado) del aliasing de punteros: ¿cuándo puede el compilador suponer que es seguro «recordar» (guardar en caché) valores en lugar de cargarlos una y otra vez? Para saberlo, el compilador necesita determinar si <em>podría</em> haber hombrecillos enfadados modificando la memoria a tus espaldas.</p>
+<blockquote>
+<p><strong>NARRATOR:</strong> the compiler also uses this information to cache stores, which just means it can avoid committing things to memory if it thinks no one will notice. In this case the problem is still tiny angry men, but they only need to read the memory for it to be a problem.</p>
+</blockquote>
+<h1><a class="header" href="#préstamos-apilados-seguros" id="préstamos-apilados-seguros">Préstamos apilados seguros</a></h1>
+<p>Queremos que el compilador tenga buena información sobre el aliasing de punteros. ¿Podemos conseguirlo? Parece que Rust está <em>diseñado</em> para ello. Por definición, las referencias mutables no tienen alias, y aunque las referencias compartidas <em>pueden</em> tener alias, no pueden modificar datos. ¡Perfecto, enviémoslo!</p>
+<p>Except it's more complicated than that. We can &quot;reborrow&quot; mutable pointers like this:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut data = 10;
+let ref1 = &amp;mut data;
+let ref2 = &amp;mut *ref1;
+
+*ref2 += 2;
+*ref1 += 1;
+
+println!(&quot;{}&quot;, data);
+<span class="boring">}
+</span></code></pre></pre>
+<p>Compila y se ejecuta correctamente. ¿Qué ocurre?</p>
+<p>Well we can see what's going on by swapping the two uses:</p>
+<pre><code class="language-rust ignore">let mut data = 10;
+let ref1 = &amp;mut data;
+let ref2 = &amp;mut *ref1;
+
+// ORDER SWAPPED!
+*ref1 += 1;
+*ref2 += 2;
+
+println!(&quot;{}&quot;, data);
+</code></pre>
+<pre><code class="language-text">error[E0503]: cannot use `*ref1` because it was mutably borrowed
+ --&gt; src/main.rs:6:5
+  |
+4 |     let ref2 = &amp;mut *ref1;
+  |                ---------- borrow of `*ref1` occurs here
+5 |     
+6 |     *ref1 += 1;
+  |     ^^^^^^^^^^ use of borrowed `*ref1`
+7 |     *ref2 += 2;
+  |     ---------- borrow later used here
+
+For more information about this error, try `rustc --explain E0503`.
+error: could not compile `playground` due to previous error
+</code></pre>
+<p>¡De repente es un error del compilador!</p>
+<p>Cuando volvemos a tomar prestado un puntero mutable, ya no podemos usar el puntero original hasta que el nuevo préstamo haya terminado (es decir, hasta que no haya más usos).</p>
+<p>En el código que funciona, los usos están bien anidados. Volvemos a tomar prestado el puntero, usamos el nuevo durante un tiempo y dejamos de usarlo antes de volver a usar el puntero antiguo. En el código que <em>no</em> funciona, eso no ocurre: intercalamos los usos arbitrariamente.</p>
+<p>This is how we can have reborrows and still have aliasing information: all of our reborrows clearly nest, so we can consider only one of them &quot;live&quot; at any given time.</p>
+<p>Hey, you know what's a great way to represent cleanly nested things? A stack. A stack of borrows.</p>
+<p>Oh hey it's <em>Stacked Borrows</em>!</p>
+<p>Whatever's at the top of the borrow stack is &quot;live&quot; and knows it's effectively unaliased. When you reborrow a pointer, the new pointer is pushed onto the stack, becoming <em>the</em> live pointer. When you use an older pointer it's brought back to life by popping everything on the borrow stack above it. At this point the pointer &quot;knows&quot; it was reborrowed and that the memory might have been modified, but that it once more has exclusive access -- no need to worry about little angry men.</p>
+<p>So it's actually <em>always</em> ok to access a reborrowed pointer, because we can always pop everything above it. The real trouble is accessing a pointer that has already been popped off of the borrow stack -- then you've messed up.</p>
+<p>Thankfully the design of the borrowchecker ensures that safe Rust programs follow these rules, as we saw in the above example, but the compiler generally views this problem &quot;backwards&quot; from the stacked borrows perspective. Instead of saying using <code>ref1</code> invalidates <code>ref2</code>, it insists that <code>ref2</code> <em>must</em> be valid for all its uses, and that <code>ref1</code> is the one messing things up by going out of turn.</p>
+<p>De ahí «no se puede usar <code>*ref1</code> porque se tomó prestado de forma mutable». Es el mismo resultado (especialmente con tiempos de vida no léxicos), pero expresado de una manera probablemente más intuitiva.</p>
+<p>¡Pero el comprobador de préstamos no puede ayudarnos cuando empezamos a usar punteros inseguros!</p>
+<h1><a class="header" href="#préstamos-apilados-inseguros" id="préstamos-apilados-inseguros">Préstamos apilados inseguros</a></h1>
+<p>Queremos encontrar una forma de que los punteros inseguros participen en este sistema de préstamos apilados, aunque el compilador no pueda seguirlos correctamente. También queremos que el sistema sea bastante permisivo para que no resulte <em>demasiado</em> fácil estropearlo y provocar comportamiento indefinido.</p>
+<p>Es un problema difícil y no sé cómo resolverlo, pero quienes trabajaron en los préstamos apilados idearon algo plausible y <code>miri</code> intenta implementarlo.</p>
+<p>La idea general es que, cuando conviertes una referencia (o cualquier otro puntero seguro) en un puntero crudo, es <em>básicamente</em> como tomar un nuevo préstamo. El puntero crudo puede hacer entonces lo que quiera con esa memoria, y cuando el nuevo préstamo caduca ocurre lo mismo que con los nuevos préstamos normales.</p>
+<p>Pero la pregunta es: ¿cuándo caduca ese nuevo préstamo? Probablemente un buen momento sea cuando vuelves a usar la referencia original. De lo contrario, las cosas no forman una pila bien anidada.</p>
+<p>¡Pero espera, puedes convertir un puntero crudo <em>en</em> una referencia! ¡Y puedes copiar punteros crudos! ¿Qué ocurre si haces <code>&amp;mut -&gt; *mut -&gt; &amp;mut -&gt; *mut</code> y después accedes al primer <code>*mut</code>? ¿Cómo demonios funcionan entonces los préstamos apilados?</p>
+<p>¡Sinceramente, no lo sé! Por eso las cosas son complicadas. De hecho son <em>aún</em> más complicadas porque los préstamos apilados intentan ser más permisivos y permitir que más código inseguro funcione como esperarías. Por eso ejecuto el código con <code>miri</code>, para que me ayude a detectar errores.</p>
+<p>De hecho, este desorden es la razón por la que <code>miri</code> tiene un modo aún más experimental y estricto: <code>-Zmiri-tag-raw-pointers</code>.</p>
+<p>Para activarlo, tenemos que pasarlo mediante una variable de entorno <code>MIRIFLAGS</code>, así:</p>
+<pre><code class="language-text">MIRIFLAGS=&quot;-Zmiri-tag-raw-pointers&quot; cargo +nightly-2022-01-21 miri test
+</code></pre>
+<p>O así en Windows, donde basta con establecer la variable globalmente:</p>
+<pre><code class="language-text">$env:MIRIFLAGS=&quot;-Zmiri-tag-raw-pointers&quot;
+cargo +nightly-2022-01-21 miri test
+</code></pre>
+<p>En general intentaremos cumplir este modo especialmente estricto para tener <em>aún más</em> confianza en nuestro trabajo. En cierto sentido también es más «sencillo», así que resulta mejor para experimentar y adquirir intuición sobre los préstamos apilados.</p>
+<h1><a class="header" href="#managing-stacked-borrows" id="managing-stacked-borrows">Managing Stacked Borrows</a></h1>
+<p>Así que, al usar punteros crudos, intentaremos seguir una heurística sencilla y contundente que, con suerte, ofrezca un amplio margen de error:</p>
+<p><strong>Cuando empieces a usar punteros crudos, intenta usar ÚNICAMENTE punteros crudos.</strong></p>
+<p>Esto reduce al mínimo la posibilidad de perder accidentalmente el «permiso» del puntero crudo para acceder a la memoria.</p>
+<blockquote>
+<p><strong>NARRATOR:</strong> this is oversimplified in two regards:</p>
+<ol>
+<li>
+<p>Safe pointers often assert more properties than just aliasing: the memory is allocated, it's aligned, it's large enough to fit the type of the pointee, the pointee is properly initialized, etc. So it's even more dangerous to wildly throw them around when things are in a dubious state.</p>
+</li>
+<li>
+<p>Even if you stay in raw pointer land, you no puede just wildly alias any memory. Pointers are conceptually tied to specific &quot;allocations&quot; (which can be as granular as a local variable on the stack), and you're not supposed to take a pointer from one allocation, offset it, and then access memory in a different allocation. If this was allowed, there would <em>always</em> be the threat of tiny angry men <em>everywhere</em>. This is part of the reason &quot;pointers are just integers&quot; is a <em>problematic</em> viewpoint.</p>
+</li>
+</ol>
+</blockquote>
+<p>Aun así, queremos referencias seguras en nuestra <em>interfaz</em>, porque queremos construir una buena <em>abstracción segura</em> para que el usuario de nuestra lista no tenga que conocer estos detalles ni preocuparse por ellos.</p>
+<p>Así que haremos lo siguiente:</p>
+<ol>
+<li>Al principio de un método, usar las referencias de entrada para obtener nuestros punteros crudos.</li>
+<li>Intentar usar únicamente punteros inseguros a partir de ese momento.</li>
+<li>Volver a convertir nuestros punteros crudos en punteros seguros al final, si es necesario.</li>
+</ol>
+<p>Pero los campos de nuestros tipos son privados, así que los mantendremos <em>completamente</em> como punteros crudos.</p>
+<p>De hecho, parte del gran error que cometimos fue seguir usando <code>Box</code>. <code>Box</code> tiene una anotación especial que indica al compilador: «esto se parece mucho a <code>&amp;mut</code>, porque posee ese puntero de forma exclusiva». ¡Y es verdad!</p>
+<p>Pero el puntero crudo que conservábamos hacia el final de la lista apuntaba al interior de un <code>Box</code>, así que cada vez que accedemos normalmente al <code>Box</code> probablemente invalidamos el «nuevo préstamo» de ese puntero crudo. ☠</p>
+<p>En la siguiente sección volveremos a nuestra verdadera forma y nos golpearemos la cabeza con un montón de ejemplos.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="fifth-miri.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="fifth-testing-stacked-borrows.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="fifth-miri.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="fifth-testing-stacked-borrows.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

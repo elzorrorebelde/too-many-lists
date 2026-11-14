@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Introducción - Aprendiendo Rust con Demasiadas Listas Enlazadas</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Aprendiendo Rust con Demasiadas Listas Enlazadas">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> Introducción</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> Una Pila Mala</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> Nuevo</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> Propiedad (Ownership) 101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> Una Pila Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> Option</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> Genérico</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> Peek</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> IntoIter</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> Iter</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> IterMut</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> Una Pila Persistente</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> Drop</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> Una Doble Cola Mala Pero Segura</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> Construcción</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> Rompiendo</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> Peek</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> Casos Simétricos</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> Iteración</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> Una Cola Insegura Aceptable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> Inseguro (Unsafe)</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="fifth-miri.html"><strong aria-hidden="true">6.4.</strong> Miri</a></li><li class="chapter-item expanded "><a href="fifth-stacked-borrows.html"><strong aria-hidden="true">6.5.</strong> Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-testing-stacked-borrows.html"><strong aria-hidden="true">6.6.</strong> Probando Stacked Borrows</a></li><li class="chapter-item expanded "><a href="fifth-layout-basics-redux.html"><strong aria-hidden="true">6.7.</strong> Layout + Conceptos Básicos Redux</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.8.</strong> Extras</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.9.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> Una Doble Cola Insegura de Producción</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sixth-layout.html"><strong aria-hidden="true">7.1.</strong> Diseño (Layout)</a></li><li class="chapter-item expanded "><a href="sixth-variance.html"><strong aria-hidden="true">7.2.</strong> Varianza y Subtipos</a></li><li class="chapter-item expanded "><a href="sixth-basics.html"><strong aria-hidden="true">7.3.</strong> Conceptos Básicos</a></li><li class="chapter-item expanded "><a href="sixth-panics.html"><strong aria-hidden="true">7.4.</strong> Seguridad ante Pánicos (Panic Safety)</a></li><li class="chapter-item expanded "><a href="sixth-combinatorics.html"><strong aria-hidden="true">7.5.</strong> Combinatoria Aburrida</a></li><li class="chapter-item expanded "><a href="sixth-random-bits.html"><strong aria-hidden="true">7.6.</strong> Rellenando Bits Aleatorios</a></li><li class="chapter-item expanded "><a href="sixth-testing.html"><strong aria-hidden="true">7.7.</strong> Pruebas (Testing)</a></li><li class="chapter-item expanded "><a href="sixth-send-sync.html"><strong aria-hidden="true">7.8.</strong> Send, Sync y Pruebas de Compilación</a></li><li class="chapter-item expanded "><a href="sixth-cursors-intro.html"><strong aria-hidden="true">7.9.</strong> Una Introducción a los Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-impl.html"><strong aria-hidden="true">7.10.</strong> Implementando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-cursors-testing.html"><strong aria-hidden="true">7.11.</strong> Probando Cursores</a></li><li class="chapter-item expanded "><a href="sixth-final.html"><strong aria-hidden="true">7.12.</strong> Código Final</a></li></ol></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> Un Montón de Listas Tontas</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> El Doble Single</a></li><li class="chapter-item expanded "><a href="infinity-stack-allocated.html"><strong aria-hidden="true">8.2.</strong> La Lista Enlazada Asignada en la Pila</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Aprendiendo Rust con Demasiadas Listas Enlazadas</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/elzorrorebelde/too-many-lists" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#aprendiendo-rust-con-demasiadas-listas-enlazadas" id="aprendiendo-rust-con-demasiadas-listas-enlazadas">Aprendiendo Rust Con Demasiadas Listas Enlazadas</a></h1>
+<blockquote>
+<p>¿Tienes algún problema o quieres ver todo el código final de una vez?
+<a href="https://github.com/elzorrorebelde/too-many-lists">¡Todo está en Github!</a></p>
+</blockquote>
+<blockquote>
+<p><strong>NOTA</strong>: La edición actual de este libro está escrita para Rust 2018,
+que se lanzó por primera vez con rustc 1.31 (8 de diciembre de 2018). Si tu
+cadena de herramientas de Rust es suficientemente nueva, el archivo
+<code>Cargo.toml</code> que <code>cargo new</code> crea debería contener la línea
+<code>edition = &quot;2018&quot;</code> (o si estás leyendo esto en un futuro lejano, ¡quizás
+un número aún mayor!). Usar una cadena de herramientas más antigua es posible,
+pero desbloquea un <strong>modo difícil</strong> secreto, donde obtendrás errores extra del
+compilador que no se mencionan en el texto de este libro. ¡Vaya, suena divertido!</p>
+</blockquote>
+<p>Con bastante frecuencia me preguntan cómo implementar una lista enlazada en Rust.
+La respuesta honestamente depende de cuáles sean tus requisitos, y obviamente no
+es muy fácil responder la pregunta en el momento. Por eso he decidido escribir
+este libro para responder la pregunta de forma exhaustiva de una vez por todas.</p>
+<p>En esta serie te enseñaré programación básica y avanzada de Rust
+íntegramente haciéndote implementar 6 listas enlazadas. Al hacerlo, deberías
+aprender:</p>
+<ul>
+<li>Los siguientes tipos de punteros: <code>&amp;</code>, <code>&amp;mut</code>, <code>Box</code>, <code>Rc</code>, <code>Arc</code>, <code>*const</code>, <code>*mut</code>, <code>NonNull</code>(?)</li>
+<li>Propiedad (ownership), préstamo (borrowing), mutabilidad heredada, mutabilidad interior, <code>Copy</code></li>
+<li>Todas las palabras clave: struct, enum, fn, pub, impl, use, ...</li>
+<li>Pattern matching, genéricos, destructores</li>
+<li>Pruebas, instalación de nuevas cadenas de herramientas, uso de <code>miri</code></li>
+<li>Rust inseguro: punteros crudos, aliasing, stacked borrows, <code>UnsafeCell</code>, varianza</li>
+</ul>
+<p>Sí, las listas enlazadas son tan verdaderamente horribles que terminas lidiando
+con todos estos conceptos al hacerlas reales.</p>
+<p>Todo está en la barra lateral (puede estar colapsada en móvil), pero para
+referencia rápida, aquí está lo que vamos a hacer:</p>
+<ol>
+<li><a href="first.html">Una Pila Mala Enlazada Simple</a></li>
+<li><a href="second.html">Una Pila Aceptable Enlazada Simple</a></li>
+<li><a href="third.html">Una Pila Persistente Enlazada Simple</a></li>
+<li><a href="fourth.html">Una Doble Cola Mala Pero Segura Doblemente Enlazada</a></li>
+<li><a href="fifth.html">Una Cola Aceptable Insegura Enlazada Simple</a></li>
+<li><a href="sixth.html">Una Doble Cola Insegura de Producción Doblemente Enlazada</a></li>
+<li><a href="infinity.html">Bonus: Un Montón de Listas Tontas</a></li>
+</ol>
+<p>Solo para que estemos todos en la misma página, escribiré todos los comandos
+que introduzco en mi terminal. También usaré el gestor de paquetes estándar de Rust,
+Cargo, para desarrollar el proyecto. Cargo no es necesario para escribir un
+programa en Rust, pero es <em>mucho</em> mejor que usar rustc directamente. Si solo
+quieres jugar un poco también puedes ejecutar algunos programas simples en el
+navegador mediante <a href="https://play.rust-lang.org/">play.rust-lang.org</a>.</p>
+<p>En secciones posteriores, usaremos &quot;rustup&quot; para instalar herramientas
+adicionales de Rust. Recomiendo encarecidamente
+<a href="https://www.rust-lang.org/tools/install">instalar todas tus cadenas de herramientas de Rust usando rustup</a>.</p>
+<p>Empecemos y creemos nuestro proyecto:</p>
+<pre><code class="language-text">&gt; cargo new --lib lists
+&gt; cd lists
+</code></pre>
+<p>Pondremos cada lista en un archivo separado para no perder nada de nuestro trabajo.</p>
+<p>Cabe señalar que la experiencia <em>auténtica</em> de aprender Rust implica
+escribir código, que el compilador te grite, e intentar averiguar
+qué demonios significa eso. Me aseguraré cuidadosamente de que esto ocurra
+con la mayor frecuencia posible. Aprender a leer y entender los errores
+generalmente excelentes del compilador de Rust y su documentación es
+<em>increíblemente</em> importante para ser un programador productivo de Rust.</p>
+<p>Aunque en realidad eso es mentira. Mientras escribía esto encontré <em>muchos</em>
+más errores del compilador de los que muestro. En particular, en los capítulos
+posteriores no mostraré muchos de los errores aleatorios de &quot;escribí mal
+(copié y pegué)&quot; que esperas encontrar en cualquier lenguaje. Esto es un <em>tour
+guiado</em> de tener al compilador gritándonos.</p>
+<p>Iremos bastante lento, y honestamente no seré muy serio prácticamente todo
+el tiempo. ¡Creo que programar debería ser divertido, caramba!
+Si eres del tipo de persona que quiere contenido máximamente denso en
+información, serio y formal, este libro no es para ti. Nada de lo que
+haga será jamás para ti. Estás equivocado.</p>
+<h1><a class="header" href="#un-anuncio-de-servicio-público-obligatorio" id="un-anuncio-de-servicio-público-obligatorio">Un Anuncio de Servicio Público Obligatorio</a></h1>
+<p>Solo para que estemos total y absolutamente claros: odio las listas enlazadas. Con
+pasión. Las listas enlazadas son estructuras de datos terribles. Ahora bien, por
+supuesto hay varios casos de uso excelentes para una lista enlazada:</p>
+<ul>
+<li>Quieres hacer un <em>montón</em> de divisiones o fusiones de listas grandes. <em>Un montón</em>.</li>
+<li>Estás haciendo algo genial de concurrencia sin bloqueos (lock-free).</li>
+<li>Estás escribiendo un núcleo/sistema embebido y quieres usar una lista intrusiva.</li>
+<li>Estás usando un lenguaje puramente funcional y la semántica limitada y la
+ausencia de mutación hacen que las listas enlazadas sean más fáciles de usar.</li>
+<li>... ¡y más!</li>
+</ul>
+<p>Pero todos estos casos son <em>super raros</em> para cualquiera que escriba un programa
+en Rust. El 99% del tiempo deberías usar un <code>Vec</code> (array/pila), y el 99% del
+otro 1% del tiempo deberías usar un <code>VecDeque</code> (array/deque). Estas son
+estructuras de datos abiertamente superiores para la mayoría de las cargas de
+trabajo debido a una asignación de memoria menos frecuente, menor sobrecarga de
+memoria, acceso aleatorio real y localidad de caché.</p>
+<p>Las listas enlazadas son una estructura de datos tan <em>especializada</em> y <em>vaga</em>
+como un trie. Pocos se sorprenderían si afirmara que un trie es una estructura
+especializada que un programador promedio podría felizmente nunca aprender en
+toda una carrera productiva — y sin embargo las listas enlazadas tienen un
+extraño estatus de celebridad. Enseñamos a cada estudiante a escribir una lista
+enlazada. Es la única colección especializada
+<a href="https://doc.rust-lang.org/std/collections/struct.LinkedList.html">que no pude eliminar de std::collections</a>. Es
+<a href="http://en.cppreference.com/w/cpp/container/list"><em>la</em> lista en C++</a>!</p>
+<p>Deberíamos todos como comunidad decir <em>no</em> a las listas enlazadas como una
+estructura de datos &quot;estándar&quot;. Es una buena estructura de datos con varios
+casos de uso excelentes, pero esos casos de uso son <em>excepcionales</em>, no comunes.</p>
+<p>Varias personas aparentemente leen el primer párrafo de este PSA y luego dejan
+de leer. Como, literalmente intentan refutar mi argumento enumerando una de las
+cosas en mi lista de <em>casos de uso excelentes</em>. ¡Justo lo que viene después del
+primer párrafo!</p>
+<p>Solo para poder enlazar directamente a un argumento detallado, aquí hay varios
+intentos de contraargumentos que he visto, y mi respuesta a ellos. Siéntete libre
+de saltar al <a href="first.html">primer capítulo</a> si solo quieres aprender algo de Rust.</p>
+<h2><a class="header" href="#el-rendimiento-no-siempre-importa" id="el-rendimiento-no-siempre-importa">El rendimiento no siempre importa</a></h2>
+<p>¡Sí! Quizás tu aplicación está limitada por E/S o el código en cuestión está en
+algún caso poco relevante que simplemente no importa. Pero esto ni siquiera es un
+argumento para usar una lista enlazada. Es un argumento para usar <em>lo que sea</em>.
+¿Por qué conformarte con una lista enlazada? ¡Usa un mapa hash enlazado!</p>
+<p>Si el rendimiento no importa, entonces <em>seguramente</em> está bien aplicar la opción
+natural por defecto de un array.</p>
+<h2><a class="header" href="#tienen-split-append-insert-remove-o1-si-tienes-un-puntero-allí" id="tienen-split-append-insert-remove-o1-si-tienes-un-puntero-allí">Tienen split-append-insert-remove O(1) si tienes un puntero allí</a></h2>
+<p>¡Sip! Aunque como <a href="https://web.archive.org/web/20240228123439/https://www.youtube.com/watch?v=YQs6IC-vgmo">señala Bjarne Stroustrup</a> <em>esto en realidad no
+importa</em> si el tiempo que toma obtener ese puntero supera por completo el
+tiempo que tomaría simplemente copiar todos los elementos en un array (que
+es realmente bastante rápido).</p>
+<p>A menos que tengas una carga de trabajo que esté fuertemente dominada por
+costos de dividir y fusionar, la penalización que <em>todas las demás</em>
+operaciones sufren debido a efectos de caché y complejidad del código
+eliminará cualquier ganancia teórica.</p>
+<p><em>Pero sí, si estás perfilando tu aplicación y esta pasa mucho tiempo en
+dividir y fusionar, puedes tener ganancias con una lista enlazada</em>.</p>
+<h2><a class="header" href="#no-puedo-permitirme-la-amortización" id="no-puedo-permitirme-la-amortización">No puedo permitirme la amortización</a></h2>
+<p>Ya has entrado en un espacio bastante especializado — la mayoría puede
+permitirse la amortización. Aún así, los arrays se amortizan <em>en el peor caso</em>.
+Solo porque uses un array, no significa que tengas costos amortizados. Si puedes
+predecir cuántos elementos vas a almacenar (o incluso tener un límite superior),
+puedes pre-reservar todo el espacio que necesites. En mi experiencia es <em>muy</em>
+común poder predecir cuántos elementos necesitarás. En Rust en particular, todos
+los iteradores proporcionan un <code>size_hint</code> exactamente para este caso.</p>
+<p>Entonces <code>push</code> y <code>pop</code> serán operaciones verdaderamente O(1). Y van a ser
+<em>considerablemente</em> más rápidas que <code>push</code> y <code>pop</code> en una lista enlazada.
+Haces un desplazamiento de puntero, escribes los bytes, e incrementas un
+entero. Sin necesidad de ir a ningún tipo de asignador.</p>
+<p>¿Qué tal para baja latencia?</p>
+<p><em>Pero sí, si no puedes predecir tu carga, ¡hay ahorros de latencia en el peor
+caso que puedes obtener!</em></p>
+<h2><a class="header" href="#las-listas-enlazadas-desperdician-menos-espacio" id="las-listas-enlazadas-desperdician-menos-espacio">Las listas enlazadas desperdician menos espacio</a></h2>
+<p>Bueno, esto es complicado. Una estrategia de &quot;redimensionamiento&quot; estándar de
+un array es crecer o encoger para que como máximo la mitad del array esté vacía.
+Esto es de hecho una gran cantidad de espacio desperdiciado. Especialmente en Rust,
+no encogemos colecciones automáticamente (es un desperdicio si solo vas a
+llenarlo de nuevo), por lo que el desperdicio puede acercarse al infinito.</p>
+<p>Pero esto es un escenario de peor caso. En el mejor caso, una pila con array
+solo tiene tres punteros de sobrecarga para todo el array. Básicamente sin
+sobrecarga.</p>
+<p>Las listas enlazadas, por otro lado, desperdician espacio incondicionalmente
+por elemento. Una lista enlazada simple desperdicia un puntero mientras
+que una doblemente enlazada desperdicia dos. A diferencia de un array, el
+desperdicio relativo es proporcional al tamaño del elemento. Si tienes elementos
+<em>enormes</em> esto se acerca al 0% de desperdicio. Si tienes elementos diminutos
+(digamos, bytes), entonces esto puede ser hasta 16 veces la sobrecarga de
+memoria (8 veces en 32 bits).</p>
+<p>En realidad, es más como 23 veces (11 veces en 32 bits) porque se añadirá
+relleno (padding) al byte para alinear el tamaño total del nodo a un puntero.</p>
+<p>Esto también asume el mejor caso para tu asignador: que asignar y
+desasignar nodos se hace de forma densa y no estás perdiendo memoria por
+fragmentación.</p>
+<p><em>Pero sí, si tienes elementos enormes, no puedes predecir tu carga, y tienes
+un asignador decente, ¡hay ahorros de memoria que puedes obtener!</em></p>
+<h2><a class="header" href="#uso-listas-enlazadas-todo-el-tiempo-en-lenguaje-funcional" id="uso-listas-enlazadas-todo-el-tiempo-en-lenguaje-funcional">Uso listas enlazadas todo el tiempo en &lt;lenguaje funcional&gt;</a></h2>
+<p>¡Genial! Las listas enlazadas son super elegantes de usar en lenguajes
+funcionales porque puedes manipularlas sin ninguna mutación, puedes describirlas
+recursivamente, y también trabajar con listas infinitas gracias a la magia de la
+pereza (laziness).</p>
+<p>Específicamente, las listas enlazadas son agradables porque representan una
+iteración sin necesidad de ningún estado mutable. El siguiente paso es
+simplemente visitar la siguiente sublista.</p>
+<p>Rust hace este tipo de cosas principalmente con <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">iteradores</a>. Pueden
+ser infinitos y puedes mapearlos, filtrarlos, invertirlos y concatenarlos como
+una lista funcional, ¡y todo se hará igual de perezosamente!</p>
+<p>Rust también te permite hablar fácilmente de sub-arrays con <em><a href="https://doc.rust-lang.org/std/primitive.slice.html">rebanadas
+(slices)</a></em>. Tu división habitual cabeza/cola en un lenguaje funcional
+es <a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_at_mut">solo <code>slice.split_at_mut(1)</code></a>. Durante mucho tiempo, Rust tuvo un
+sistema experimental para pattern matching en slices que era super genial,
+pero la característica se simplificó cuando se estabilizó. Aún así,
+<a href="https://doc.rust-lang.org/edition-guide/rust-2018/slice-patterns.html">los patrones básicos de slices</a> son interesantes. Y por supuesto,
+¡los slices se pueden convertir en iteradores!</p>
+<p><em>Pero sí, si estás limitado a semántica inmutable, las listas enlazadas pueden ser
+muy agradables</em>.</p>
+<p>Nótese que no estoy diciendo que la programación funcional sea necesariamente
+débil o mala. Sin embargo, <em>es</em> fundamentalmente limitada semánticamente: en
+gran medida solo se te permite hablar de cómo <em>son</em> las cosas, y no de cómo
+deberían <em>hacerse</em>. Esto es en realidad una <em>característica</em>, porque permite
+al compilador hacer toneladas de <a href="https://wiki.haskell.org/GHC_optimisations#Fusion">transformaciones exóticas</a> y
+potencialmente encontrar la <em>mejor</em> manera de hacer las cosas sin que tengas
+que preocuparte. Sin embargo, esto tiene el costo de <em>poder</em> preocuparte por
+ello. Generalmente hay escapes, pero en algún límite solo estás escribiendo
+código procedural otra vez.</p>
+<p>Incluso en lenguajes funcionales, deberías esforzarte por usar la estructura
+de datos apropiada para el trabajo cuando realmente necesitas una estructura
+de datos. Sí, las listas enlazadas individualmente son tu herramienta principal
+para el flujo de control, pero son una forma realmente pobre de almacenar un
+montón de datos y consultarlos.</p>
+<h2><a class="header" href="#las-listas-enlazadas-son-geniales-para-construir-estructuras-de-datos-concurrentes" id="las-listas-enlazadas-son-geniales-para-construir-estructuras-de-datos-concurrentes">¡Las listas enlazadas son geniales para construir estructuras de datos concurrentes!</a></h2>
+<p>¡Sí! Aunque escribir una estructura de datos concurrente es realmente un animal
+completamente diferente, y no es algo que deba tomarse a la ligera. Ciertamente
+no es algo que mucha gente siquiera <em>considerará</em> hacer. Una vez que se ha
+escrito, tampoco estás realmente eligiendo usar una lista enlazada. Estás
+eligiendo usar una cola MPSC o lo que sea. ¡La estrategia de implementación
+está bastante lejos en este caso!</p>
+<p><em>Pero sí, las listas enlazadas son las heroínas de facto del oscuro mundo de la
+concurrencia sin bloqueos.</em></p>
+<h2><a class="header" href="#mumble-mumble-kernel-embebido-algo-algo-intrusivo" id="mumble-mumble-kernel-embebido-algo-algo-intrusivo">Mumble mumble kernel embebido algo algo intrusivo.</a></h2>
+<p>Es especializado. Estás hablando de una situación donde ni siquiera estás
+usando el <em>entorno de ejecución</em> de tu lenguaje. ¿No es esa una bandera roja
+de que estás haciendo algo extraño?</p>
+<p>También es salvajemente inseguro.</p>
+<p><em>Pero claro. Construye tus increíbles listas de cero asignaciones en la pila.</em></p>
+<h2><a class="header" href="#los-iteradores-no-se-invalidan-por-insercioneseliminaciones-no-relacionadas" id="los-iteradores-no-se-invalidan-por-insercioneseliminaciones-no-relacionadas">Los iteradores no se invalidan por inserciones/eliminaciones no relacionadas</a></h2>
+<p>Esa es una danza delicada la que estás realizando. Especialmente si no tienes
+un recolector de basura. Podría argumentar que tus patrones de flujo de control
+y propiedad están probablemente un poco demasiado enredados, dependiendo de los
+detalles.</p>
+<p><em>Pero sí, puedes hacer cosas realmente geniales y locas con cursores.</em></p>
+<h2><a class="header" href="#son-simples-y-geniales-para-enseñar" id="son-simples-y-geniales-para-enseñar">¡Son simples y geniales para enseñar!</a></h2>
+<p>Bueno, sí. Estás leyendo un libro dedicado a esa premisa.
+Bueno, las listas enlazadas individualmente son bastante simples. Las listas
+doblemente enlazadas pueden ponerse bastante complicadas, como veremos.</p>
+<h1><a class="header" href="#toma-un-respiro" id="toma-un-respiro">Toma un Respiro</a></h1>
+<p>Ok. Eso ya está fuera del camino. Escribamos un montón de listas enlazadas.</p>
+<p><a href="first.html">¡Al primer capítulo!</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+                            <a rel="next" href="first.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+                    <a rel="next" href="first.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
