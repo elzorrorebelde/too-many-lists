@@ -1,6 +1,6 @@
 # Conceptos Básicos (Basics)
 
-Muy bien, this is the part of the book that sucks, and why it took me 7 years to write this chapter! Time to just burn through a whole lot of really boring stuff we've done 5 times already, but extra verbose and long because we have to do everything twice and with `Option<NonNull<Node<T>>>`!
+Muy bien, esta es la parte del libro que apesta, ¡y por eso tardé 7 años en escribir este capítulo! Es hora de repasar un montón de cosas realmente aburridas que ya hemos hecho 5 veces, pero de forma más extensa y prolija porque tenemos que hacerlo todo dos veces y con `Option<NonNull<Node<T>>>`.
 
 ```rust ,ignore
 impl<T> LinkedList<T> {
@@ -15,7 +15,7 @@ impl<T> LinkedList<T> {
 }
 ```
 
-PhantomData is a weird type with no fields, so you just make one by saying its type name. *shrug*
+`PhantomData` es un tipo extraño sin campos, así que basta con crear uno escribiendo su nombre de tipo. *se encoge de hombros*
 
 ```rust ,ignore
 pub fn push_front(&mut self, elem: T) {
@@ -54,7 +54,7 @@ error[E0614]: type `NonNull<Node<T>>` cannot be dereferenced
 ```
 
 
-Ah yes, I truly hate my pointer-y children. We need to explicitly get the raw pointer out of NonNull with `as_ptr`, because DerefMut is defined in terms of `&mut` and we no want to randomly introduce safe references into our unsafe code!
+Ah, sí, detesto de verdad a mis pequeños punteros. Tenemos que extraer explícitamente el puntero crudo de `NonNull` con `as_ptr`, porque `DerefMut` está definido en términos de `&mut` y no queremos introducir referencias seguras accidentalmente en nuestro código inseguro.
 
 
 ```rust ,ignore
@@ -77,7 +77,7 @@ warning: `linked-list` (lib test) generated 1 warning
     Finished test [unoptimized + debuginfo] target(s) in 0.33s
 ```
 
-Nice, now for pop (and len):
+Genial, pasemos ahora a `pop` (y `len`):
 
 ```rust ,ignore
 pub fn pop_front(&mut self) -> Option<T> {
@@ -120,7 +120,7 @@ pub fn len(&self) -> usize {
     Finished dev [unoptimized + debuginfo] target(s) in 0.37s
 ```
 
-Seems legit to me, time to write a test!
+Parece correcto; ¡es hora de escribir una prueba!
 
 ```rust ,ignore
 #[cfg(test)]

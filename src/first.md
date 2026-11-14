@@ -1,4 +1,4 @@
-# Una Pila Mala Enlazada Individualmente
+# Una Pila Mala con Enlace Simple
 
 Este va a ser *con diferencia* el más largo, ya que necesitamos introducir básicamente
 todo Rust, y vamos a construir algunas cosas "a la manera difícil" para entender

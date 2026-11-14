@@ -1,14 +1,14 @@
 # Send, Sync y Pruebas de Compilación
 
-Ok actually we do have one more pair of traits to think about, but they're special. We have to deal with Rust's Holy Roman Empire: The Unsafe Opt-In Built-In Traits (OIBITs): [Send and Sync](https://doc.rust-lang.org/nomicon/send-and-sync.html), which are in fact opt-out and built-out (1 out of 3 is pretty good!).
+En realidad nos queda otro par de traits en los que pensar, pero son especiales. Tenemos que tratar con el Sacro Imperio Romano de Rust: los traits integrados inseguros de activación explícita (OIBIT): [Send y Sync](https://doc.rust-lang.org/nomicon/send-and-sync.html), que en realidad se desactivan por defecto y se implementan automáticamente (¡1 de 3 no está mal!).
 
-Like Copy, these traits have absolutely no code associated with them, and are just markers that your type has a particular property. Send says that your type is safe to send to another thread. Sync says your type is safe to share between threads (&Self: Send).
+Al igual que `Copy`, estos traits no tienen código asociado; son simplemente marcadores que indican que un tipo posee una propiedad concreta. `Send` indica que es seguro enviar el tipo a otro hilo. `Sync` indica que es seguro compartirlo entre hilos (`&Self: Send`).
 
-The same argument for LinkedList being covariant applies here: generally normal collections which no use fancy interior mutability tricks are safe to make Send and Sync.
+Aquí se aplica el mismo argumento de que `LinkedList` sea covariante: en general, las colecciones normales que no usan trucos sofisticados de mutabilidad interior pueden implementar `Send` y `Sync` de forma segura.
 
-But I said they're *opt out*. So actually, are we already? How would we know?
+Pero he dicho que se desactivan por defecto. Entonces, ¿ya lo están en nuestro caso? ¿Cómo podríamos saberlo?
 
-Vamos a add some new magic to our code: random private garbage that no compile unless our types have the properties we expect:  
+Añadamos algo de magia al código: basura privada que no compile a menos que nuestros tipos tengan las propiedades esperadas:
 
 ```rust ,ignore
 #[allow(dead_code)]
@@ -62,9 +62,9 @@ note: required by a bound in `is_send`
 <a million more errors>
 ```
 
-Oh geez, what gives! I had that great Holy Roman Empire joke!
+¡Pero qué demonios! ¡Tenía un chiste buenísimo sobre el Sacro Imperio Romano!
 
-Well, I lied to you when I said raw pointers have only one safety guard: this is the other. `*const` AND `*mut` explicitly opt out of Send and Sync to be safe, so we do *actually* have to opt back in:
+Te mentí cuando dije que los punteros crudos solo tenían una protección de seguridad: esta es la otra. `*const` y `*mut` se excluyen explícitamente de `Send` y `Sync` para estar a salvo, así que *realmente* tenemos que volver a incluirlos:
 
 ```rust ,ignore
 unsafe impl<T: Send> Send for LinkedList<T> {}
@@ -77,9 +77,9 @@ unsafe impl<'a, T: Send> Send for IterMut<'a, T> {}
 unsafe impl<'a, T: Sync> Sync for IterMut<'a, T> {}
 ```
 
-Nótese que we have to write *unsafe impl* here: these are *unsafe traits*! Unsafe code (like concurrency libraries) gets to rely on us only implementing these traits correctly! Since hay no actual code, the guarantee we're making is just that, yes, we are indeed safe to Send or Share between threads!
+Ten en cuenta que aquí tenemos que escribir una *implementación `unsafe`*: ¡son traits *unsafe*! El código inseguro, como las bibliotecas de concurrencia, puede confiar en nosotros únicamente si implementamos estos traits correctamente. Como no hay código real, la garantía que ofrecemos es simplemente que sí, es seguro enviar o compartir estos tipos entre hilos.
 
-Don't just slap these on lightly, but I am a Certified Professional here to say: yep hay are totally fine. Note how we no need to implement Send and Sync for IntoIter: it just contains LinkedList, so it auto-derives Send and Sync &mdash; I told you they were actually opt out! (You opt out with the hillarious syntax of `impl !Send for MyType {}`.)
+No añadas estas implementaciones a la ligera, pero como profesional certificado puedo decir que aquí son totalmente correctas. Observa que no necesitamos implementar `Send` y `Sync` para `IntoIter`: solo contiene una `LinkedList`, así que obtiene `Send` y `Sync` automáticamente &mdash; Te dije que en realidad se excluían por defecto. (La sintaxis para excluirse es la hilarante of `impl !Send for MyType {}`.)
 
 ```text
 cargo build
@@ -87,11 +87,11 @@ cargo build
     Finished dev [unoptimized + debuginfo] target(s) in 0.18s
 ```
 
-Ok nice!
+¡Perfecto!
 
-...Wait, actually it would be really dangerous if stuff that *shouldn't* be these things wasn't. In particular, IterMut *definitely* no debería be covariant, because it's "like" `&mut T`. But how can we check that?
+...Espera, en realidad sería muy peligroso que algo que *no debería* tener estas propiedades las tuviera. En particular, `IterMut` *definitivamente* no debería ser covariante, porque es «como» `&mut T`. Pero ¿cómo podemos comprobarlo?
 
-With Magic! Well, actually, with rustdoc! Ok well we no have to use rustdoc for this, but it's the funniest way to do it. See, if you write a doccomment and include a code block, then rustdoc will try to compile and run it, so we can use that to make fresh anonymous "programs" that no affect the main one:
+¡Con magia! Bueno, en realidad con `rustdoc`. No tenemos que usar `rustdoc` para esto, pero es la forma más divertida. Si escribes un comentario de documentación e incluyes un bloque de código, `rustdoc` intentará compilarlo y ejecutarlo, así que podemos usarlo para crear «programas» anónimos que no afecten al programa principal:
 
 
 ```rust ,ignore
@@ -126,9 +126,9 @@ error[E0308]: mismatched types
              found struct `linked_list::IterMut<'_, &'static T>`
 ```
 
-Ok cool, we've proved it's invariant, but uh, now our tests fail. No worries, rustdoc lets you say that's expected by annotating the fence with compile_fail!
+De acuerdo, hemos demostrado que es invariante, pero ahora fallan las pruebas. No pasa nada: `rustdoc` permite indicar que el fallo es esperado anotando el bloque con `compile_fail`.
 
-(Actually we only proved it's "not covariant" but honestly if you manage to make a type "accidentaly and incorrectly contravariant" then, congrats?)
+(En realidad solo hemos demostrado que «no es covariante», pero, sinceramente, si consigues hacer que un tipo sea «contravariante de forma accidental e incorrecta», enhorabuena.)
 
 ```rust ,ignore
     /// ```compile_fail
@@ -155,9 +155,9 @@ test src\lib.rs - assert_properties::iter_mut_invariant (line 458) - compile fai
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
 ```
 
-Yay! I recommend always making the test without compile_fail so that you can confirm that it fails to compile *for the right reason*. For instance, that test will also fail (and therefore pass) if you forget the `use`, which,  no es what we want! While it's conceptually appealing to be able to "require" a specific error from the compiler, this would be an absolute nightmare that would effectively make it a breaking change *for the compiler to produce better errors*. We want the compiler to get better, so, no you no get to have that.
+¡Bien! Recomiendo escribir siempre primero la prueba sin `compile_fail`, para confirmar que no compila *por el motivo correcto*. Por ejemplo, esa prueba también fallaría (y por tanto pasaría) si olvidaras el `use`, y eso no es lo que queremos. Aunque conceptualmente resulte atractivo poder «exigir» un error concreto al compilador, sería una pesadilla absoluta que convertiría en un cambio incompatible el hecho de que el compilador produjera mejores errores. Queremos que el compilador mejore, así que no podemos exigir eso.
 
-(Oh wait, we can actually just specify the error code we want next to the compile_fail **but this only works on nightly and is a bad idea to rely on for the reasons stated above. It will be silently ignored on not-nightly.**)
+(Espera, en realidad podemos especificar el código de error que queremos junto a `compile_fail`, **pero esto solo funciona en `nightly` y es mala idea depender de ello por los motivos anteriores. En versiones que no sean `nightly` se ignorará silenciosamente.**)
 
 ```rust ,ignore
     /// ```compile_fail,E0308
@@ -168,7 +168,7 @@ Yay! I recommend always making the test without compile_fail so that you can con
     fn iter_mut_invariant() {}
 ```
 
-...also, did you notice the part where we actually made IterMut invariant? It was easy to miss, since I "just" copy-pasted Iter and dumped it at the end. Es the last line here:
+...además, ¿te fijaste en que realmente hicimos que `IterMut` fuera invariante? Era fácil pasarlo por alto, porque simplemente copié y pegué `Iter` y lo añadí al final. Es la última línea de este bloque:
 
 ```rust ,ignore
 pub struct IterMut<'a, T> {
@@ -179,7 +179,7 @@ pub struct IterMut<'a, T> {
 }
 ```
 
-Vamos a try removing that PhantomData:
+Probemos a eliminar ese `PhantomData`:
 
 ```text
  cargo build
@@ -193,7 +193,7 @@ error[E0392]: parameter `'a` is never used
    = help: consider removing `'a`, referring to it in a field, or using a marker such as `PhantomData`
 ```
 
-Ha! The compiler has our back and no just let us *not* use the lifetime. Vamos a try using the *wrong* example instead:
+¡Ja! El compilador nos protege y no permite simplemente que *no* usemos el tiempo de vida. Probemos en su lugar el ejemplo *incorrecto*:
 
 ```rust ,ignore
     _boo: PhantomData<&'a T>,
@@ -205,7 +205,7 @@ cargo build
     Finished dev [unoptimized + debuginfo] target(s) in 0.17s
 ```
 
-It builds! Do our tests catch a problem now?
+¡Compila! ¿Detectan ahora algún problema nuestras pruebas?
 
 ```text
 cargo test
@@ -228,5 +228,5 @@ failures:
 test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
 ```
 
-Eyyy!!! The system works! I love having tests that actually do their job, so that I no have to be quite so horrified of looming mistakes!
+¡¡¡Sí!!! ¡El sistema funciona! Me encanta tener pruebas que realmente cumplen su función, para no tener que horrorizarme tanto ante errores inminentes.
 

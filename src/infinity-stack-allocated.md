@@ -1,14 +1,14 @@
 # La Lista Enlazada Asignada en la Pila
 
-This book is largely focused on *heap-allocated* linked lists, because those are the most common and practical, but we no *have* to use heap allocation. Heap allocation is nice because it makes it easy to dynamically allocate memory. Stack allocation is less friendly in this regard &mdash; things like C's `alloca` are widely regarded as Very Cursed And Problematic.
+Este libro se centra principalmente en listas enlazadas *asignadas en el montón*, porque son las más comunes y prácticas, pero no *tenemos* por qué usar asignación en el montón. La asignación en el montón facilita reservar memoria dinámicamente. La asignación en la pila es menos amable en este sentido; cosas como `alloca` de C suelen considerarse Muy Malditas Y Problemáticas.
 
-So let's allocate memory on the stack the easy way: by calling a function and getting a new stack frame with more space! This is a very silly solution to our problem but also genuinely practical and useful. Es done all the time, potentially without actually even thinking about it as a linked list! 
+Así que asignemos memoria en la pila de la forma sencilla: llamando a una función y obteniendo un nuevo marco de pila con más espacio. Es una solución muy tonta a nuestro problema, pero también es realmente práctica y útil. Se hace constantemente, quizá sin pensar siquiera en ello como una lista enlazada.
 
-Any time you're doing something recursively, you can just pass a pointer to the current step's state to the next step. If that pointer itself is *part* of the state, then you've created a linked list that's stack-allocated!
+Cada vez que haces algo de forma recursiva, puedes pasar un puntero al estado del paso actual al siguiente paso. Si ese puntero forma parte del propio estado, ¡has creado una lista enlazada asignada en la pila!
 
-Now of course we're in the *silly* part of the book so we're going to do this in a silly way: by making the linked list the star and forcing all the user's code to live in a swamp of callbacks. Everybody loves nested callbacks!
+Por supuesto, ahora estamos en la parte *tonta* del libro, así que lo haremos de una forma tonta: convirtiendo la lista enlazada en la protagonista y obligando a todo el código del usuario a vivir en un pantano de callbacks. ¡A todo el mundo le encantan los callbacks anidados!
 
-Our List type will just be a Node with a reference to another Node:
+Nuestro tipo `List` será simplemente un `Node` con una referencia a otro `Node`:
 
 ```rust
 pub struct List<'a, T> {
@@ -17,7 +17,7 @@ pub struct List<'a, T> {
 }
 ```
 
-And it will have only one operation, `push`, which will take the old list, the state for the current node, and a callback. The new list will be produced in the callback. We will also let callbacks return any value, which `push` will return when it completes:
+Solo tendrá una operación, `push`, que recibirá la lista antigua, el estado del nodo actual y un callback. El callback producirá la lista nueva. También permitiremos que los callbacks devuelvan cualquier valor, que `push` devolverá al terminar:
 
 ```rust ,ignore
 impl<'a, T> List<'a, T> {
@@ -32,7 +32,7 @@ impl<'a, T> List<'a, T> {
 }
 ```
 
-Eso es it! We can use it like this:
+¡Eso es todo! Podemos usarlo así:
 
 ```rust ,ignore
 List::push(None, 3, |list| {
@@ -46,9 +46,9 @@ List::push(None, 3, |list| {
 })
 ```
 
-Es beautiful. 😿
+Es precioso. 😿
 
-The user can already traverse this list by using while-let to walk over the `prev` values, but just for fun, let's implement an iterator, which is the usual:
+El usuario ya puede recorrer esta lista usando `while let` para avanzar por los valores de `prev`, pero, por diversión, implementemos un iterador, como de costumbre:
 
 ```rust ,ignore
 impl<'a, T> List<'a, T> {
@@ -69,7 +69,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
 }
 ```
 
-Vamos a test it out:
+Vamos a probarlo:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -117,7 +117,7 @@ test third::test::iter ... ok
 test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;
 ```
 
-Now at this point you might be wonder "hey can I mutate the data stored in a node?". Maybe! Vamos a try to make the list use mutable references instead of shared ones:
+Llegados a este punto quizá te preguntes: «¿puedo modificar los datos almacenados en un nodo?». ¡Quizá! Intentemos hacer que la lista use referencias mutables en lugar de referencias compartidas:
 
 
 ```rust
@@ -188,8 +188,7 @@ error[E0521]: borrowed data escapes outside of closure
 <ad infinitum>
 ```
 
-Whelp. Seems like it no like our iterator. Maybe we messed that up? Let's
-simplify the test a bit to check:
+Vaya. Parece que a nuestro iterador no le gusta esto. ¿Quizá lo hemos estropeado? Simplifiquemos un poco la prueba para comprobarlo:
 
 
 ```rust ,ignore
@@ -242,21 +241,21 @@ error[E0521]: borrowed data escapes outside of closure
    | |______________^ `list` escapes the closure body here
 ```
 
-Hmm no that's still some hot garbage.
+Mmm, no, esto sigue siendo un desastre.
 
-The problem is that our list is accidentally(😉) relying on *variance*. [Variance is a complicated subject](https://doc.rust-lang.org/nomicon/subtyping.html) but let's look at it in simplified terms here:
+El problema es que nuestra lista depende accidentalmente (😉) de la *varianza*. [La varianza es un tema complicado](https://doc.rust-lang.org/nomicon/subtyping.html), pero veámosla aquí de forma simplificada:
 
-Each list contains a reference to a List with *the exact same type as itself*. From the perspective of the inner-most list, that means all lists are using the same lifetime as itself, but this is *objectively* false: each node in the list lives strictly longer than the next one, because they are literally in nested scopes!
+Cada lista contiene una referencia a una `List` con *exactamente el mismo tipo que ella*. Desde la perspectiva de la lista más interna, eso significa que todas las listas usan el mismo tiempo de vida que ella, pero esto es *objetivamente* falso: cada nodo de la lista vive estrictamente más tiempo que el siguiente, porque están literalmente en ámbitos anidados.
 
-So... why did the code compile when we were using shared references? Because in many cases, the compiler knows it's safe to have something that lives "too long"! When we stuff a reference to a list into the next one, the compiler is quietly "shrinking" down the lifetimes to make them fit what the new list expects. This lifetime shrinking is *variance*. 
+Entonces... ¿por qué compilaba el código cuando usábamos referencias compartidas? ¡Porque en muchos casos el compilador sabe que es seguro que algo viva «demasiado tiempo»! Cuando introducimos una referencia a una lista en la siguiente, el compilador «reduce» silenciosamente los tiempos de vida para que encajen con lo que espera la lista nueva. Esta reducción de tiempos de vida es la *varianza*.
 
-Es the exact same trick in languages with inheritance that let's you pass a Cat where an Animal (a supertype of a Cat) is expected. Intuitively we know it's fine to pass a Cat when an Animal is expected because a Cat is just an Animal *and more*. Es *fine* to forget the "and more" part for a while, right?
+Es exactamente el mismo truco que se usa en lenguajes con herencia para pasar un `Cat` donde se espera un `Animal` (un supertipo de `Cat`). Intuitivamente sabemos que está bien pasar un `Cat` cuando se espera un `Animal`, porque un `Cat` es un `Animal` *y algo más*. Está *bien* olvidar durante un rato la parte de «y algo más», ¿verdad?
 
-Similarly, a larger lifetime is just a smaller lifetime *and more*. So it's fine to forget the "and more" here too!
+Del mismo modo, un tiempo de vida más largo es simplemente un tiempo de vida más corto *y algo más*. Así que también está bien olvidar aquí la parte de «y algo más».
 
-But of course you are now wondering: then why no the mutable reference version work!?
+Pero, por supuesto, ahora te preguntarás: ¡¿por qué no funciona la versión con referencias mutables?!
 
-Well, variance *isn't* always safe. If our code *did* compile, we could have written a use-after-free like this:
+Bueno, la varianza *no* siempre es segura. Si nuestro código *llegara* a compilar, podríamos escribir un uso después de liberar memoria como este:
 
 ```rust ,ignore
 List::push(None, 3, |list| {
@@ -271,13 +270,13 @@ List::push(None, 3, |list| {
 })
 ```
 
-The problem with forgetting details is that *somewhere else might remember
-those details and expect them to remain true*. That is a very big problem
-once you introduce *mutation*. If you're not careful, the code that doesn't
-remember the "and more" that we threw away might think it's fine to write
-things to places that "remember" and *expect* the "and more" to still be there.
+El problema de olvidar detalles es que *en algún otro lugar podrían recordarse
+esos detalles y esperar que sigan siendo ciertos*. Es un problema muy grave
+cuando introduces la *mutabilidad*. Si no tienes cuidado, el código que no
+recuerda la parte de «y algo más» que descartamos podría creer que está bien
+escribir en lugares que la «recuerdan» y *esperan* que siga presente.
 
-Put in terms of inheritance: this code has to be illegal:
+En términos de herencia, este código tiene que ser ilegal:
 
 ```rust ,ignore
 let mut my_kitty = Cat;                  // Make a Cat (long lifetime)
@@ -286,25 +285,25 @@ let animal: &mut Animal = &mut my_kitty; // Forget it's a Cat (shorten lifetime)
 my_kitty.meow();                         // Meowing Dog! (Use After Free)
 ```
 
-So while you *can* shorten the lifetime of a mutable reference, once you start
-*nesting* them things become "invariant" and you're not allowed to shorten
+Así que puedes acortar el tiempo de vida de una referencia mutable, pero cuando
+empiezas a *anidarlas* las cosas se vuelven «invariantes» y ya no puedes acortarlo.
 lifetimes anymore. 
 
-Specifically `&mut &'big mut T` cannot be converted to `&mut &'small mut T`, 
-where `'big` is bigger than `'small`. Or more formally, `&'a mut T` is covariant
-over `'a` but invariant over `T`.
+En concreto, `&mut &'big mut T` no se puede convertir en `&mut &'small mut T`,
+donde `'big` es mayor que `'small`. O, de forma más formal, `&'a mut T` es
+covariante respecto de `'a`, pero invariante respecto de `T`.
 
-Fun fact: Java actually specifically *lets* you do this kind of thing, but it
-[does runtime checks to prevent meowing dogs](https://docs.oracle.com/javase/7/docs/api/java/lang/ArrayStoreException.html).
+Dato curioso: Java permite explícitamente hacer este tipo de cosas, pero
+[hace comprobaciones en tiempo de ejecución para evitar perros que maúllen](https://docs.oracle.com/javase/7/docs/api/java/lang/ArrayStoreException.html).
 
 ----
 
-So what can we do to mutate the data? Use interior mutability! This lets us
-tell the compiler that we just want to be able to mutate the *data* but won't
-touch the references.
+Entonces, ¿qué podemos hacer para modificar los datos? ¡Usar mutabilidad
+interior! Esto permite indicar al compilador que solo queremos modificar los
+*datos*, sin cambiar las referencias.
 
-We can just revert back to the previous version of our code with shared references,
-and use `Cell` in a new test:
+Podemos volver a la versión anterior del código, con referencias compartidas,
+y usar `Cell` en una prueba nueva:
 
 ```rust ,ignore
 #[test]

@@ -1,10 +1,10 @@
-# Una Pila Persistente Enlazada Individualmente
+# Una Pila Persistente Enlazada Simple
 
 Muy bien, hemos dominado el arte de las pilas enlazadas individualmente
 mutables.
 
 Pasemos de la propiedad *única (single ownership)* a la propiedad *compartida
-(shared ownership)* escribiendo una lista enlazada individualmente *persistente*
+(shared ownership)* escribiendo una lista enlazada simple *persistente*
 e inmutable. Esta será exactamente la lista que los programadores funcionales
 han llegado a conocer y amar. Puedes obtener la cabeza *o* la cola y poner la
 cabeza de alguien en la cola de otro... y... eso es básicamente todo.

@@ -1,6 +1,6 @@
 # Drop y Seguridad ante Pánicos
 
-So hey, did you notice this comment:
+Oye, ¿te fijaste en este comentario?
 
 ```rust
 // Note that we don't need to mess around with `take` anymore
@@ -8,11 +8,11 @@ So hey, did you notice this comment:
 // run if we mess up... right? :) Riiiight? :)))
 ```
 
-Is it right? 
+¿Es correcto?
 
-Sorry did you forget the book you're reading? Of course it's wrong! (Sort Of.)
+Perdona, ¿has olvidado qué libro estás leyendo? ¡Por supuesto que está mal! (Más o menos.)
 
-Vamos a look at the inner body of pop_front again:
+Veamos de nuevo el cuerpo interno de `pop_front`:
 
 ```rust ,ignore
 // Bring the Box back to life so we can move out its value and
@@ -36,33 +36,33 @@ result
 // Box gets implicitly freed here, knows there is no T.
 ```
 
-Do you see the bug? Horrifyingly, it's actually this line:
+¿Ves el error? Lo aterrador es que está precisamente en esta línea:
 
 ```rust ,ignore
 debug_assert!(self.len == 1);
 ```
 
-*Really*? Our friggin' integrity check for tests is a bug?? Yes!!! Well, if we implement our collection right it *shouldn't* be, but it can turn something benign like "oh we are doing a bad job of keeping len up to date" into *An Exploitable Memory Safety Bug*! Why? Because it can panic! Most of the time you no have to think or worry about panics, but once you start writing *really* unsafe code and playing fast and loose with "invariants", you need to become hyper-vigilant about panics!
+¿¡En serio!? ¿¡Nuestra maldita comprobación de integridad para las pruebas es un error!? ¡Sí! Si implementamos bien nuestra colección *no debería* serlo, pero puede convertir algo benigno como «no estamos actualizando bien `len`» en *un error explotable de seguridad de memoria*. ¿Por qué? ¡Porque puede provocar un pánico! Normalmente no tienes que pensar ni preocuparte por los pánicos, pero cuando empiezas a escribir código *realmente* inseguro y a tomarte a la ligera las «invariantes», debes vigilar los pánicos con muchísimo cuidado.
 
-Hemos gotta talk about [*exception safety*](https://doc.rust-lang.org/nightly/nomicon/exception-safety.html) (AKA panic safety, AKA unwind safety, ...).
+Tenemos que hablar de la [*seguridad frente a excepciones*](https://doc.rust-lang.org/nightly/nomicon/exception-safety.html) (también llamada seguridad frente a pánicos o seguridad durante el desenrollado).
 
-So here's the deal: by default, panics are *unwinding*. Unwinding is just a fancy way to say "make every single function immediately return". You might think "well, if *everyone* returns then the program is about to die, so why care about it?", but you'd be wrong!
+La cuestión es la siguiente: de forma predeterminada, los pánicos provocan un *desenrollado*. «Desenrollado» es una forma elegante de decir «haz que todas las funciones retornen inmediatamente». Podrías pensar «si *todo el mundo* retorna, el programa está a punto de morir, así que ¿por qué debería importarnos?», pero te equivocarías.
 
-We have to care for two reasons: destructors run when a function returns, and the unwind can be *caught*. In both cases, code can keep running after a panic, so we need to be very careful and make sure our unsafe collections are always in *some* kind of coherent state whenever a panic could occur, because each panic is an implicit early return!
+Debemos preocuparnos por dos motivos: los destructores se ejecutan cuando una función retorna y el desenrollado puede *capturarse*. En ambos casos, el código puede seguir ejecutándose después de un pánico, así que debemos asegurarnos de que nuestras colecciones inseguras siempre estén en un estado coherente cuando pueda producirse un pánico, porque cada pánico es un retorno anticipado implícito.
 
-Vamos a think about what state our collection is in when we get to that line:
+Pensemos en el estado en el que se encuentra nuestra colección cuando llegamos a esa línea:
 
 We have our boxed_node on the stack, and we've extracted the element from it. If we were to return at this point, the Box would be dropped, and the node would be freed. Do you see it now..? self.back is still pointing at that freed node! Once we implement the rest of our collection and start using self.back for things, this could result in a use-after-free! Yikes!
 
-Interesantemente, this line has similar problems, but it's much safer:
+Curiosamente, esta línea tiene problemas parecidos, pero es mucho más segura:
 
 ```rust ,ignore
 self.len -= 1;
 ```
 
-By default in debug builds Rust checks for underflows and overflows and will panic when they happen. Yes, every arithmetic operation is a panic-safety hazard! This one is *better* because it happens after we've repaired all of our invariants, so it no cause memory-safety issues... as long as we no trust len to be right, but then, if we underflow it's definitely wrong, so we were dead either way! The debug assert is in some sense *worse* because it can escalate a minor issue into a critical one!
+De forma predeterminada, Rust comprueba los desbordamientos inferiores y superiores en las compilaciones de depuración y provoca un pánico cuando suceden. ¡Sí, toda operación aritmética es un riesgo para la seguridad frente a pánicos! Esta es *mejor* porque ocurre después de reparar todas nuestras invariantes, así que no causa problemas de seguridad de memoria... siempre que no confiemos en que `len` sea correcto. Pero si se produce un desbordamiento inferior, sin duda hay un error y estaríamos perdidos igualmente. La aserción de depuración es, en cierto sentido, *peor*, porque puede convertir un problema menor en uno crítico.
 
-He brought up the term "invariants" a few times, and that's because it's a really useful concept for panic-safety! Básicamente, to an outside observer of our collection, there are certain property we're always upholding. For a LinkedList, one of those is that any node that is reachable in our list is still allocated and initialized.
+He mencionado varias veces el término «invariantes» porque es un concepto muy útil para la seguridad frente a pánicos. Básicamente, desde el punto de vista de un observador externo, hay ciertas propiedades que nuestra colección siempre mantiene. En una `LinkedList`, una de ellas es que cualquier nodo accesible desde la lista sigue estando asignado e inicializado.
 
 *Inside* the implementation we have a bit more flexibility to break invariants *temporarily* as long as we make sure to repair them *before anyone notices*. This is actually one of the "killer apps" of Rust's ownership and borrowing system for collections: if an operation requires an `&mut Self`, then we are *guaranteed* that we have exclusive access to our collection and that it's fine for us to temporarily break invariants, safe in the knowledge that no one can sneakily mess with it.
 
@@ -72,15 +72,15 @@ Perhaps the greatest expression of this is [Vec::drain](https://doc.rust-lang.or
 
 For a situation where you *can* actually use destructors for panic-safety, check out the [BinaryHeap::sift_up case study](https://doc.rust-lang.org/nightly/nomicon/exception-safety.html#binaryheapsift_up).
 
-Anyway, we no be needing all of this fancy stuff for our LinkedLists, we just need to be a bit more vigilant about where we break our invariants, what we trust/require to be correct, and to avoid introducing unnecessary unwinds in the middle of hairy tasks.
+En cualquier caso, no necesitaremos toda esta sofisticación para nuestras `LinkedList`; solo tenemos que vigilar un poco más dónde rompemos nuestras invariantes, qué damos por correcto y qué exigimos que sea correcto, y evitar introducir desenrollados innecesarios en mitad de tareas complicadas.
 
 In this case, we have two options to make our code a bit more robust:
 
-* Use operations like Option::take a lot more aggressively, because they are more "transactional" and have a tendency to preserve invariants.
+* Usar operaciones como `Option::take` de forma mucho más agresiva, porque son más «transaccionales» y tienden a preservar las invariantes.
 
-* Kill the debug_asserts and trust ourselves to write better tests with dedicated "integrity check" functions that no run in user code ever.
+* Eliminar las `debug_assert` y confiar en que escribiremos mejores pruebas mediante funciones de «comprobación de integridad» que nunca se ejecuten en el código del usuario.
 
-In principle I like the first option, but it no actually work great for a doubly-linked list, because everything is doubly-redundantly encoded. Option::take no fix the problem here, but moving the debug_assert down a line would. But really, why make things harder for ourselves? Vamos a just remove those debug_asserts, and make sure anything that can panic is at the start or end of our methods, where our invariants should be known to hold.
+In principle I like the first option, but it no actually work great for a doubly-linked list, because everything is doubly-redundantly encoded. Option::take no fix the problem here, but moving the debug_assert down a line would. But really, why make things harder for ourselves? Simplemente eliminemos esas `debug_assert` y asegurémonos de que todo lo que pueda provocar un pánico esté al principio o al final de nuestros métodos, donde sabemos que nuestras invariantes deberían cumplirse.
 
 (In this way it's perhaps more accurate to think of them as *preconditions* and *postconditions* but you really should endeavour to treat them as invariants as much as possible!)
 
@@ -172,7 +172,7 @@ impl<T> LinkedList<T> {
 
 What can panic here? Well, knowing that honestly requires you to be a bit of a Rust expert, but thankfully, I am!
 
-The only places I can see in this code that *possibly* can panic (barring some absolute fuckery where someone recompiles the stdlib with debug_asserts enabled, but this  no es something you should ever do) are `Box::new` (for out-of-memory conditions) and the len arithmetic. All of that stuff is at the very end or very start of our methods, so yep, we're being nice and safe!
+Los únicos lugares de este código que *podrían* provocar un pánico (salvo que alguien haga la barbaridad de recompilar la biblioteca estándar con `debug_assert` activadas, algo que nunca deberías hacer) son `Box::new` (por falta de memoria) y la aritmética de `len`. Todo eso está al principio o al final de nuestros métodos, así que sí, estamos siendo razonablemente seguros.
 
-...were you surprised by `Box::new` being able to panic? Panics will get you like that! Try to preserve those invariants so you no need to worry about it!
+...¿te sorprendió que `Box::new` pudiera provocar un pánico? ¡Los pánicos son así! Intenta preservar esas invariantes para no tener que preocuparte por ello.
 

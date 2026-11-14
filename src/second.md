@@ -1,6 +1,6 @@
-# Una Pila Aceptable Enlazada Individualmente
+# Una Pila Aceptable con Enlace Simple
 
-En el capítulo anterior escribimos una pila enlazada individualmente mínima
+En el capítulo anterior escribimos una pila enlazada simple mínima
 viable. Sin embargo, hay algunas decisiones de diseño que la hacen algo
 mala. Hagámosla menos mala. Al hacerlo, vamos a:
 

@@ -1,8 +1,8 @@
 # Rellenando Bits Aleatorios
 
-Hey you said you wanted to be production-quality, no you? 
+Oye, dijiste que querías que fuera de calidad de producción, ¿no?
 
-Here's some more random gunk to toss in to be a "good" collection:
+Añadamos más cosas variadas para convertirla en una colección «buena»:
 
 ```rust ,ignore
 impl<T> LinkedList<T> {
@@ -17,7 +17,7 @@ impl<T> LinkedList<T> {
 }
 ```
 
-And now we've got a bunch of traits to implement that everyone expects:
+Y ahora tenemos que implementar un montón de traits que todo el mundo espera:
 
 ```rust ,ignore
 impl<T> Default for LinkedList<T> {
@@ -92,15 +92,15 @@ impl<T: Hash> Hash for LinkedList<T> {
 }
 ```
 
-I definitely wrote all of these from scratch, and no just copy the std impls. Because they're so interesting, and I definitely remember the subtleties of manually implementing Hash. Yeah, that's something I think about All The Time...
+Definitivamente escribí todo esto desde cero y no me limité a copiar las implementaciones de `std`. Porque son muy interesantes y, sin duda, recuerdo las sutilezas de implementar `Hash` manualmente. Sí, pienso en eso Todo El Tiempo...
 
-Ok hay actually a few things worth noting here.
+De acuerdo, en realidad hay algunas cosas que merece la pena señalar aquí.
 
-Primero, a nasty namespace clash. For whatever reason std now has macros named Hash and Debug, and so if you no have the traits imported, you'll get really cryptic errors about macros instead of the proper "missing trait".
+Primero, hay un conflicto de nombres bastante desagradable. Por algún motivo, `std` tiene ahora macros llamadas `Hash` y `Debug`, así que si no has importado los traits recibirás errores muy crípticos sobre macros en lugar del error correcto de «trait ausente».
 
-The other interesting thing to talk about is Hash itself. Do you see how we hash in `len`? Eso es actually really important! If collections no hash in lengths, [they can make themselves vulnerable to prefix collisions](https://doc.rust-lang.org/std/hash/trait.Hash.html#prefix-collisions). For instance, `[]`, `[()]` and `[(), ()]` are all zero-sized types: without hashing in the length they will all hash to the same value. Making it too easy for hash collisions to accidentally or maliciously happen can result in serious sadness, so be careful!
+El otro tema interesante es el propio `Hash`. ¿Ves que incluimos `len` en el hash? ¡Eso es realmente importante! Si las colecciones no incluyen sus longitudes en el hash, [pueden quedar expuestas a colisiones de prefijo](https://doc.rust-lang.org/std/hash/trait.Hash.html#prefix-collisions). Por ejemplo, `[]`, `[()]` y `[(), ()]` son tipos de tamaño cero; sin incluir la longitud, todos producirían el mismo hash. Facilitar demasiado que se produzcan colisiones de hash, accidental o maliciosamente, puede causar problemas graves, así que ten cuidado.
 
-Muy bien, here's our current code:
+Muy bien, este es nuestro código actual:
 
 ```rust
 use std::cmp::Ordering;

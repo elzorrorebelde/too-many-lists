@@ -1,20 +1,20 @@
 # Implementando Cursores
 
-Ok so we're only going to bother with std's CursorMut because the immutable version no es actually interesting. Just like my original design, it has a "ghost" element that contains None to indicate the start/end of the list, and you can "walk over it" to wrap around to the other side of the list. To implement it, we're going to need:
+Solo vamos a ocuparnos del `CursorMut` de `std`, porque la versión inmutable no es especialmente interesante. Al igual que en mi diseño original, tiene un elemento «fantasma» que contiene `None` para indicar el principio o el final de la lista, y se puede «pasar por encima» de él para rodear la lista y llegar al otro extremo. Para implementarlo necesitaremos:
 
-* A pointer to the current node
-* A pointer to the list
-* The current index
+* Un puntero al nodo actual
+* Un puntero a la lista
+* El índice actual
 
-Wait what's the index when we point at the "ghost"? 
+Espera, ¿cuál es el índice cuando apuntamos al «fantasma»?
 
-*furrows brow* ... *checks std* ... *dislikes std's answer*
+*frunce el ceño* ... *consulta `std`* ... *no le gusta la respuesta de `std`*
 
-Ok so quite reasonably `index` on a Cursor returns an `Option<usize>`. The std implementation does a bunch of junk to avoid storing it as an Option but... we're a linked list, it's fine. Also std has the cursor_front/cursor_back stuff which starts the cursor on the front/back elements, which feels intuitive, but then has to do something weird when the list is empty.
+Así que, razonablemente, `index` en un cursor devuelve un `Option<usize>`. La implementación de `std` hace un montón de cosas para evitar almacenarlo como `Option`, pero... nosotros tenemos una lista enlazada, no pasa nada. `std` también tiene `cursor_front` y `cursor_back`, que colocan el cursor en los elementos delantero y trasero; resulta intuitivo, pero luego hay que hacer algo extraño cuando la lista está vacía.
 
-You can implement that stuff if you want, but Estoy going to cut down on all the repetitive gunk and corner cases and just make a bare `cursor_mut` method that starts at the ghost, and people can use move_next/move_prev to get the one they want (and then you can wrap that up as cursor_front if you really want).
+Puedes implementar todo eso si quieres, pero yo voy a reducir la repetición y los casos límite y crear únicamente un método `cursor_mut` básico que empiece en el fantasma. Después, cada usuario podrá usar `move_next` o `move_prev` para llegar al elemento que quiera (y envolverlo en `cursor_front` si de verdad lo desea).
 
-Vamos a get cracking:
+Vamos a ponernos manos a la obra:
 
 ```rust ,ignore
 pub struct CursorMut<'a, T> {
@@ -24,7 +24,7 @@ pub struct CursorMut<'a, T> {
 }
 ```
 
-Pretty straight-forward, one field for each item of our bulleted list! Now the `cursor_mut` method:
+Bastante sencillo: un campo por cada elemento de nuestra lista. Ahora, el método `cursor_mut`:
 
 ```rust ,ignore
 impl<T> LinkedList<T> {
@@ -38,7 +38,7 @@ impl<T> LinkedList<T> {
 }
 ```
 
-Since we're starting at the ghost, we can just start with everything as None, nice and simple! Next, movement:
+Como empezamos en el fantasma, podemos inicializarlo todo a `None`; ¡sencillo! Pasemos al movimiento:
 
 
 ```rust ,ignore
@@ -70,14 +70,14 @@ impl<'a, T> CursorMut<'a, T> {
 }
 ```
 
-So hay 4 interesting cases:
+Así que hay 4 casos interesantes:
 
-* The normal case
-* The normal case, but we reach the ghost
-* The ghost case, where we go to the front of the list
-* The ghost case, but the list is empty, so do nothing
+* El caso normal.
+* El caso normal, pero llegamos al fantasma.
+* El caso del fantasma, en el que vamos al principio de la lista.
+* El caso del fantasma, pero la lista está vacía, así que no hacemos nada.
 
-move_prev is the exact same logic, but with front/back inverted and the indexing changes inverted:
+`move_prev` sigue exactamente la misma lógica, pero invirtiendo `front`/`back` y los cambios del índice:
 
 ```rust ,ignore
 pub fn move_prev(&mut self) {
@@ -102,9 +102,9 @@ pub fn move_prev(&mut self) {
 }
 ```
 
-Next let's add some methods to look at the elements around the cursor: current, peek_next, and peek_prev. **A Very Important Note:** these methods must borrow our cursor by `&mut self`, and the results must be tied to that borrow. We cannot let the user get multiple copies of a mutable reference, and we cannot let them use any of our insert/remove/split/splice APIs while holding onto such a reference!
+Ahora añadamos métodos para consultar los elementos alrededor del cursor: `current`, `peek_next` y `peek_prev`. **Nota muy importante:** estos métodos deben tomar prestado nuestro cursor mediante `&mut self`, y los resultados deben quedar vinculados a ese préstamo. No podemos permitir que el usuario obtenga varias copias de una referencia mutable ni que use nuestras API de `insert`, `remove`, `split` o `splice` mientras conserve una referencia de ese tipo.
 
-Afortunadamente, this is the default assumption rust makes when you use lifetime elision, so, we will just do the right thing by default!
+Afortunadamente, esta es la suposición predeterminada que hace Rust al omitir los tiempos de vida, así que por defecto hará lo correcto.
 
 ```rust ,ignore
 pub fn current(&mut self) -> Option<&mut T> {
@@ -130,35 +130,35 @@ pub fn peek_prev(&mut self) -> Option<&mut T> {
 }
 ```
 
-Head empty, Option methods and (omitted) compiler errors do all thinking now. I was skeptical about the `Option<NonNull>` stuff, but, god damn it really just lets me autopilot this code. He spent way too much time writing array-based collections where you never get to use Option, wow this is nice! (`(*node.as_ptr())` is still miserable but, that's just Rust's raw pointers for you...)
+La cabeza vacía, los métodos de `Option` y los errores del compilador (omitidos) hacen ahora todo el trabajo mental. Era escéptico con lo de `Option<NonNull>`, pero, demonios, realmente me permite escribir este código en piloto automático. He pasado demasiado tiempo escribiendo colecciones basadas en arrays donde nunca puedes usar `Option`; ¡esto es maravilloso! (`(*node.as_ptr())` sigue siendo horrible, pero así son los punteros crudos de Rust.)
 
-Next we have a choice: we can either jump right to split and splice, the entire point of these APIs, or we can take a baby-step with single element insert/remove. I have a feeling we're just going to want to implement insert/remove in terms of split and splice so... let's just do those first and see where the cards fall (genuinely have no idea as I type this).
+Ahora tenemos una elección: podemos saltar directamente a `split` y `splice`, que son el objetivo principal de estas API, o dar un pequeño paso implementando la inserción y eliminación de un solo elemento. Tengo la sensación de que acabaremos implementando `insert` y `remove` en términos de `split` y `splice`, así que hagamos primero estas últimas y veamos qué ocurre (sinceramente, no tengo ni idea mientras escribo esto).
 
 
 
 
 # Split
 
-First up, split_before and split_after, which return everything before/after the current element as a LinkedList (stopping at the ghost element, unless you're at the ghost, in which case we just return the whole List and the cursor now points to an empty list):
+Primero, `split_before` y `split_after`, que devuelven todo lo que hay antes o después del elemento actual como una `LinkedList` (se detienen en el elemento fantasma; si el cursor está en el fantasma, devuelven la lista completa y el cursor pasa a apuntar a una lista vacía):
 
-*squints* ok this one is actually some non-trivial logic so we're going to have to talk it out one step at a time.
+*entrecierra los ojos* De acuerdo, aquí hay lógica no trivial, así que tendremos que analizarla paso a paso.
 
-I see 4 potentially interesting cases for split_before:
+Veo 4 casos potencialmente interesantes para `split_before`:
 
 * The normal case
-* The normal case, but prev is the ghost
-* The ghost case, where we return the whole list and become empty
-* The ghost case, but the list is empty, so do nothing and return the empty list
+* El caso normal, pero `prev` es el fantasma.
+* El caso del fantasma, en el que devolvemos la lista completa y nos quedamos vacíos.
+* El caso del fantasma, pero la lista está vacía, así que no hacemos nada y devolvemos una lista vacía.
 
-Vamos a start with the corner cases. The third case I believe is just
+Empecemos por los casos límite. Creo que el tercero se reduce simplemente a
 
 ```rust
 mem::replace(self.list, LinkedList::new())
 ```
 
-Right? We become empty, we return the whole list, and our fields were already None, so nothing to update. Nice. Oh hey, this also Does The Right Thing on the fourth case too!
+¿Verdad? Nos quedamos vacíos, devolvemos la lista completa y nuestros campos ya eran `None`, así que no hay nada que actualizar. Genial. ¡Y esto también hace lo correcto en el cuarto caso!
 
-So now the normal cases... ok Estoy going to need some ASCII diagrams for this. In the most general case, we have something like this:
+Pasemos ahora a los casos normales... de acuerdo, voy a necesitar algunos diagramas ASCII. En el caso más general tenemos algo como esto:
 
 ```text
 list.front -> A <-> B <-> C <-> D <- list.back
@@ -166,7 +166,7 @@ list.front -> A <-> B <-> C <-> D <- list.back
                          cur
 ```
 
-And we want to produce this:
+Y queremos producir esto:
 
 ```text
 list.front -> C <-> D <- list.back
@@ -176,7 +176,7 @@ list.front -> C <-> D <- list.back
 return.front -> A <-> B <- return.back
 ```
 
-So we need to break the link between cur and prev, and... god so much needs to change. Ok I just need to break this up into steps so I can convince myself it makes sense. This will be a bit over-verbose but I can at least make sense of it:
+Tenemos que romper el enlace entre `cur` y `prev`, y... Dios mío, hay que cambiar muchísimas cosas. De acuerdo, voy a dividirlo en pasos para convencerme de que tiene sentido. Será algo prolijo, pero al menos podré entenderlo:
 
 ```rust ,ignore
 pub fn split_before(&mut self) -> LinkedList<T> {
@@ -240,33 +240,33 @@ if let Some(prev) = prev {
 }
 ```
 
-If *you* want to, you can squash that all together and apply optimizations like:
+Si *quieres*, puedes juntar todo eso y aplicar optimizaciones como:
 
-* fold the two accesses to `(*cur.as_ptr()).front` as just `(*cur.as_ptr()).front.take()` 
-* note that new_back is a noop, and just remove both
+* convertir los dos accesos a `(*cur.as_ptr()).front` en un único `(*cur.as_ptr()).front.take()`
+* observar que `new_back` no hace nada y eliminar ambas cosas
 
-As far as I can tell, everything else just incidentally Does The Right Thing otherwise. Vamos a see when we write tests! (copy-paste to make split_after)
+Por lo que puedo ver, todo lo demás hace casualmente lo correcto. ¡Ya lo veremos al escribir las pruebas! (Copia y pega para crear `split_after`.)
 
-I am done Making Mistakes and I am just going to try to write the most foolproof code I can. This is how I *actually* write collections: just break things down into trivial steps and cases until it can fit in my head and seems foolproof. Then write a ton of tests until Estoy convinced I no manage to mess it up still.
+He terminado de cometer errores y ahora voy a intentar escribir el código más resistente a errores que pueda. Así es como *realmente* escribo colecciones: divido las cosas en pasos y casos triviales hasta que caben en mi cabeza y parecen infalibles. Después escribo un montón de pruebas hasta convencerme de que no he conseguido estropearlo.
 
-Because most of the collections work He done is *extremely unsafe* I no generally get to rely on the compiler catching mistakes, and miri no exist back in the day! So I just need to squint at a problem until my head hurts and try my hardest to Never Ever Ever Make A Mistake.
+Como la mayor parte del trabajo que he hecho con colecciones es *extremadamente inseguro*, normalmente no puedo confiar en que el compilador detecte los errores; además, ¡`miri` ni siquiera existía entonces! Así que tengo que mirar un problema hasta que me duela la cabeza e intentar con todas mis fuerzas No Cometer Jamás Un Error.
 
-Don't write Unsafe Rust Code! Safe Rust is so much better!!!!
+¡¡¡No escribas código Rust inseguro! El Rust seguro es muchísimo mejor!!!
 
 
 
 
 # Splice
 
-Just one more boss to fight, splice_before and splice_after, which I expect to be the corner-casiest one of them all. The two functions *take in* a LinkedList and grafts its contents into outrs. Our list could be empty, their list could be empty, we've got ghosts to deal with... *sigh* let's just take it one step at a time with splice_before.
+Solo queda un jefe más: `splice_before` y `splice_after`, que espero que sean los campeones de los casos límite. Las dos funciones *reciben* una `LinkedList` y injertan su contenido en la nuestra. Nuestra lista podría estar vacía, la otra también y además tenemos fantasmas... *suspira*; vayamos paso a paso con `splice_before`.
 
-* If their list is empty, we no need to do anything. 
-* If our list is empty, then our list just becomes their list.
-* If we're pointing at the ghost, then this appends to the back (change list.back)
-* If we're pointing at the first element (0), then this appends to the front (change list.front)
-* In the general case, we do a whole lot of pointer fuckery.
+* Si su lista está vacía, no tenemos que hacer nada.
+* Si nuestra lista está vacía, pasa a ser la lista recibida.
+* Si apuntamos al fantasma, añadimos al final (cambiamos `list.back`).
+* Si apuntamos al primer elemento (0), añadimos al principio (cambiamos `list.front`).
+* En el caso general, hacemos un montón de manipulación de punteros.
 
-The general case is this:
+El caso general es el siguiente:
 
 ```text
 input.front -> 1 <-> 2 <- input.back
@@ -282,7 +282,7 @@ Becoming this:
 list.front -> A <-> 1 <-> 2 <-> B <-> C <- list.back
 ```
 
-Ok? Ok. Vamos a write that out... *TAKES A HUGE BREATH AND PLUNGES IN*:
+¿De acuerdo? De acuerdo. Escribámoslo... *TOMA UNA ENORME BOCANADA DE AIRE Y SE LANZA*:
 
 ```rust ,ignore
     pub fn splice_before(&mut self, mut input: LinkedList<T>) {
@@ -344,16 +344,16 @@ input.len = 0;
 
 > Use of moved value: `input`
 
-Ah, right, in the "we're empty" case we're moving the list. Vamos a replace that with a swap:
+Ah, cierto: en el caso en que estamos vacíos estamos moviendo la lista. Sustituyamos eso por un intercambio:
 
 ```rust ,ignore
 // We're empty, become the input, remain on the ghost
 std::mem::swap(self.list, &mut input);
 ```
 
-In this case the writes will be pointless, but, they still work (we could probably also early-return in this branch to appease the compiler).
+En este caso las escrituras serán innecesarias, pero siguen funcionando (probablemente también podríamos retornar pronto en esta rama para satisfacer al compilador).
 
-This unwrap is just a consequence of me thinking about the cases backwards, and can be fixed by making the if-let ask the right question:
+Este `unwrap` es consecuencia de haber pensado en los casos al revés y se puede arreglar haciendo que el `if let` plantee la pregunta correcta:
 
 ```rust ,ignore
 if let Some(0) = self.index {
@@ -363,13 +363,13 @@ if let Some(0) = self.index {
 }
 ```
 
-Adjusting the index is duplicated inside the branches, so can also be hoisted out:
+El ajuste del índice está duplicado dentro de las ramas, así que también podemos sacarlo fuera:
 
 ```rust
 *self.index.as_mut().unwrap() += input.len;
 ```
 
-Ok, putting that all together we get this:
+De acuerdo, juntándolo todo obtenemos esto:
 
 ```rust
 if input.is_empty() {
@@ -470,9 +470,9 @@ input.len = 0;
 
 Alright now this, this I can tolerate. The only complaints I have are that we no dedupe in_front/in_back (probably we could rejig our conditions but eh whatever). Really this is basically what you would write in C but with `Option<NonNull>` gunk making it tedious. I can live with that. Well no we should just make raw pointers better for this stuff. But, out of scope for this book.
 
-Anyway, I am absolutely exhausted after that, so, `insert` and `remove` and all the other APIs can be left as an excercise to the reader. 
+En fin, después de esto estoy absolutamente agotado, así que `insert`, `remove` y las demás API se quedan como ejercicio para el lector.
 
-Here's the final code for our Cursor with my attempt at copy-pasting the combinatorics. Did I get it right? Voy a only find out when I write the next chapter and test this monstrosity!
+Este es el código final de nuestro cursor, con mi intento de copiar y pegar las implementaciones combinatorias. ¿Lo he hecho bien? Solo lo descubriré cuando escriba el capítulo siguiente y pruebe esta monstruosidad.
 
 
 ```rust ,ignore

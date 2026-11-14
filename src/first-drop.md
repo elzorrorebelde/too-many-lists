@@ -36,24 +36,6 @@ Cuando se suelta `list`, intentará soltar A, que intentará soltar B,
 que intentará soltar C. Algunos podrían estar poniéndose nerviosos con razón.
 ¡Esto es código recursivo, y el código recursivo puede reventar la pila!
 
-Como ejemplo, si incluimos una prueba que intenta insertar muchos elementos en
-nuestra lista, fallará debido a un desbordamiento de pila (stack overflow).
-
-```rust, ignore
-#[test]
-fn long_list() {
-    let mut list = List::new();
-    for i in 0..100000 {
-        list.push(i);
-    }
-    drop(list);
-}
-```
-
-```text
-thread 'first::test::long_list' has overflowed its stack
-```
-
 Algunos podrían estar pensando "esto es claramente recursivo por la cola
 (tail recursive), y cualquier lenguaje decente se aseguraría de que tal código
 no reventara la pila". ¡Esto es, de hecho, incorrecto! Para ver por qué,

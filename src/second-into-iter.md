@@ -36,8 +36,8 @@ tal, implementaremos IntoIter como un envoltorio de nuevo tipo (newtype)
 alrededor de List:
 
 ```rust ,ignore
-// Tuple structs are an alternative form of struct,
-// useful for trivial wrappers around other types.
+// Las tuplas estructurales son una forma alternativa de struct,
+// útil para envolver otros tipos de manera sencilla.
 pub struct IntoIter<T>(List<T>);
 
 impl<T> List<T> {
@@ -49,7 +49,7 @@ impl<T> List<T> {
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
-        // access fields of a tuple struct numerically
+        // Acceder numéricamente a los campos de una tupla estructural
         self.0.pop()
     }
 }
@@ -91,52 +91,3 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 ```
 
 ¡Bien!
-
-Por curiosidad, intentemos iterar dos veces sobre la lista:
-
-```rust ,ignore
-#[test]
-fn into_iter() {
-    let mut list = List::new();
-    list.push(1); list.push(2); list.push(3);
-
-    let mut iter = list.into_iter();
-    assert_eq!(iter.next(), Some(3));
-    assert_eq!(iter.next(), Some(2));
-    assert_eq!(iter.next(), Some(1));
-    assert_eq!(iter.next(), None);
-
-    let mut iter = list.into_iter();
-    assert_eq!(iter.next(), Some(3));
-    assert_eq!(iter.next(), Some(2));
-    assert_eq!(iter.next(), Some(1));
-    assert_eq!(iter.next(), None);
-}
-```
-
-```text
-> cargo build
-error[E0382]: use of moved value: `list`
-   --> src/second.rs:167:24
-    |
-158 |         let mut list = List::new();
-    |             -------- move occurs because `list` has type `second::List<i32>`, which does not implement the `Copy` trait
-...
-161 |         let mut iter = list.into_iter();
-    |                             ----------- `list` moved due to this method call
-...
-167 |         let mut iter = list.into_iter();
-    |                        ^^^^ value used here after move
-    |
-note: this function takes ownership of the receiver `self`, which moves `list`
-   --> src/second.rs:45:22
-    |
-45  |     pub fn into_iter(self) -> IntoIter<T> {
-    |                      ^^^^
-```
-
-Este es el costo de `into_iter`. Para que `next` devuelva valores y no
-referencias, para dar propiedad del resultado a quien llama, nuestro
-`into_iter` tuvo que tomar posesión de la lista; lo que significa que la
-lista ya no se puede usar. Que es exactamente lo que hacemos en la siguiente
-sección.

@@ -1,10 +1,10 @@
 # Conceptos Básicos (Basics)
 
-> **NARRATOR:** This section has a looming fundamental error in it, because that's the whole point of the book. However once we start using `unsafe` it's possible to do things wrong and still have everything compile and *seemingly* work. The fundamental mistake will be identified in the next section. Don't actually use the contents of this section in production code!
+> **NARRADOR:** Esta sección contiene un error fundamental latente, porque ese es precisamente el objetivo del libro. Sin embargo, cuando empezamos a usar `unsafe`, es posible hacer las cosas mal y aun así conseguir que todo compile y *parezca* funcionar. El error fundamental se identificará en la siguiente sección. ¡No uses realmente el contenido de esta sección en código de producción!
 
-Muy bien, back to basics. How do we construct our list?
+Muy bien, volvamos a lo básico. ¿Cómo construimos nuestra lista?
 
-Before we just did:
+Antes hacíamos lo siguiente:
 
 ```rust ,ignore
 impl<T> List<T> {
@@ -14,7 +14,7 @@ impl<T> List<T> {
 }
 ```
 
-But we're not using Option for the `tail` anymore:
+Pero ya no usamos `Option` para `tail`:
 
 ```text
 > cargo build
@@ -30,13 +30,11 @@ error[E0308]: mismatched types
               found type `std::option::Option<_>`
 ```
 
-We *could* use an Option, but unlike Box, `*mut` *is* nullable. This means it
-no puede benefit from the null pointer optimization. Instead, we'll be using `null`
-to represent None.
+*Podríamos* usar un `Option`, pero, a diferencia de `Box`, `*mut` *puede* ser nulo. Esto significa que no puede beneficiarse de la optimización de puntero nulo. En su lugar, usaremos `null` para representar `None`.
 
-So how do we get a null pointer? There's a few ways, but I prefer to use
-`std::ptr::null_mut()`. If you want, you can also use `0 as *mut _`, but that
-just seems so *messy*.
+Entonces, ¿cómo obtenemos un puntero nulo? Hay varias formas, pero prefiero usar
+`std::ptr::null_mut()`. Si quieres, también puedes usar `0 as *mut _`, pero me
+parece demasiado *sucio*.
 
 ```rust ,ignore
 use std::ptr;
@@ -80,24 +78,24 @@ warning: field is never used: `head`
    |     ^^^^^^^^^^^^^
 ```
 
-*shush* compiler, we will use them soon.
+*shh*, compilador, pronto los usaremos.
 
-Muy bien, let's move on to writing `push` again. This time, instead of grabbing
-an `Option<&mut Node<T>>` after we insert, we're just going to grab a
-`*mut Node<T>` to the insides of the Box right away. We know we can soundly do
-this because the contents of a Box has a stable address, even if we move the
-Box around. Of course, this no es *safe*, because if we just drop the Box we'll
-have a pointer to freed memory.
+Muy bien, volvamos a escribir `push`. Esta vez, en lugar de obtener un
+`Option<&mut Node<T>>` después de insertar, obtendremos directamente un
+`*mut Node<T>` que apunte al contenido del `Box`. Sabemos que esto es correcto
+porque el contenido de un `Box` tiene una dirección estable, incluso si movemos
+el `Box`. Por supuesto, esto no es *safe*, porque si simplemente eliminamos el
+`Box`, tendremos un puntero a memoria liberada.
 
-How do we make a raw pointer from a normal pointer? Coercions! If a variable
-is declared to be a raw pointer, a normal reference will coerce into it:
+¿Cómo convertimos un puntero normal en un puntero crudo? ¡Coerciones! Si una
+variable se declara como puntero crudo, una referencia normal se convertirá en él:
 
 ```rust ,ignore
 let raw_tail: *mut _ = &mut *new_tail;
 ```
 
-We have all the info we need. We can translate our code into, approximately,
-the previous reference version:
+Ya tenemos toda la información necesaria. Podemos traducir nuestro código,
+aproximadamente, a la versión anterior basada en referencias:
 
 ```rust ,ignore
 pub fn push(&mut self, elem: T) {
@@ -134,11 +132,11 @@ error[E0609]: no field `next` on type `*mut fifth::Node<T>`
    |             try dereferencing it: `(*self.tail).next`
 ```
 
-Huh? We have a pointer to a Node, why no puede we get the `next` field?
+¿Eh? Tenemos un puntero a un `Node`; ¿por qué no podemos acceder al campo `next`?
 
-Rust is kinda a jerk when you use raw pointers. To access the contents of a
-raw pointer, it insists that we manually deref them, because it's such an unsafe
-operation. So let's do that:
+Rust se pone un poco pesado cuando usas punteros crudos. Para acceder al
+contenido de un puntero crudo, exige que lo desreferenciemos manualmente, porque
+es una operación insegura. Hagámoslo:
 
 ```rust ,ignore
 *self.tail.next = Some(new_tail);
@@ -179,15 +177,16 @@ error[E0133]: dereference of raw pointer is unsafe and requires
      all of these are undefined behavior
 ```
 
-THIS. SHOULDN'T. BE. THIS. HARD.
+ESTO. NO. DEBERÍA. SER. TAN. DIFÍCIL.
 
-Remember how I said Unsafe Rust is like an FFI language for Safe Rust? Well, the
-compiler wants us to explicitly delimit where we're doing this FFI-ing. We have
-two options. Primero, we can mark our *entire* function as unsafe, in which case
-it becomes an Unsafe Rust function and can only be called in an `unsafe`
-context. This no es great, because we want our list to be safe to use. Second,
-we can write an `unsafe` block inside our function, to delimit the FFI boundary.
-This declares the overall function to be safe. Vamos a do that one:
+¿Recuerdas que dije que Rust inseguro es como un lenguaje FFI para Rust seguro? El
+compilador quiere que delimitemos explícitamente dónde hacemos ese trabajo de FFI.
+Tenemos dos opciones. Primero, podemos marcar *toda* la función como `unsafe`,
+en cuyo caso se convierte en una función de Rust inseguro y solo se puede llamar
+dentro de un contexto `unsafe`. No es una buena opción, porque queremos que
+nuestra lista sea segura de usar. Segundo, podemos escribir un bloque `unsafe`
+dentro de la función para delimitar el límite de FFI. Esto declara que la
+función completa es segura. Hagamos eso:
 
 
 ```rust ,ignore
@@ -226,55 +225,56 @@ warning: field is never used: `elem`
 
 Yay!
 
-Es kind of interesting that that's the *only* place we've had to write an
-unsafe block so far. We do raw pointer stuff all over the place, what's up with
-that?
+Es bastante interesante que ese sea el *único* lugar en el que hemos tenido que
+escribir un bloque `unsafe` hasta ahora. Trabajamos con punteros crudos por todas
+partes; ¿qué ocurre?
 
-It turns out that Rust is a massive rules-lawyer pedant when it comes to
-`unsafe`. We quite reasonably want to maximize the set of Safe Rust programs,
-because those are programs we can be much more confident in. To accomplish this,
-Rust carefully carves out a minimal surface area for unsafety. Nótese que all
-the other places we've worked with raw pointers has been *assigning* them, or
-just observing whether they're null or not.
+Resulta que Rust es un auténtico abogado puntilloso con las reglas cuando se
+trata de `unsafe`. Y es razonable: queremos maximizar el conjunto de programas
+de Rust seguro, porque son programas en los que podemos confiar mucho más. Para
+conseguirlo, Rust delimita cuidadosamente una superficie mínima de inseguridad.
+Fíjate en que, en todos los demás lugares donde hemos trabajado con punteros
+crudos, solo los hemos *asignado* o hemos observado si eran nulos.
 
-If you never actually dereference a raw pointer *those are totally safe things
-to do*. You're just reading and writing an integer! The only time you can
-actually get into trouble with a raw pointer is if you actually dereference it.
-So Rust says *only* that operation is unsafe, and everything else is totally
-safe.
+Si nunca desreferencias realmente un puntero crudo, *esas operaciones son
+completamente seguras*. ¡Solo estás leyendo y escribiendo un entero! La única
+forma de meterte en problemas con un puntero crudo es desreferenciarlo. Por eso
+Rust considera insegura *únicamente* esa operación; todo lo demás es seguro.
 
-Super. Pedantic. But technically correct.
+Genial. Puntilloso. Pero técnicamente correcto.
 
-> **NARRATOR:** Somewhere on the other side of the world, a hardware engineer
-feels a shiver down her spine &mdash; someone must be insisting pointers
-are just integers again. She looks down at her proposal for a new hardware
-pointer authentication scheme and sheds a single tear. The compiler engineer
-next door feels nothing &mdash; they long ago learned to always wear a heavy
-sweater.
+> **NARRADOR:** En algún lugar al otro lado del mundo, una ingeniera de hardware
+siente un escalofrío por la espalda: alguien debe de estar insistiendo otra vez
+en que los punteros no son más que enteros. Mira su propuesta para un nuevo
+sistema de autenticación de punteros por hardware y derrama una sola lágrima.
+El ingeniero del compilador de al lado no siente nada: hace mucho que aprendió
+a llevar siempre un jersey grueso.
 
-Having only some of the pointer operations be *actually* unsafe raises an
-interesting problem: although we're supposed to delimit the scope of the
-unsafety with the `unsafe` block, it actually depends on state that was
-established outside of the block. Outside of the function, even!
+Que solo algunas operaciones con punteros sean *realmente* inseguras plantea
+un problema interesante: aunque se supone que debemos delimitar el alcance de
+la inseguridad con el bloque `unsafe`, este depende de un estado establecido
+fuera del bloque. ¡Incluso fuera de la función!
 
-This is what I call unsafe *taint*. As soon as you use `unsafe` in a module,
-that whole module is tainted with unsafety. Everything has to be correctly
-written in order to make sure all invariants are upheld for the unsafe code.
+A esto lo llamo *contaminación* insegura. En cuanto usas `unsafe` en un módulo,
+todo el módulo queda contaminado de inseguridad. Hay que escribirlo todo
+correctamente para garantizar que se mantienen todas las invariantes del código
+inseguro.
 
-This taint is manageable because of *privacy*. Outside of our module, all of our
-struct fields are totally private, so no one else can mess with our state in
-arbitrary ways. As long as no combination of the APIs we expose causes bad stuff
-to happen, as far as an outside observer is concerned, all of our code is safe!
-And really, this is no different from the FFI case. No one needs to care
-if some python math library shells out to C as long as it exposes a safe
-interface.
+Esta contaminación es manejable gracias a la *privacidad*. Fuera de nuestro
+módulo, todos los campos de nuestras estructuras son completamente privados,
+así que nadie puede alterar nuestro estado de forma arbitraria. Mientras ninguna
+combinación de las API expuestas provoque problemas, desde el punto de vista de
+un observador externo todo nuestro código es seguro. Y, en realidad, esto no es
+distinto del caso de FFI. A nadie le importa que una biblioteca matemática de
+Python ejecute código C por debajo, siempre que exponga una interfaz segura.
 
-Anyway, let's move on to `pop`, which is pretty much verbatim the reference
-version:
+En cualquier caso, pasemos a `pop`, que es prácticamente idéntico a la versión
+basada en referencias:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<T> {
     self.head.take().map(|head| {
+        let head = *head;
         self.head = head.next;
 
         if self.head.is_none() {
@@ -286,11 +286,12 @@ pub fn pop(&mut self) -> Option<T> {
 }
 ```
 
-Again we see another case where safety is stateful. If we fail to null out the
-tail pointer in *this* function, we'll see no problems at all. However
-subsequent calls to `push` will start writing to the dangling tail!
+De nuevo vemos un caso en el que la seguridad depende del estado. Si no ponemos
+a `null` el puntero `tail` en *esta* función, no veremos ningún problema. Sin
+embargo, las llamadas posteriores a `push` empezarán a escribir en el `tail`
+colgante.
 
-Vamos a test it out:
+Vamos a probarlo:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -336,9 +337,9 @@ mod test {
 }
 ```
 
-This is just the stack test, but with the expected `pop` results flipped around.
-I also added some extra steps at the end to make sure that tail-pointer
-corruption case in `pop` no occur.
+Esta es simplemente la prueba de la pila, pero con los resultados esperados de
+`pop` invertidos. También añadí algunos pasos al final para asegurarme de que no
+se produzca el caso de corrupción del puntero `tail` en `pop`.
 
 ```text
 cargo test

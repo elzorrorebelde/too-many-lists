@@ -47,7 +47,7 @@ error[E0515]: cannot return value referencing temporary value
 
 Ok, solo estoy quemando mi computadora.
 
-Esta es exactamente la misma lógica que nuestra pila enlazada individualmente.
+Esta es exactamente la misma lógica que nuestra pila enlazada simple.
 ¿Por qué son diferentes las cosas? POR QUÉ.
 
 La respuesta es realmente toda la moraleja de este capítulo: RefCells hacen

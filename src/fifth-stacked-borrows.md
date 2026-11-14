@@ -1,32 +1,32 @@
 # Intentando Entender Stacked Borrows
 
-In the previous section we tried running our unsafe singly-linked queue under miri, and it said we had broken the rules of *stacked borrows*, and linked us some documentation.
+En la sección anterior intentamos ejecutar nuestra cola enlazada simple insegura bajo `miri`, y nos indicó que habíamos infringido las reglas de los *préstamos apilados* y nos enlazó documentación.
 
-Normally I'd give a guided tour of the docs, but we're not really the target audience of that documentation. Es more designed for compiler developers and academics who are working on the semantics of Rust. 
+Normalmente haría un recorrido guiado por la documentación, pero no somos realmente su público objetivo. Está más bien pensada para desarrolladores del compilador y académicos que trabajan en la semántica de Rust.
 
-So Estoy going to just give you the high level *idea* of "stacked borrows", and then give you a simple strategy for following the rules.
+Así que solo voy a explicar la *idea* general de los «préstamos apilados» y después ofreceré una estrategia sencilla para seguir las reglas.
 
-> **NARRATOR:** Stacked borrows are still "experimental" as a semantic model for Rust, so breaking these rules may not actually mean your program is "wrong". But unless you literally work on the compiler, you should just fix your program when miri complains. Better safe than sorry when it comes to Undefined Behaviour.
+> **NARRADOR:** Los préstamos apilados siguen siendo «experimentales» como modelo semántico de Rust, así que infringir estas reglas no significa necesariamente que tu programa esté «mal». Pero, a menos que trabajes literalmente en el compilador, deberías arreglar el programa cuando `miri` se queje. Más vale prevenir que lamentar cuando se trata de comportamiento indefinido.
 
 
 
-# The Motivation: Pointer Aliasing
+# La motivación: aliasing de punteros
 
-Before we get into *what* rules we've broken, it will help to understand *why* the rules exist in the first place. There are a few different motivating problems, but I think the most important one is *pointer aliasing*.
+Antes de explicar *qué* reglas hemos infringido, será útil entender *por qué* existen. Hay varios problemas que las motivan, pero creo que el más importante es el *aliasing de punteros*.
 
-We say two pointers *alias* when the pieces of memory they point to overlap. Just as someone who "goes by an alias" can be referred to by two different names, that overlapping piece of memory can be referred to by two different pointers. This can lead to problems.
+Decimos que dos punteros tienen *aliasing* cuando se solapan las zonas de memoria a las que apuntan. Igual que alguien que «usa un alias» puede ser llamado por dos nombres distintos, esa zona de memoria solapada puede estar referenciada por dos punteros diferentes. Esto puede causar problemas.
 
-The compiler uses information about pointer aliasing to optimize accesses to memory, so if the information it has is *wrong* then the program will be miscompiled and do random garbage. 
+El compilador utiliza la información sobre el aliasing de punteros para optimizar los accesos a memoria, así que si esa información es *incorrecta*, el programa se compilará mal y hará cosas absurdas.
 
-> **NARRATOR:** Practically speaking, aliasing is more concerned with memory accesses than the pointers themselves, and only really matters when one of the accesses is mutating. Pointers are emphasized because they're a convenient thing to attach rules to.
+> **NARRADOR:** En la práctica, el aliasing tiene más que ver con los accesos a memoria que con los punteros en sí, y solo importa realmente cuando uno de los accesos es mutable. Se hace hincapié en los punteros porque son un elemento cómodo al que asociar reglas.
 
-To understand why pointer aliasing information is important, let's consider *The Parable of the Tiny Angry Man*. 
+Para entender por qué es importante la información sobre el aliasing de punteros, consideremos *la parábola del hombrecillo enfadado*.
 
 ----
 
-Michiel was looking through their bookshelf one day when they saw a book they no remember. They pulled it from the bookcase and looked at the cover. 
+Un día, Michiel estaba mirando su estantería cuando vio un libro que no recordaba. Lo sacó de la estantería y miró la portada.
 
-"Oh yes, my old copy of *War and Peace*, a book I definitely have read. I loved the part with all the Peace."
+«Ah, sí, mi viejo ejemplar de *Guerra y paz*, un libro que sin duda he leído. Me encantó la parte de toda la paz.»
 
 Suddenly there was a knock at the door. Michiel returned the book to its shelf and opened the door -- it was their sworn nemesis **Hamslaw**. As Hamslaw prepared a devastating remark about Michiel's clearly inferior codegolfing skills, they sensed an opening: 
 
@@ -36,11 +36,11 @@ Suddenly there was a knock at the door. Michiel returned the book to its shelf a
 
 "Well I have, look it's right there in my bookcase, which *obviously* means He read it."
 
-Hamslaw no pudo believe it. Her face shifted from its usual smug demeanor to an iron mask of rage and determination. Hamslaw pushed Michiel aside and power-walked to the book shelf, cleaving the tome from its resting place with the fury of a thousand Valkyries. She turned the ancient text over in her hands, and the instant she saw the cover she began to shake.
+Hamslaw no podía creérselo. Su rostro pasó de la habitual suficiencia a una máscara de hierro llena de rabia y determinación. Apartó a Michiel y caminó decididamente hasta la estantería, arrancando el tomo de su sitio con la furia de mil valquirias. Dio la vuelta al texto antiguo entre sus manos y, en cuanto vio la portada, empezó a temblar.
 
 Michiel prepared to boast of their clearly unparalleled brilliance, but was interrupted by the sudden laughter of Hamslaw.
 
-"This no es War and Peace, this is War and *Feet*!"
+«¡Esto no es *Guerra y paz*, es *Guerra y pies*!»
 
 Tears were rolling down Hamslaw's face. This was clearly the greatest moment of her life.
 
@@ -60,7 +60,7 @@ Hamslaw was already working on a zine commemorating her incredible victory &mdas
 
 No one wants to be like Michiel, but no one wants to live in constant fear of the tiny angry man either. We want to know when the tiny angry man could be playing tricks on us. When he is, we will be very careful and paranoid about checking everything before we use it. But when the tiny angry man is gone, we want to be able to remember things.
 
-Eso es the (very simplified) crux of pointer aliasing: when can the compiler assume it's safe to "remember" (cache) values instead of loading them over and over? To know that, the compiler needs to know whenever there *could* be little angry men mutating the memory behind your back.
+Ese es el meollo (muy simplificado) del aliasing de punteros: ¿cuándo puede el compilador suponer que es seguro «recordar» (guardar en caché) valores en lugar de cargarlos una y otra vez? Para saberlo, el compilador necesita determinar si *podría* haber hombrecillos enfadados modificando la memoria a tus espaldas.
 
 > **NARRATOR:** the compiler also uses this information to cache stores, which just means it can avoid committing things to memory if it thinks no one will notice. In this case the problem is still tiny angry men, but they only need to read the memory for it to be a problem.
 
@@ -69,9 +69,9 @@ Eso es the (very simplified) crux of pointer aliasing: when can the compiler ass
 
 
 
-# Safe Stacked Borrows
+# Préstamos apilados seguros
 
-Ok so we want the compiler to have good pointer aliasing information, can we do that? Well, seemingly Rust is *designed* for it. Mutable references no son aliased by definition, and although shared references *can* alias eachother, they no puede mutate. Perfect! Ship it!
+Queremos que el compilador tenga buena información sobre el aliasing de punteros. ¿Podemos conseguirlo? Parece que Rust está *diseñado* para ello. Por definición, las referencias mutables no tienen alias, y aunque las referencias compartidas *pueden* tener alias, no pueden modificar datos. ¡Perfecto, enviémoslo!
 
 Except it's more complicated than that. We can "reborrow" mutable pointers like this:
 
@@ -86,7 +86,7 @@ let ref2 = &mut *ref1;
 println!("{}", data);
 ```
 
-The compiles and runs fine. What's the deal? 
+Compila y se ejecuta correctamente. ¿Qué ocurre?
 
 Well we can see what's going on by swapping the two uses:
 
@@ -118,11 +118,11 @@ For more information about this error, try `rustc --explain E0503`.
 error: could not compile `playground` due to previous error
 ```
 
-Es suddenly a compiler error!
+¡De repente es un error del compilador!
 
-When we reborrow a mutable pointer, the original pointer no puede be used anymore until the borrower is done with it (no more uses). 
+Cuando volvemos a tomar prestado un puntero mutable, ya no podemos usar el puntero original hasta que el nuevo préstamo haya terminado (es decir, hasta que no haya más usos).
 
-In the code that works, hay a nice little nesting of the uses. We reborrow the pointer, use the new pointer for a while, and then stop using it before using the older pointer again. In the code that *doesn't* work, that no happen. We just interleave the uses arbitrarily.
+En el código que funciona, los usos están bien anidados. Volvemos a tomar prestado el puntero, usamos el nuevo durante un tiempo y dejamos de usarlo antes de volver a usar el puntero antiguo. En el código que *no* funciona, eso no ocurre: intercalamos los usos arbitrariamente.
 
 This is how we can have reborrows and still have aliasing information: all of our reborrows clearly nest, so we can consider only one of them "live" at any given time.
 
@@ -136,55 +136,55 @@ So it's actually *always* ok to access a reborrowed pointer, because we can alwa
 
 Thankfully the design of the borrowchecker ensures that safe Rust programs follow these rules, as we saw in the above example, but the compiler generally views this problem "backwards" from the stacked borrows perspective. Instead of saying using `ref1` invalidates `ref2`, it insists that `ref2` *must* be valid for all its uses, and that `ref1` is the one messing things up by going out of turn.
 
-Hence "cannot use `*ref1` because it was mutably borrowed". Es the same result (especially with non-lexical lifetimes), but framed in a way that's probably more intuitive.
+De ahí «no se puede usar `*ref1` porque se tomó prestado de forma mutable». Es el mismo resultado (especialmente con tiempos de vida no léxicos), pero expresado de una manera probablemente más intuitiva.
 
-But the borrowchecker no puede help us when we start using unsafe pointers!
-
-
+¡Pero el comprobador de préstamos no puede ayudarnos cuando empezamos a usar punteros inseguros!
 
 
 
-# Unsafe Stacked Borrows
 
-So we want to somehow have a way for unsafe pointers to participate in this stacked borrows system, even though the compiler no puede track them properly. And we also want the system to be fairly permissive so that it's not *too* easy to mess it up and cause UB.
 
-Eso es a hard problem, and I no know how to solve it, but the folks who worked on Stacked Borrows came up with something plausible, and miri tries to implement it.
+# Préstamos apilados inseguros
 
-The very high-level concept is that when you convert a reference (or any other safe pointer) into an raw pointer it's *basically* like taking a reborrow. So now the raw pointer is allowed to do whatever it wants with that memory, and when the reborrow expires it's just like when that happens with normal reborrows.
+Queremos encontrar una forma de que los punteros inseguros participen en este sistema de préstamos apilados, aunque el compilador no pueda seguirlos correctamente. También queremos que el sistema sea bastante permisivo para que no resulte *demasiado* fácil estropearlo y provocar comportamiento indefinido.
 
-But the question is, when does that reborrow expire? Well, probably a good time to expire it is when you start using the original reference again. Otherwise things no son a nice nested stack.
+Es un problema difícil y no sé cómo resolverlo, pero quienes trabajaron en los préstamos apilados idearon algo plausible y `miri` intenta implementarlo.
 
-But wait, you can turn a raw pointer *into* a reference! And you can copy raw pointers! What if you go `&mut -> *mut -> &mut -> *mut` and then access the first `*mut`? How the heck do the stacked borrows work then?
+La idea general es que, cuando conviertes una referencia (o cualquier otro puntero seguro) en un puntero crudo, es *básicamente* como tomar un nuevo préstamo. El puntero crudo puede hacer entonces lo que quiera con esa memoria, y cuando el nuevo préstamo caduca ocurre lo mismo que con los nuevos préstamos normales.
 
-I genuinely no know! Eso es why things are complicated. In fact they're *extra* complicated because stacked borrows are *trying* to be more permissive and let more unsafe code work the way you'd expect it to. This is why I run things under miri to try to help me catch mistakes.
+Pero la pregunta es: ¿cuándo caduca ese nuevo préstamo? Probablemente un buen momento sea cuando vuelves a usar la referencia original. De lo contrario, las cosas no forman una pila bien anidada.
 
-In fact, this messiness is why there is an extra-experimental extra-strict mode of miri: `-Zmiri-tag-raw-pointers`.
+¡Pero espera, puedes convertir un puntero crudo *en* una referencia! ¡Y puedes copiar punteros crudos! ¿Qué ocurre si haces `&mut -> *mut -> &mut -> *mut` y después accedes al primer `*mut`? ¿Cómo demonios funcionan entonces los préstamos apilados?
 
-To enable it, we need to pass it via a MIRIFLAGS environment variable like this:
+¡Sinceramente, no lo sé! Por eso las cosas son complicadas. De hecho son *aún* más complicadas porque los préstamos apilados intentan ser más permisivos y permitir que más código inseguro funcione como esperarías. Por eso ejecuto el código con `miri`, para que me ayude a detectar errores.
+
+De hecho, este desorden es la razón por la que `miri` tiene un modo aún más experimental y estricto: `-Zmiri-tag-raw-pointers`.
+
+Para activarlo, tenemos que pasarlo mediante una variable de entorno `MIRIFLAGS`, así:
 
 ```text
 MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri test
 ```
 
-Or like this on Windows, where you need to just set the variable globally:
+O así en Windows, donde basta con establecer la variable globalmente:
 
 ```text
 $env:MIRIFLAGS="-Zmiri-tag-raw-pointers"
 cargo +nightly-2022-01-21 miri test
 ```
 
-Vamos a generally be trying to conform to this extra-strict mode just to be *extra* confident in our work. Es also in some sense "simpler", so it's actually better for messing around and getting an intuition for stacked borrows.
+En general intentaremos cumplir este modo especialmente estricto para tener *aún más* confianza en nuestro trabajo. En cierto sentido también es más «sencillo», así que resulta mejor para experimentar y adquirir intuición sobre los préstamos apilados.
 
 
 
 
 # Managing Stacked Borrows
 
-So when using raw pointers we're going to try to stick to a heuristic that's simple and blunt and will hopefully have a large margin of error: 
+Así que, al usar punteros crudos, intentaremos seguir una heurística sencilla y contundente que, con suerte, ofrezca un amplio margen de error:
 
-**Once you start using raw pointers, try to ONLY use raw pointers.**
+**Cuando empieces a usar punteros crudos, intenta usar ÚNICAMENTE punteros crudos.**
 
-This makes it as unlikely as possible to accidentally lose the raw pointer's "permission" to access the memory.
+Esto reduce al mínimo la posibilidad de perder accidentalmente el «permiso» del puntero crudo para acceder a la memoria.
 
 > **NARRATOR:** this is oversimplified in two regards:
 >
@@ -192,20 +192,20 @@ This makes it as unlikely as possible to accidentally lose the raw pointer's "pe
 >
 > 2. Even if you stay in raw pointer land, you no puede just wildly alias any memory. Pointers are conceptually tied to specific "allocations" (which can be as granular as a local variable on the stack), and you're not supposed to take a pointer from one allocation, offset it, and then access memory in a different allocation. If this was allowed, there would *always* be the threat of tiny angry men *everywhere*. This is part of the reason "pointers are just integers" is a *problematic* viewpoint.
 
-Now, we still want safe references in our *interface*, because we want to build a nice *safe abstraction* so the user of our list no have to know or worry about. 
+Aun así, queremos referencias seguras en nuestra *interfaz*, porque queremos construir una buena *abstracción segura* para que el usuario de nuestra lista no tenga que conocer estos detalles ni preocuparse por ellos.
 
-So what we're going to do is:
+Así que haremos lo siguiente:
 
-1. At the start of a method, use the input references to get our raw pointers
-2. Do our best to only use unsafe pointers from this point on
-3. Convert our raw pointers back to safe pointers at the end if needed
+1. Al principio de un método, usar las referencias de entrada para obtener nuestros punteros crudos.
+2. Intentar usar únicamente punteros inseguros a partir de ese momento.
+3. Volver a convertir nuestros punteros crudos en punteros seguros al final, si es necesario.
 
-But the fields of our types are private so we're going to keep those *entirely* as raw pointers.
+Pero los campos de nuestros tipos son privados, así que los mantendremos *completamente* como punteros crudos.
 
-In fact, part of the big mistake we made was continuing to use Box! Box has a special annotation in it that tells the compiler "hey this is a lot like `&mut`, because it uniquely owns that pointer". Which is true!
+De hecho, parte del gran error que cometimos fue seguir usando `Box`. `Box` tiene una anotación especial que indica al compilador: «esto se parece mucho a `&mut`, porque posee ese puntero de forma exclusiva». ¡Y es verdad!
 
-But the raw pointer we were keeping to the end of the list was pointing into a Box, so whenever we access the Box normally we're probably invalidating that raw pointer's "reborrow"! ☠
+Pero el puntero crudo que conservábamos hacia el final de la lista apuntaba al interior de un `Box`, así que cada vez que accedemos normalmente al `Box` probablemente invalidamos el «nuevo préstamo» de ese puntero crudo. ☠
 
-In the next section we'll return to our true form and hit our heads against a bunch of examples.
+En la siguiente sección volveremos a nuestra verdadera forma y nos golpearemos la cabeza con un montón de ejemplos.
 
 

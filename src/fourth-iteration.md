@@ -100,19 +100,106 @@ test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 
 ## Iter e IterMut
 
-¿Podríamos implementar Iter para nuestro deque seguro?
+¿Podríamos implementar `Iter` para nuestra doble cola segura?
 
-Bueno, necesitamos devolver una referencia inmutable a los elementos de la
-lista, pero como usamos RefCells internamente, los usuarios necesitan usar Refs
-para obtener inmutabilidad.
+Será bastante menos sencillo. Tenemos que devolver referencias inmutables a
+los elementos de la lista, pero internamente usamos `RefCell`, así que los
+usuarios tendrían que trabajar con `Ref` para obtener esa inmutabilidad.
 
-En realidad no podemos ocultarlo. Simplemente no podemos.
+En realidad, no podemos ocultar ese detalle. Hemos creado una abstracción que
+se filtra: los consumidores de nuestra API tendrían que conocer `Ref`,
+`RefCell` y `RefMut` para iterar sobre nuestra doble cola segura.
 
-Aquí está el truco: hemos creado una abstracción que se fuga. Los
-consumidores de nuestra API necesitan saber sobre Refs, RefCells y RefMut
-para iterar sobre nuestra deque segura.
+Podríamos intentar almacenar un `Ref` dentro del iterador:
 
-Aceptémoslo. No implementemos Iter e IterMut. Es demasiado difícil y
-desordenado.
+```rust ,ignore
+pub struct Iter<'a, T>(Option<Ref<'a, Node<T>>>);
 
-Pasemos a la siguiente lista para sentirnos mejor con nosotros mismos.
+impl<T> List<T> {
+    pub fn iter(&self) -> Iter<T> {
+        Iter(self.head.as_ref().map(|head| head.borrow()))
+    }
+}
+```
+
+A primera vista parece razonable. El problema aparece al implementar `next`:
+para devolver el elemento actual y conservar el siguiente nodo necesitamos
+separar un `Ref` en dos préstamos distintos. `Ref::map` solo puede transformar
+el préstamo completo, y el siguiente préstamo queda ligado al `Ref` que
+intentamos consumir:
+
+```rust ,ignore
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = Ref<'a, T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.take().map(|node_ref| {
+            self.0 = node_ref.next.as_ref().map(|head| head.borrow());
+            Ref::map(node_ref, |node| &node.elem)
+        })
+    }
+}
+```
+
+La función que parece adecuada existe y se llama [`map_split`][map-split]:
+
+```rust ,ignore
+pub fn map_split<U, V, F>(orig: Ref<'b, T>, f: F) -> (Ref<'b, U>, Ref<'b, V>) where
+    F: FnOnce(&T) -> (&U, &V),
+    U: ?Sized,
+    V: ?Sized,
+```
+
+Pero tampoco resuelve el problema. Cada vez que avanzamos por la lista nos
+adentramos en otro `RefCell`, así que acabaríamos necesitando conservar una
+pila de `Ref` para representar todos los préstamos pendientes. Cuando dejamos
+de mirar un elemento, tendríamos que reducir el contador de préstamos de todos
+los `RefCell` anteriores.
+
+Podríamos intentar salir de los `RefCell` usando los `Rc`. Si el iterador
+clonara el `Rc` completo, obtendríamos un identificador propietario hacia el
+interior de la lista:
+
+```rust ,ignore
+pub struct Iter<T>(Option<Rc<Node<T>>>);
+
+impl<T> List<T> {
+    pub fn iter(&self) -> Iter<T> {
+        Iter(self.head.as_ref().map(|head| head.clone()))
+    }
+}
+```
+
+Pero ¿qué devolveríamos entonces? ¿`&T`? ¿`Ref<T>`? Ninguna de las dos
+opciones funciona: el iterador ya no tiene un tiempo de vida y ambas referencias
+necesitan uno declarado de antemano. Podríamos buscar una forma de transformar
+el `Rc<Node<T>>` en un `Rc<T>` mediante una abstracción como
+[`owning_ref`][own-ref], pero eso introduce otro problema: la invalidación del
+iterador.
+
+Hasta ahora éramos inmunes a la invalidación porque `Iter` tomaba prestada la
+lista y la mantenía inmutable. Si el iterador devolviera `Rc`, no tomaría
+prestada la lista, de modo que el usuario podría llamar a `push` y `pop` al
+mismo tiempo que conserva punteros hacia ella. Insertar elementos sería
+relativamente inocuo, pero eliminar el nodo al que apunta el iterador acabaría
+provocando un fallo al intentar recuperar el `Rc` con `try_unwrap`.
+
+Eso es interesante: podemos tener punteros propietarios hacia el interior de
+la lista y modificarla a la vez, y todo funciona hasta que intentamos eliminar
+un nodo observado por el iterador. Incluso entonces no obtenemos punteros
+colgantes: el programa falla de forma determinista. Sin embargo, tener que
+resolver la invalidación además de mapear `Rc` parece una mala solución.
+
+`Rc<RefCell>` nos ha fallado finalmente. La mutabilidad interior es estupenda
+para escribir *aplicaciones* seguras, pero no tanto para escribir *bibliotecas*
+seguras con una API limpia. Podríamos hacer que funcionara si expusiéramos
+`Node` por todas partes, e incluso podríamos crear varios `IterMut` cuya
+exclusión mutua se comprobara en tiempo de ejecución, pero eso sería una API
+terrible.
+
+Así que abandonamos `Iter` e `IterMut` en esta implementación. Se podrían
+hacer, pero el coste en complejidad y ergonomía no merece la pena. Pasemos a la
+siguiente lista para sentirnos un poco mejor.
+
+[own-ref]: https://crates.io/crates/owning_ref
+[map-split]: https://doc.rust-lang.org/std/cell/struct.Ref.html#method.map_split

@@ -1,6 +1,6 @@
 # Miri
 
-*nervously laughs* This unsafe stuff is so easy, I no know why everyone says otherwise. Our program works perfectly.
+*ríe nerviosamente* Esto de `unsafe` es muy fácil; no sé por qué todo el mundo dice lo contrario. Nuestro programa funciona perfectamente.
 
 > **NARRATOR:** 🙂
 
@@ -8,27 +8,27 @@
 
 > **NARRATOR:** 🙂
 
-Well, we're writing `unsafe` code now, so the compiler no puede help us catch mistakes as well. It could be that the tests *happened* to work, but were actually doing something non-deterministic. Something Undefined Behavioury.
+Bueno, ahora estamos escribiendo código `unsafe`, así que el compilador no puede ayudarnos a detectar errores de la misma manera. Puede que las pruebas *simplemente* hayan funcionado, pero que en realidad estén haciendo algo no determinista. Algo parecido al comportamiento indefinido.
 
-But what can we do? Hemos pried open the windows and snuck out of rustc's classroom. No one can help us now.
+Pero ¿qué podemos hacer? Hemos forzado las ventanas y escapado del aula de `rustc`. Ahora nadie puede ayudarnos.
 
-...Wait, who's that sketchy looking person in the alleyway?
+...Espera, ¿quién es esa persona de aspecto sospechoso en el callejón?
 
-*"Hey kid, you wanna interpret some Rust code?"*
+*«Oye, chico, ¿quieres interpretar código Rust?»*
 
 Wh- no? Why,
 
-*"Es wild man, it can validate that the actual dynamic execution of your program conforms to the semantics of Rust's memory model. Blows your mind..."*
+*«Es una locura, puede comprobar que la ejecución dinámica real de tu programa cumple la semántica del modelo de memoria de Rust. Te vuela la cabeza...»*
 
 What?
 
-*"It checks if you Do An Undefined Behaviour."*
+*«Comprueba si provocas comportamiento indefinido.»*
 
-I guess I could try interpretters just *once*.
+Supongo que podría probar un intérprete *una sola vez*.
 
-*"You've got rustup installed right?"*
+*«Tienes `rustup` instalado, ¿verdad?»*
 
-Of course I do, it's *the* tool for having an up to date Rust toolchain!
+Claro que sí, ¡es *la* herramienta para mantener actualizada la cadena de herramientas de Rust!
 
 ```text
 > rustup +nightly-2022-01-21 component add miri
@@ -51,28 +51,29 @@ info: downloading component 'miri'
 info: installing component 'miri'
 ```
 
-What did you just install on my computer!?
+¿Qué acabas de instalar en mi ordenador?
 
-*"The Good Stuff"*
+*«Lo bueno»*
 
-> **NARRATOR:** Some weird stuff going on with toolchain versions:
+> **NARRADOR:** Hay algunas cosas extrañas con las versiones de la cadena de herramientas:
 >
-> The tool we're installing, `miri`, works closely with rustc's internals, 
-> so it's only available for nightly toolchains.
+> La herramienta que estamos instalando, `miri`, trabaja estrechamente con los
+> componentes internos de `rustc`, por lo que solo está disponible en cadenas
+> de herramientas `nightly`.
 >
-> `+nightly-2022-01-21` tells `rustup` we want to install miri with the rust 
-> nightly toolchain for that date. Estoy giving a specific date because sometimes
-> miri falls behind and no puede be built for a few nightlies. rustup will
-> automatically download whatever toolchain we specify with `+` if we don't
-> have it installed yet.
+> `+nightly-2022-01-21` indica a `rustup` que queremos instalar `miri` con la
+> cadena `nightly` de Rust de esa fecha. Especifico una fecha concreta porque a
+> veces `miri` se queda atrás y no se puede compilar con algunas versiones
+> `nightly`. `rustup` descargará automáticamente la cadena que especifiquemos
+> con `+` si todavía no está instalada.
 >
-> 2022-01-21 is just a nightly I know has miri support, which you can check 
-> [on this status page](https://rust-lang.github.io/rustup-components-history/).
-> You can just use `+nightly` if you're feeling lucky.
-> 
-> Whenever we invoke miri via `cargo miri` we will also use this `+` syntax to
-> specify the toolchain we installed miri on. If you no want to have to
-> specify it every time, you can use [`rustup override set`](https://rust-lang.github.io/rustup/overrides.html).
+> 2022-01-21 es una versión `nightly` que sé que admite `miri`, como puedes
+> comprobar en [esta página de estado](https://rust-lang.github.io/rustup-components-history/).
+> También puedes usar simplemente `+nightly` si te sientes afortunado.
+>
+> Cada vez que invoquemos `miri` mediante `cargo miri`, usaremos esta sintaxis
+> `+` para indicar la cadena en la que instalamos `miri`. Si no quieres tener que
+> especificarla cada vez, puedes usar [`rustup override set`](https://rust-lang.github.io/rustup/overrides.html).
 
 ```text
 > cargo +nightly-2022-01-21 miri test
@@ -81,9 +82,9 @@ I will run `"cargo.exe" "install" "xargo"` to install
 a recent enough xargo. Proceed? [Y/n]
 ```
 
-UH WHAT ON EARTH IS XARGO?
+¿¡PERO QUÉ DEMONIOS ES XARGO!?
 
-*"Es fine, no worry about it."*
+*«Todo va bien, no te preocupes.»*
 
 ```text
 > y
@@ -102,7 +103,7 @@ the `rust-src` component for the selected toolchain. Proceed? [Y/n]
 
 UH???
 
-*"Who no love having a copy of Rust's source code?"*
+*«¿A quién no le gusta tener una copia del código fuente de Rust?»*
 
 ```text
 > y
@@ -111,7 +112,7 @@ info: downloading component 'rust-src'
 info: installing component 'rust-src'
 ```
 
-*"Aw yeah it's ready, here's the good part."*
+*«Sí, ya está listo; aquí viene lo bueno.»*
 
 ```text
    Compiling lists v0.1.0 (C:\Users\ninte\dev\tmp\lists)
@@ -170,52 +171,52 @@ note: inside closure at src\fifth.rs:62:5
 error: aborting due to previous error
 ```
 
-Woah. Eso es one heck of an error.
+Vaya. Ese es un error monumental.
 
-*"Yeah, look at that shit. You love to see it."*
+*«Sí, mira eso. Da gusto verlo.»*
 
-Thank you?
+¿Gracias?
 
-*"Here take the bottle of estradiol too, you're gonna need it later."*
+*«Toma también esta botella de estradiol; la necesitarás más adelante.»*
 
-Wait why?
+¿Por qué?
 
-*"You're about to think about memory models, trust me."*
+*«Estás a punto de empezar a pensar en modelos de memoria, créeme.»*
 
-> **NARRATOR:** The mysterious person then proceeded to transform into a fox and scampered through a hole in the wall. The author then stared into the middle distance for several minutes while they tried to process everything that just happened.
+> **NARRADOR:** La misteriosa persona se transformó entonces en un zorro y salió corriendo por un agujero de la pared. El autor se quedó mirando al vacío durante varios minutos mientras intentaba asimilar todo lo que acababa de ocurrir.
 
 
 -------
 
-The mysterious fox in the alleyway was right about more than just my gender: miri really is The Good Shit.
+El misterioso zorro del callejón tenía razón en algo más que en lo relacionado con mi género: `miri` es realmente la leche.
 
-Ok so what *is* [miri](https://github.com/rust-lang/miri)?
+De acuerdo, ¿qué *es* [miri](https://github.com/rust-lang/miri)?
 
-> An experimental interpreter for Rust's mid-level intermediate representation (MIR). It can run binaries and test suites of cargo projects and detect certain classes of undefined behavior, for example:
+> Un intérprete experimental de la representación intermedia de nivel medio de Rust (MIR). Puede ejecutar binarios y conjuntos de pruebas de proyectos de Cargo y detectar ciertas clases de comportamiento indefinido, por ejemplo:
 >
-> * Out-of-bounds memory accesses and use-after-free
-> * Invalid use of uninitialized data
-> * Violation of intrinsic preconditions (an unreachable_unchecked being reached, calling copy_nonoverlapping with overlapping ranges, ...)
-> * Not sufficiently aligned memory accesses and references
-> * Violation of some basic type invariants (a bool that  no es 0 or 1, for example, or an invalid enum discriminant)
-> * Experimental: Violations of the Stacked Borrows rules governing aliasing for reference types
-> * Experimental: Data races (but no weak memory effects)
+> * Accesos a memoria fuera de los límites y uso después de liberar memoria.
+> * Uso incorrecto de datos no inicializados.
+> * Incumplimiento de precondiciones intrínsecas (alcanzar `unreachable_unchecked`, llamar a `copy_nonoverlapping` con rangos solapados, ...).
+> * Accesos y referencias a memoria con una alineación insuficiente.
+> * Incumplimiento de algunas invariantes básicas de los tipos (por ejemplo, un `bool` que no sea 0 o 1, o un discriminante de `enum` no válido).
+> * Experimental: incumplimientos de las reglas de préstamos apilados que gobiernan el aliasing de los tipos de referencia.
+> * Experimental: carreras de datos (pero no efectos de memoria débil).
 >
-> On top of that, Miri will also tell you about memory leaks: when there is memory still allocated at the end of the execution, and that memory  no es reachable from a global static, Miri will raise an error.
+> Además, `Miri` también te informará de las fugas de memoria: si queda memoria asignada al final de la ejecución y esa memoria no es accesible desde un `static` global, `Miri` emitirá un error.
 >
 > ...
 >
-> Sin embargo, be aware that Miri  no catch all cases of undefined behavior in your program, and cannot run all programs
+> Sin embargo, ten en cuenta que `Miri` no detecta todos los casos de comportamiento indefinido de tu programa y no puede ejecutar todos los programas.
 
-TL;DR: it interprets your program and notices if you break the rules *at runtime* and Do An Undefined Behaviour. This is necessary because Undefined Behaviour is *generally* a thing that happens at runtime. If the issue could be found at compile time, the compiler would just make it an error!
+En resumen: interpreta tu programa y detecta si infringe las reglas *en tiempo de ejecución* y provoca comportamiento indefinido. Esto es necesario porque el comportamiento indefinido suele producirse en tiempo de ejecución. Si el problema pudiera detectarse al compilar, ¡el compilador simplemente lo convertiría en un error!
 
-If you're familiar with tools like ubsan and tsan: it's basically that but all together and more extreme.
+Si conoces herramientas como `ubsan` y `tsan`, esto es algo parecido, pero todo junto y de forma más extrema.
 
 -------
 
-Miri is now hanging outside the classroom window with a knife. A learning knife.
+Ahora `miri` cuelga fuera de la ventana del aula con un cuchillo. Un cuchillo didáctico.
 
-If we ever want miri to check our work, we can ask them to interpret our test suite with
+Si queremos que `miri` compruebe nuestro trabajo, podemos pedirle que interprete nuestro conjunto de pruebas con
 
 ```text
 > cargo +nightly-2022-01-21 miri test
@@ -243,6 +244,6 @@ error: Undefined Behavior: trying to reborrow for Unique at alloc84055, but pare
       for further information
 ```
 
-Well I can see we made an error, but that's a confusing error message. What's the "borrow stack"?
+Veo que hemos cometido un error, pero es un mensaje bastante confuso. ¿Qué es la «pila de préstamos»?
 
-Vamos a try to figure that out in the next section.
+Intentaremos averiguarlo en la siguiente sección.

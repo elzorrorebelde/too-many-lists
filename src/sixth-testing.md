@@ -1,6 +1,6 @@
 # Pruebas (Testing)
 
-Alright I put off testing for a while because well, we both know that we're now masters of Rust and we no make mistakes anymore! Also just, this is a rewrite of an old crate, so I just have all the tests already. They're tests, you've seen tests a lot already. Here they are:
+De acuerdo, he pospuesto las pruebas durante un tiempo porque, bueno, ambos sabemos que ahora somos maestros de Rust y ya no cometemos errores. Además, esto es una reescritura de un crate antiguo, así que ya tengo todas las pruebas. Son pruebas; ya has visto muchas. Aquí están:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -276,7 +276,7 @@ mod test {
 }
 ```
 
-And now for the moments of truth:
+Y ahora llega el momento de la verdad:
 
 ```text
 cargo test
@@ -326,6 +326,6 @@ test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 😭
 
-We did it, we actually no screw up. This no es a trick! All of our practice and training was finally worth it, we've finally written *good code*!!!
+Lo hemos conseguido; en realidad no hemos metido la pata. ¡Esto no es un truco! Toda nuestra práctica y entrenamiento por fin han valido la pena: ¡por fin hemos escrito *buen código*!
 
-Now with all that gunk out of the way, we can get back to the Interesting Stuff!
+Ahora que nos hemos quitado toda esa morralla de encima, podemos volver a lo interesante.

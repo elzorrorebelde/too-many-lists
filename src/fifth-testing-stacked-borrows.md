@@ -1,30 +1,30 @@
 # Probando Stacked Borrows
 
-> TL;DR of the previous section's (simplified) memory model for Rust:
+> Resumen del modelo de memoria (simplificado) de Rust de la sección anterior:
 >
-> * Rust conceptually handles reborrows by maintaining a "borrow stack"
-> * Only the one on the top of the stack is "live" (has exclusive access)
-> * When you access a lower one it becomes "live" and the ones above it get popped
-> * You're not allowed to use pointers that have been popped from the borrow stack
-> * The borrowchecker ensures safe code code obeys this
-> * Miri theoretically checks that raw pointers obey this at runtime
+> * Rust gestiona conceptualmente los nuevos préstamos manteniendo una «pila de préstamos».
+> * Solo el préstamo que está en la parte superior está «activo» (tiene acceso exclusivo).
+> * Cuando accedes a uno inferior, este pasa a estar «activo» y los que están por encima se extraen de la pila.
+> * No se permite usar punteros que se hayan extraído de la pila de préstamos.
+> * El comprobador de préstamos garantiza que el código seguro cumpla estas reglas.
+> * En teoría, `miri` comprueba en tiempo de ejecución que los punteros crudos las cumplan.
 
-That was a lot of theory and ideas -- let's move on to the true heart and soul of this book: writing some bad code and getting our tools to scream at us. Estamos going to go through a *ton* of examples to try to see if our mental model makes sense, and to try to get an intuitive feel for stacked borrows.
+Ha sido mucha teoría e ideas; pasemos al verdadero corazón de este libro: escribir código incorrecto y hacer que nuestras herramientas nos griten. Recorreremos un *montón* de ejemplos para comprobar si nuestro modelo mental tiene sentido y adquirir una intuición sobre los préstamos apilados.
 
-> **NARRATOR:** Catching Undefined Behaviour in practice is a hairy business. After all, you're dealing with situations that the compiler literally *assumes* no happen.
+> **NARRADOR:** Detectar comportamiento indefinido en la práctica es complicado. Al fin y al cabo, estás tratando con situaciones que el compilador literalmente *supone* que no ocurren.
 >
-> If you're lucky, things will "seem to work" today, but they'll be a ticking time bomb for a Smarter Compiler or slight change to the code. If you're *really* lucky things will reliably crash so you can just catch the mistake and fix it. But if you're unlucky, then things will be broken in weird and baffling ways.
+> Si tienes suerte, hoy las cosas «parecerán funcionar», pero serán una bomba de relojería para un compilador más inteligente o para un pequeño cambio en el código. Si tienes *mucha* suerte, fallarán de forma reproducible, para que puedas detectar y arreglar el error. Pero si no tienes suerte, todo se romperá de formas extrañas y desconcertantes.
 >
-> Miri tries to work around this by getting rustc's most naive and unoptimized view of the program and tracking extra state as it interprets. As far as "sanitizers" go, this is a fairly deterministic and robust approach but it will never be *perfect*. You need your test program to actually have an execution with that UB, and for a large enough program it's very easy to introduce all sorts of non-determinism (HashMaps use RNG by default!).
+> `Miri` intenta solucionar esto obteniendo la visión más ingenua y sin optimizar del programa que tiene `rustc` y siguiendo estado adicional mientras lo interpreta. En cuanto a «sanitizadores» se refiere, es un enfoque bastante determinista y robusto, pero nunca será *perfecto*. El programa de prueba debe ejecutar realmente ese comportamiento indefinido y, en un programa suficientemente grande, es muy fácil introducir todo tipo de no determinismo (¡los `HashMap` usan un generador aleatorio de forma predeterminada!).
 >
-> We can never take miri approving of our program's execution as an absolute certain statement hay no UB. Es also possible for miri to *think* something's UB when it really isn't. But if we have a mental model of how things work, and miri seems to agree with us, that's a good sign that we're on the right track.
+> Nunca podemos interpretar que la aprobación de `miri` sea una afirmación absolutamente cierta de que no hay comportamiento indefinido. También es posible que `miri` *crea* que algo es comportamiento indefinido cuando en realidad no lo es. Pero si tenemos un modelo mental de cómo funciona todo y `miri` parece estar de acuerdo, es una buena señal de que vamos por el camino correcto.
 
 
 
 
 # Basic Borrows
 
-In previous sections we saw that the borrowchecker no like this code:
+En las secciones anteriores vimos que al comprobador de préstamos no le gusta este código:
 
 ```rust ,ignore
 let mut data = 10;
@@ -38,7 +38,7 @@ let ref2 = &mut *ref1;
 println!("{}", data);
 ```
 
-Vamos a see what happens when we replace `ref2` with `*mut`:
+Veamos qué ocurre cuando sustituimos `ref2` por `*mut`:
 
 ```rust ,ignore
 unsafe {
@@ -62,7 +62,7 @@ cargo run
 13
 ```
 
-Rustc seems perfectly happy with this: no warnings and the program produced the result we expected! Now let's look at what miri (in strict mode) thinks of it: 
+`rustc` parece completamente satisfecho: no hay advertencias y el programa produjo el resultado esperado. Veamos ahora qué opina `miri` (en modo estricto):
 
 ```text
 MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
@@ -85,9 +85,9 @@ to tag <untagged> at alloc748 found in borrow stack.
  
 ```
 
-Nice! Our intuitive model of how things work held up: although the compiler no pudo catch the issue for us, miri did.
+¡Bien! Nuestro modelo intuitivo de cómo funciona todo se mantuvo: aunque el compilador no pudo detectar el problema, `miri` sí pudo.
 
-Vamos a try something more complicated, the `&mut -> *mut -> &mut -> *mut` case we alluded to before:
+Probemos algo más complicado: el caso `&mut -> *mut -> &mut -> *mut` que mencionamos antes:
 
 ```rust ,ignore
 unsafe {
@@ -127,7 +127,7 @@ to tag <1621> at alloc748 found in borrow stack.
    |
 ```
 
-Wow yep! In strict mode miri can "tell apart" the two raw pointers and have using the second one invalidate the first one. Vamos a see if everything works when we remove the first use that messes everything up:
+¡Vaya, sí! En modo estricto, `miri` puede «distinguir» los dos punteros crudos y hacer que usar el segundo invalide el primero. Veamos si todo funciona cuando eliminamos el primer uso, que es el que lo estropea todo:
 
 ```rust ,ignore
 unsafe {
@@ -157,7 +157,7 @@ MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
 
 NICE.
 
-Yeah Estoy pretty sure at this point we can all get PhD's in programming language memory model design and implementation. Who even *needs* compilers, this stuff is *easy*.
+A estas alturas estoy bastante seguro de que todos podemos conseguir un doctorado en diseño e implementación de modelos de memoria de lenguajes de programación. ¿Quién necesita compiladores? ¡Esto es *facilísimo*!
 
 > **NARRATOR:** it was not, but Estoy proud of you nonetheless.
 
@@ -167,7 +167,7 @@ Yeah Estoy pretty sure at this point we can all get PhD's in programming languag
 
 # Testing Arrays
 
-Vamos a mess with some arrays and pointer offsets (`add` and `sub`). This should work, right?
+Juguemos con algunos arrays y desplazamientos de punteros (`add` y `sub`). Esto debería funcionar, ¿verdad?
 
 ```rust ,ignore
 unsafe {
@@ -202,7 +202,7 @@ to tag <1619> at alloc748+0x4 found in borrow stack.
 
 *Rips up gradschool application*
 
-What happened? Estamos using the borrow stack perfectly fine! Does something weird happen when we go `ptr -> ptr`? What if we just copy the pointer so they all go to the same location:
+¿Qué ha ocurrido? ¡Estamos usando perfectamente la pila de préstamos! ¿Sucede algo extraño cuando pasamos de `ptr -> ptr`? ¿Y si simplemente copiamos el puntero para que todos apunten al mismo lugar?
 
 ```rust
 unsafe {
@@ -228,7 +228,7 @@ MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
 [6, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
 
-Nope, that works fine. Maybe we're getting lucky, let's just make a real big mess of pointers:
+No, eso funciona bien. Quizá estemos teniendo suerte; hagamos un auténtico lío de punteros:
 
 ```rust
 unsafe {
@@ -262,15 +262,15 @@ MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
 [20, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
 
-Nope! Miri is actually *way* more permissive when it comes to raw pointers that are derived from other raw pointers. They all share the same "borrow" (or miri calls it, a *tag*).
+¡No! `Miri` es mucho más permisivo con los punteros crudos derivados de otros punteros crudos. Todos comparten el mismo «préstamo» (o *etiqueta*, como lo llama `miri`).
 
-Once you start using raw pointers they can freely split into their own tiny angry men and mess with themselves. This is ok because the compiler understands that and no optimize the reads and writes the same it does with references.
+Una vez que empiezas a usar punteros crudos, estos pueden dividirse libremente en sus propios hombrecillos enfadados y jugar entre sí. No pasa nada, porque el compilador entiende esto y no optimiza las lecturas y escrituras del mismo modo que lo hace con las referencias.
 
-> **NARRATOR:** If the code is simple enough, the compiler can keep track of all the derived pointers and still optimize things where possible, but it's going to be a lot more brittle than the reasoning it can use for references.
+> **NARRADOR:** Si el código es lo bastante sencillo, el compilador puede seguir todos los punteros derivados y optimizar lo que sea posible, pero este razonamiento será mucho más frágil que el que puede aplicar a las referencias.
 
 So what's the *real* problem?
 
-Even though `data` is one "allocation" (local variable), `ref1_at_0` is only borrowing the first element. Rust allows borrows to be broken up so that they only apply to particular parts of the allocation! Vamos a try it out:
+Aunque `data` es una única «asignación» (una variable local), `ref1_at_0` solo toma prestado el primer elemento. Rust permite dividir los préstamos para que solo se apliquen a partes concretas de la asignación. Probémoslo:
 
 ```rust ,ignore
 unsafe {
@@ -305,7 +305,7 @@ error[E0499]: cannot borrow `data[_]` as mutable more than once at a time
     to obtain two mutable non-overlapping sub-slices
 ```
 
-Shoot! Rust no track array indices to prove these borrows are disjoint, but it does give us `split_at_mut` to break a slice into multiple parts in a way that is safe to assume works:
+¡Rayos! Rust no sigue los índices de los arrays para demostrar que estos préstamos son disjuntos, pero nos proporciona `split_at_mut` para dividir un slice en varias partes de una forma que es seguro asumir que funciona:
 
 ```rust
 unsafe {
@@ -337,11 +337,11 @@ MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
 [10, 12, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
 
-Hey, that works! Slices properly tell the compiler and miri "hey Estoy taking a huge loan on all of the memory in my range", so they know all of the elements can be mutated.
+¡Oye, funciona! Los slices indican correctamente al compilador y a `miri`: «estoy tomando prestada toda la memoria de mi rango», así que saben que todos los elementos pueden modificarse.
 
-Also note that operations like `split_at_mut` being allowed tells us that borrows can be less of a *stack* and more of a *tree*, because we can break one big borrow into a bunch of disjoint smaller ones, and everything still works.
+Observa también que permitir operaciones como `split_at_mut` indica que los préstamos pueden parecer menos una *pila* y más un *árbol*: podemos dividir un préstamo grande en varios préstamos pequeños y disjuntos, y todo sigue funcionando.
 
-(I think in the actual stacked borrows model everything's still stacks because the stacks are conceptually tracking permissions for each byte of the program..?)
+(Creo que en el modelo real de préstamos apilados todo sigue siendo una pila, porque conceptualmente las pilas siguen los permisos de cada byte del programa... ¿no?)
 
 What if we *directly* turn a slice into a pointer? Will that pointer have access to the full slice?
 
@@ -388,7 +388,7 @@ MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
 ```
 
 
-Nice! Pointers no son just integers: they have a range of memory associated with them, and with Rust we're allowed to narrow that range!
+¡Genial! Los punteros no son simples enteros: tienen asociado un rango de memoria y Rust nos permite estrechar ese rango.
 
 
 
@@ -396,11 +396,11 @@ Nice! Pointers no son just integers: they have a range of memory associated with
 
 # Testing Shared References
 
-In all of these examples I have been very carefully only using mutable references and doing read-modify-write operations (`+=`) to keep things as simple as possible.
+En todos estos ejemplos he usado cuidadosamente solo referencias mutables y operaciones de lectura-modificación-escritura (`+=`) para mantener las cosas lo más sencillas posible.
 
-But Rust has shared references that are read-only and can be freely copied, how should those work? Well we've seen that raw pointers can be freely copied and we can handle that by saying they "share" a single borrow. Maybe we think of shared references the same way?
+Pero Rust también tiene referencias compartidas, que son de solo lectura y se pueden copiar libremente. ¿Cómo deberían funcionar? Hemos visto que los punteros crudos se pueden copiar libremente y que podemos tratarlo diciendo que «comparten» un único préstamo. Quizá podamos pensar lo mismo de las referencias compartidas.
 
-Vamos a test that out with a function that reads a value (`println!` can be a little magical with auto-ref/deref stuff, so Estoy wrapping it in a function to make sure we're testing what we want to be):
+Probémoslo con una función que lea un valor (`println!` puede hacer magia con las conversiones automáticas de referencias y desreferencias, así que la envolveré en una función para asegurarnos de probar lo que queremos):
 
 ```rust ,ignore
 fn opaque_read(val: &i32) {
@@ -448,7 +448,7 @@ warning: `miri-sandbox` (bin "miri-sandbox") generated 1 warning
 11
 ```
 
-Oh yeah we forgot to do anything with raw pointers, but at least we can see that it's fine for all the shared references to be used interchangeably. Now let's mix in some raw pointers:
+Ah, sí, hemos olvidado hacer nada con punteros crudos, pero al menos podemos ver que está bien usar indistintamente todas las referencias compartidas. Mezclemos ahora algunos punteros crudos:
 
 ```rust ,ignore
 fn opaque_read(val: &i32) {
@@ -481,7 +481,7 @@ error[E0606]: casting `&&mut i32` as `*mut i32` is invalid
    |                ^^^^^^^^^^^^^^^^^
 ```
 
-Oh whoops, we were actually messing around with `& &mut` instead of `&`! Rust is very good at papering over that when it no matter. Vamos a properly reborrow it with `let sref3 = &*mref1`:
+Vaya, en realidad estábamos trabajando con `& &mut` en lugar de `&`. Rust es muy bueno ocultando esa diferencia cuando no importa. Volvamos a tomarlo prestado correctamente con `let sref3 = &*mref1`:
 
 
 ```text
@@ -494,7 +494,7 @@ error[E0606]: casting `&i32` as `*mut i32` is invalid
    |                ^^^^^^^^^^^^^^^^^
 ```
 
-Nope, Rust still no like that! You can only cast a shared reference to a `*const` which can only read. But what if we just... do... this...?
+No, a Rust todavía no le gusta. Una referencia compartida solo se puede convertir en un `*const`, que únicamente puede leer. Pero ¿y si simplemente... hacemos... esto...?
 
 ```rust ,ignore
     let ptr4 = sref3 as *const i32 as *mut i32;
@@ -507,7 +507,7 @@ cargo run
 17
 ```
 
-WHAT. OK SURE FINE? Great cast system there Rust. Es almost like the `*const` is a pretty useless type that only really exists to describe C APIs and to vaguely suggest correct usage (it is, it does). What does miri think?
+¿¡QUÉ!? DE ACUERDO, ¿¡VALE!? Menudo sistema de conversiones, Rust. Es casi como si `*const` fuera un tipo bastante inútil que solo existe para describir API de C y sugerir vagamente el uso correcto (y así es, en efecto). ¿Qué opina `miri`?
 
 ```text
 MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri run
@@ -521,11 +521,11 @@ tag <1621> at alloc742 found in borrow stack.
    |                at alloc742 found in borrow stack.
 ```
 
-Alas, though we can get around the compiler complaining with a double cast, it no actually make this operation *allowed*. When we take the shared reference, we're promising not to modify the value. 
+Aunque podemos evitar la queja del compilador con una conversión doble, eso no hace que la operación esté *permitida*. Al tomar la referencia compartida, prometemos no modificar el valor.
 
-This is important because that means when the shared borrow is popped off the borrow stack, the mutable pointers below it *can* assume the memory no ha changed. There may have been some tiny angry men *reading* the memory (so writes had to be comitted) but they weren't able to modify it and the mutable pointers can assume the last value they wrote is still there!
+Esto es importante porque significa que, cuando el préstamo compartido se extrae de la pila, los punteros mutables que están debajo *pueden* asumir que la memoria no ha cambiado. Puede que algunos hombrecillos enfadados hayan *leído* la memoria (por lo que hubo que confirmar las escrituras), pero no pudieron modificarla y los punteros mutables pueden asumir que su último valor escrito sigue allí.
 
-**Once a shared reference is on the borrow-stack, everything that gets pushed on top of it only has read permissions.**
+**Una vez que hay una referencia compartida en la pila de préstamos, todo lo que se coloque encima solo tiene permisos de lectura.**
 
 We can however do this:
 
@@ -550,7 +550,7 @@ unsafe {
 }
 ```
 
-Note how it was still "fine" to create a mutable raw pointer as long as we only actually read from it!
+Observa que seguía estando «bien» crear un puntero crudo mutable siempre que solo leyéramos a través de él.
 
 ```text
 cargo run

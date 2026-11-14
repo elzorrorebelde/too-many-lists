@@ -1,11 +1,10 @@
 # Cosas Extra (Extra Junk)
 
-Now that `push` and `pop` are written, everything else is acutally exactly the same as the stack case, weirdly. Only operations that change the length of the list need to touch the tail pointer.
+Ahora que hemos escrito `push` y `pop`, curiosamente todo lo demás es exactamente igual que en el caso de la pila. Solo las operaciones que cambian la longitud de la lista tienen que tocar el puntero `tail`.
 
-But of course, now that everything's unsafe pointers we need to rewrite the code to use those! And if we're going to be touching all the code, we might as well
-take the chance to make sure we no son missing something.
+Pero, por supuesto, ahora que todo son punteros inseguros tenemos que reescribir el código para usarlos. Y ya que vamos a tocar todo el código, podemos aprovechar para asegurarnos de que no nos hemos dejado nada.
 
-But anyway, let's start copy-pasting code from the stack implementation:
+En cualquier caso, empecemos copiando y pegando código de la implementación de la pila:
 
 ```rust ,ignore
 // ...
@@ -21,7 +20,7 @@ pub struct IterMut<'a, T> {
 }
 ```
 
-IntoIter looks fine, but `Iter` and `IterMut` are breaking our simple rule of never using safe pointers in our types anymore. Vamos a be safe and change those to use raw pointers:
+`IntoIter` parece correcto, pero `Iter` y `IterMut` incumplen nuestra regla sencilla de no usar punteros seguros en nuestros tipos. Seamos precavidos y cambiémoslos para que usen punteros crudos:
 
 ```rust ,ignore
 pub struct IntoIter<T>(List<T>);
@@ -49,7 +48,7 @@ impl<T> List<T> {
 }
 ```
 
-Looks good!
+¡Tiene buena pinta!
 
 ```text
 error[E0392]: parameter `'a` is never used
@@ -71,7 +70,7 @@ error[E0392]: parameter `'a` is never used
      or using a marker such as `PhantomData`
 ```
 
-Doesn't look good! What's this [PhantomData](https://doc.rust-lang.org/std/marker/struct.PhantomData.html) they're on about?
+¡No tiene buena pinta! ¿Qué es eso de [`PhantomData`](https://doc.rust-lang.org/std/marker/struct.PhantomData.html) de lo que hablan?
 
 > Zero-sized type used to mark things that “act like” they own a `T`.
 >
@@ -79,21 +78,21 @@ Doesn't look good! What's this [PhantomData](https://doc.rust-lang.org/std/marke
 >
 > For a more in-depth explanation of how to use `PhantomData<T>`, please see [the Nomicon](https://doc.rust-lang.org/nightly/nomicon/).
 
-Hey no get hasty there, we're reading the book that *I* wrote. Not that other book that some huge *nerd* probably wrote! I bet if they write a data structure in there it's something lame like an Array Stack and *not* a Linked List.
+Oye, no te precipites: estamos leyendo el libro que escribí *yo*, ¡no ese otro libro que seguramente escribió algún *empollón* enorme! Apuesto a que, si allí escriben una estructura de datos, será algo aburrido como una pila basada en arrays y *no* una lista enlazada.
 
 > Unused lifetime parameters
 >
 > Perhaps the most common use case for PhantomData is a struct that has an unused lifetime parameter, typically as part of some unsafe code.
 
-Ah so we're naming a lifetime in our type but not actually using it. We *could* go down the PhantomData path, but I want to save that for the doubly-linked list in the next chapter that will *really* need it.
+Ah, así que estamos declarando un tiempo de vida en nuestro tipo, pero en realidad no lo usamos. *Podríamos* seguir el camino de `PhantomData`, pero quiero reservarlo para la lista doblemente enlazada del capítulo siguiente, que *realmente* lo necesitará.
 
-Estamos in an interesting situation where we actually no need PhantomData. *I think*. Estoy just going to claim that and trust that it's true, and if miri yells at us at the end Voy a concede the point and we'll do the PhantomData thing.
+Estamos en una situación interesante en la que en realidad no necesitamos `PhantomData`. *Creo*. Voy a afirmarlo y confiar en que sea cierto; si al final `miri` nos grita, admitiré el error y usaremos `PhantomData`.
 
-What we're actually going to do is put the references back in these Iterator types and be happy we get to use references in some places still. I think that's sound because hay still a kind of proper nesting when you use an iterator: you create the iterator, use safe references for a while, and then discard the iterator. 
+Lo que vamos a hacer en realidad es volver a poner las referencias en estos tipos de iterador y alegrarnos de que todavía podamos usarlas en algunos sitios. Creo que es correcto porque al usar un iterador sigue existiendo una especie de anidamiento adecuado: creas el iterador, utilizas referencias seguras durante un tiempo y después descartas el iterador.
 
-Only once the iterator is gone can you access the list and call things like `push` and `pop` which need to mess with the tail pointer and Boxes. Now, during the iteration we *are* going to be dereferencing a bunch of raw pointers, so there is a kind of mixing there, but we should be able to think of those references as reborrows of the unsafe pointers.
+Solo cuando desaparece el iterador puedes acceder a la lista y llamar a cosas como `push` y `pop`, que necesitan manipular el puntero `tail` y los `Box`. Durante la iteración *sí* vamos a desreferenciar un montón de punteros crudos, así que hay cierta mezcla, pero deberíamos poder considerar esas referencias como nuevos préstamos de los punteros inseguros.
 
-*I'm* not even 100% convinced but I just wanna give it a try and see!
+*Ni siquiera yo* estoy convencido al 100 %, pero quiero probarlo y ver qué ocurre.
 
 ```rust ,ignore
 pub struct IntoIter<T>(List<T>);
@@ -125,9 +124,9 @@ impl<T> List<T> {
 }
 ```
 
-If we're going to be storing references, we need to upgrade our raw pointers to options-of-references. We *could* check if the pointer is null, but this is one of the incredibly narrow cases where I *think* it's ok to use the nasty [ptr::as_ref](https://doc.rust-lang.org/std/primitive.pointer.html#method.as_ref-1) and [ptr::as_mut](https://doc.rust-lang.org/std/primitive.pointer.html#method.as_mut) methods.
+Si vamos a almacenar referencias, tenemos que convertir nuestros punteros crudos en opciones de referencias. *Podríamos* comprobar si el puntero es nulo, pero este es uno de los casos excepcionalmente limitados en los que creo que está bien usar los desagradables métodos [`ptr::as_ref`](https://doc.rust-lang.org/std/primitive.pointer.html#method.as_ref-1) y [`ptr::as_mut`](https://doc.rust-lang.org/std/primitive.pointer.html#method.as_mut).
 
-I *usually* recommend avoiding these methods like the plague because they do some surprising and nasty stuff and they're inherently reintroducing references when my whole "easy rule" is to avoid doing that!
+*Normalmente* recomiendo evitar estos métodos como si fueran la peste, porque hacen cosas sorprendentes y desagradables y, por naturaleza, vuelven a introducir referencias cuando mi «regla sencilla» consiste precisamente en evitarlo.
 
 Those methods come with a lot of warnings, but the most interesting is this:
 

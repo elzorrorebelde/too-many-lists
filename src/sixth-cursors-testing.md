@@ -1,8 +1,8 @@
 # Probando Cursores
 
-Time to find out how many horribly embarassing mistakes I made in the previous section!
+¡Es hora de descubrir cuántos errores terriblemente vergonzosos cometí en la sección anterior!
 
-Oh god we made our API unlike both std and the old impl. Alright well Estoy just gonna hastily cobble together something from both of them. Yeah let's "borrow" these tests from std:
+Dios mío, hemos hecho que nuestra API sea distinta tanto de `std` como de la implementación antigua. Bueno, voy a improvisar rápidamente algo a partir de ambas. Sí, vamos a «tomar prestadas» estas pruebas de `std`:
 
 ```rust ,ignore
     #[test]
@@ -166,9 +166,9 @@ failures:
 test result: FAILED. 12 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
-Voy a admit, I had some hubris here and was hoping I nailed it. This is why we write tests (but maybe I just did a bad job of porting the tests..?).
+Lo admito, aquí fui bastante arrogante y esperaba haberlo clavado. Por eso escribimos pruebas (aunque quizá simplemente hice un mal trabajo al adaptar estas pruebas...).
 
-What's the first failure?
+¿Cuál es el primer fallo?
 
 ```rust ,ignore
 let mut m: LinkedList<u32> = LinkedList::new();
@@ -186,7 +186,7 @@ assert_eq!(cursor.current(), None);
 assert_eq!(cursor.peek_next(), Some(&mut 1)); // DIES HERE
 ```
 
-Geez I really messed up some basic functionality. Wait,
+Caramba, he estropeado bastante la funcionalidad básica. Espera,
 
 > Head empty, Option methods and (omitted) compiler errors do all thinking now.
 
@@ -202,7 +202,7 @@ pub fn peek_next(&mut self) -> Option<&mut T> {
 }
 ```
 
-...Yeah this is just wrong. If `self.cur` is None, we no son just supposed to give up, we need to check `self.list.front` too, because we're on the ghost! So we just need to add an or_else to the chain:
+...Sí, esto está mal. Si `self.cur` es `None`, no debemos rendirnos sin más: también tenemos que comprobar `self.list.front`, porque estamos en el fantasma. Solo tenemos que añadir un `or_else` a la cadena:
 
 ```rust ,ignore
 pub fn peek_next(&mut self) -> Option<&mut T> {
@@ -224,7 +224,7 @@ pub fn peek_prev(&mut self) -> Option<&mut T> {
 }
 ```
 
-Did that fix it?
+¿Eso lo ha arreglado?
 
 ```text
 ---- test::test_cursor_move_peek stdout ----
@@ -233,7 +233,7 @@ thread 'test::test_cursor_move_peek' panicked at 'assertion failed: `(left == ri
  right: `None`', src\lib.rs:1078:9
 ```
 
-Wait now it's wrong *further back*. Ok I need to stop head-emptying peek because apparently it's a lot harder than I was willing to give it credit for. Just trying to blindly chain these cases is a disaster, let's have a proper if for the cases of ghost vs not:
+Espera, ahora está mal *más atrás*. De acuerdo, tengo que dejar de intentar resolver `peek` vaciando la cabeza, porque resulta que es mucho más difícil de lo que quería admitir. Encadenar ciegamente estos casos es un desastre; usemos un `if` apropiado para distinguir entre estar en el fantasma y no estarlo:
 
 ```rust ,ignore
 pub fn peek_next(&mut self) -> Option<&mut T> {
@@ -267,7 +267,7 @@ pub fn peek_prev(&mut self) -> Option<&mut T> {
 }
 ```
 
-Feelin' confident about this one!
+¡Este me da confianza!
 
 ```text
 failures:
@@ -285,9 +285,9 @@ failures:
 test result: FAILED. 13 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
-Yesss. Ok one more failure to go... oh.
+¡Sí! De acuerdo, solo queda un fallo... oh.
 
-Did you notice the part where I commented out some code for testing remove_current? Yeah I no era paying attention to the fact that this test is stateful. Vamos a just create a new list with the state the remove_current part would have left us in:
+¿Te fijaste en que comenté parte del código que probaba `remove_current`? No estaba prestando atención a que esta prueba tiene estado. Vamos a crear una lista nueva con el estado en el que nos habría dejado la parte de `remove_current`:
 
 ```rust ,ignore
 let mut m: LinkedList<u32> = LinkedList::new();
@@ -326,7 +326,7 @@ test src\lib.rs - assert_properties::iter_mut_invariant (line 803) - compile fai
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
 ```
 
-Heyyyy look at thaaat... ok now Estoy getting paranoid. Vamos a properly fill in check_links and test it under miri:
+Mira eso... de acuerdo, ahora me estoy volviendo paranoico. Vamos a completar correctamente `check_links` y probarlo con `miri`:
 
 ```rust ,ignore
 fn check_links<T: Eq + std::fmt::Debug>(list: &LinkedList<T>) {
@@ -338,7 +338,7 @@ fn check_links<T: Eq + std::fmt::Debug>(list: &LinkedList<T>) {
 }
 ```
 
-Is this the best way to do this? No. Is it fine? Yes.
+¿Es esta la mejor forma de hacerlo? No. ¿Funciona? Sí.
 
 ```text
 $env:MIRIFLAGS="-Zmiri-tag-raw-pointers"
@@ -377,53 +377,13 @@ DONE.
 
 Done.
 
-> **Community Contribution:** After completing the exercises a small bug was discovered when creating an empty slice from the list.
+Lo hemos conseguido. Hemos creado una `LinkedList` de calidad de producción, con prácticamente la misma funcionalidad que la de `std`. ¿Nos faltan algunos pequeños métodos de conveniencia? Por supuesto. ¿Los añadiré a la versión final publicada del crate? ¡Probablemente!
 
-```rust ,ignore
-    #[test]
-    fn test_empty_slice() {
-        let mut list = LinkedList::new();
-        list.push_back(7);
-        list.push_back(8);
-        list.push_back(9);
-
-        let mut cur = list.cursor_mut();
-        cur.move_next(); // Point at the first node
-        let result = cur.split_before(); // Everything before the first node
-
-        assert_eq!(result.len, 0);
-        assert_eq!(result.front(), None);
-        assert_eq!(result.back(), None);
-
-        assert_eq!(list.len, 3);
-        assert_eq!(list.front(), Some(7).as_ref());
-
-        let mut cur = list.cursor_mut();
-        cur.move_prev(); // Point at the last node
-        let result = cur.split_after(); // Everything after the last node
-
-        assert_eq!(result.len, 0);
-        assert_eq!(result.front(), None);
-        assert_eq!(result.back(), None);
-    }
-```
-
-In this case, we attempt to create a slice from all the elements before the first node (which should be empty). This is because the `split_before` method does not set the front and back pointers to None when the list is empty. This can be fixed by adding the following line to the `split_before` method:
-
-```rust ,ignore
-        if self.len == 0 {
-            self.front = None;
-            self.back = None;
-        }
-```
-
-We did it. We made a god damn production-quality LinkedList, with basically all the same functionality as the one in std. Are we missing little convenience methods here and there? Absolutely. Will I add them into the final published version of the crate? Probably!
-
-But, I am, So Very Tired.
+Pero estoy Muy, Muy Cansado.
 
 So. We win.
 
-Wait fuck. Estamos being production quality. Ok one last final boss: clippy.
+Espera, maldita sea. Estamos buscando calidad de producción. De acuerdo, un último jefe final: `clippy`.
 
 ```text
 cargo clippy
@@ -480,20 +440,20 @@ warning: `linked-list` (lib) generated 4 warnings
     Finished dev [unoptimized + debuginfo] target(s) in 0.29s
 ```
 
-Alright clippy, let's do this.
+Muy bien, `clippy`, allá vamos.
 
-Complaint 1 (and 3): we use `while let Some(_) = ` instead of `while .is_some()`. The loop is empty so this truly no matter but ok fine, clippy, Voy a do things your way.
+Queja 1 (y 3): usamos `while let Some(_) = ` en lugar de `while .is_some()`. El bucle está vacío, así que en realidad no importa, pero de acuerdo, `clippy`, lo haremos a tu manera.
 
-Complaint 2: We have an actual inherent into_iter method. Wait, what *checks std* ok, point to clippy. IntoIterator is in the prelude (and basically a lang item) so, we no need an inherent version too.
+Queja 2: tenemos un método inherente `into_iter` de verdad. Espera, ¿qué? *comprueba `std`*. De acuerdo, punto para `clippy`. `IntoIterator` está en el prelude (y prácticamente es un elemento del lenguaje), así que no necesitamos también una versión inherente.
 
-Complaint 4: we copied a weird cargocult from std. *shrug* fine Voy a remove it.
+Queja 4: copiamos una rareza de `std` sin entenderla. *se encoge de hombros* De acuerdo, la eliminaré.
 
 ```text
 cargo clippy
     Finished dev [unoptimized + debuginfo] target(s) in 0.00s
 ```
 
-Nice. Just one last thing to do before calling it production quality: fmt.
+Bien. Solo queda una cosa antes de llamarlo código de calidad de producción: `fmt`.
 
 ```text
 cargo fmt

@@ -1,17 +1,17 @@
-# Layout y Conceptos Básicos 2: Volviéndose Crudo
+# Diseño y conceptos básicos 2: punteros crudos
 
-> TL;DR on the previous three sections: randomly mixing safe pointers like `&`, `&mut`, and `Box` with unsafe pointers like `*mut` and `*const` is a recipe for Undefined Behaviour because the safe pointers introduce extra constraints that we no son obeying with the raw pointers.
+> Resumen de las tres secciones anteriores: mezclar aleatoriamente punteros seguros como `&`, `&mut` y `Box` con punteros inseguros como `*mut` y `*const` es una receta para provocar comportamiento indefinido, porque los punteros seguros introducen restricciones adicionales que no respetamos con los punteros crudos.
 
-Oh god I need to write linked lists again. Fine. FINE. Es Fine. Estamos fine.
+Dios mío, tengo que volver a escribir listas enlazadas. Vale. ¡VALE! Todo irá bien.
 
-Estamos gonna knock a lot of this section out real quick since we already discussed the design in the first try around, and everything we did *was* basically correct except for how we mixed together safe and unsafe pointers.
+Vamos a avanzar rápidamente por gran parte de esta sección, ya que ya hablamos del diseño en el primer intento y todo lo que hicimos era básicamente correcto, salvo por la forma en que mezclamos punteros seguros e inseguros.
 
 
 # Layout
 
-So in the new layout we're only going to only use raw pointers and everything will be perfect and we'll never make mistakes again.
+En el nuevo diseño solo usaremos punteros crudos, todo será perfecto y nunca volveremos a cometer errores.
 
-Here's our old broken layout:
+Este es nuestro diseño antiguo y defectuoso:
 
 ```rust
 pub struct List<T> {
@@ -27,12 +27,12 @@ struct Node<T> {
 }
 ```
 
-And here's our new layout:
+Y este es nuestro nuevo diseño:
 
 ```rust
 pub struct List<T> {
     head: Link<T>,
-    tail: Link<T>,
+    tail: *mut Node<T>,
 }
 
 type Link<T> = *mut Node<T>; // MUCH BETTER
@@ -43,16 +43,16 @@ struct Node<T> {
 }
 ```
 
-Remember: Option no es as nice or useful when we're using raw pointers, so we're not using that anymore. In later sections we'll look at the `NonNull` type, but no worry about that for now.
+Recuerda: `Option` no es tan práctico ni útil cuando usamos punteros crudos, así que ya no lo utilizaremos. En secciones posteriores veremos el tipo `NonNull`, pero no te preocupes por eso todavía.
 
 
 
 # Basics
 
-List::new is basically the same.
+`List::new` es prácticamente igual.
 
 ```rust ,ignore
-use std::ptr;
+use ptr;
 
 impl<T> List<T> {
     pub fn new() -> Self {
@@ -61,7 +61,7 @@ impl<T> List<T> {
 }
 ```
 
-Push is basically the s-
+`push` es básicamente lo m-
 
 
 ```rust ,ignore
@@ -69,9 +69,9 @@ pub fn push(&mut self, elem: T) {
     let mut new_tail = Box::new(
 ```
 
-Wait we're not using Box anymore. How do we allocate memory without Box?
+Espera, ya no usamos `Box`. ¿Cómo asignamos memoria sin `Box`?
 
-Well, we *could* with `std::alloc::alloc`, but that's like bringing a katana into the kitchen. It'll get the job done but it's kinda overkill and unwieldy.
+Bueno, *podríamos* hacerlo con `std::alloc::alloc`, pero sería como llevar una katana a la cocina. Cumpliría su cometido, pero sería un exceso y resultaría poco manejable.
 
 We want to *have* boxes, but, *not*. One completely wild but *maybe* viable option would be to do something like this:
 
@@ -83,9 +83,9 @@ struct Node<T> {
 }
 ```
 
-With the idea that we create the Boxes and store them in our node, but then we take a raw pointer into them and only use that raw pointer until we're done with the Node and want to destroy it. Then we can `take` the Box out of `real_next` and drop it. I *think* that would conform to our very simplified stacked borrows model? 
+La idea sería crear los `Box` y almacenarlos en nuestro nodo, pero después tomar un puntero crudo hacia ellos y usarlo únicamente hasta terminar con el `Node` y querer destruirlo. Entonces podríamos hacer `take` del `Box` de `real_next` y eliminarlo. Creo que eso cumpliría con nuestro modelo muy simplificado de préstamos apilados.
 
-If you wanna try to make that, have "fun", but that just looks awful right? This no es the chapter on Rc and RefCell, we're not gonna play this *game* anymore. Estamos gonna just make simple and clean stuff.
+Si quieres intentar hacerlo, que te "diviertas", pero tiene un aspecto horrible, ¿verdad? Este no es el capítulo sobre `Rc` y `RefCell`; ya no vamos a jugar a este *juego*. Simplemente haremos algo sencillo y limpio.
 
 So instead we're going to use the very nice [Box::into_raw][] function:
 
@@ -111,11 +111,11 @@ So instead we're going to use the very nice [Box::into_raw][] function:
 >  let x = unsafe { Box::from_raw(ptr) };
 > ```
 
-Nice, that looks *literally* designed for our use case. It also matches the rules we're trying to follow: start with safe stuff, turn into into raw pointers, and then only convert back to safe stuff at the end (when we want to Drop it).
+Genial, parece *literalmente* diseñado para nuestro caso de uso. También encaja con las reglas que intentamos seguir: empezar con elementos seguros, convertirlos en punteros crudos y volver a convertirlos en elementos seguros únicamente al final, cuando queramos hacer `Drop`.
 
-This is basically exactly like doing the weird `real_next` thing but without having to faff around storing the Box when it's the exact same pointer as the raw pointer anyway.
+Esto es prácticamente igual que hacer lo de `real_next`, pero sin tener que complicarnos almacenando el `Box` cuando, de todos modos, contiene exactamente el mismo puntero que el puntero crudo.
 
-Also now that we're just using raw pointers everywhere, let's not worry about keeping those `unsafe` blocks narrow: it's all unsafe now. (It always was, but it's nice to lie to yourself sometimes.)
+Además, ahora que usamos punteros crudos en todas partes, no nos preocupemos por mantener pequeños los bloques `unsafe`: todo es inseguro. (Siempre lo fue, pero a veces está bien engañarse un poco.)
 
 
 ```rust ,ignore
@@ -139,9 +139,9 @@ pub fn push(&mut self, elem: T) {
 ```
 
 
-Hey that code's actually looking a lot cleaner now that we're sticking to raw pointers!
+¡Ese código se ve mucho más limpio ahora que nos ceñimos a los punteros crudos!
 
-On to pop, which is also pretty similar to how we left it, although we've got to remember to use `Box::from_raw` to clean up the allocation:
+Pasemos a `pop`, que también es bastante parecido a como lo dejamos, aunque debemos recordar usar `Box::from_raw` para liberar la asignación:
 
 ```rust ,ignore
 pub fn pop(&mut self) -> Option<T> {
@@ -163,7 +163,7 @@ pub fn pop(&mut self) -> Option<T> {
 }
 ```
 
-Our nice little `take`s and `map`s are dead, gotta just check and set `null` manually now.
+Nuestros pequeños `take` y `map` han desaparecido; ahora solo tenemos que comprobar y establecer `null` manualmente.
 
 And while we're here, let's slap in the destructor. This time we'll implement it as just repeatedly popping, because it's cute and simple:
 

@@ -1,23 +1,23 @@
 # Una Introducción a los Cursores
 
-OK!!! We now have a LinkedList that's on par with std's 1.0 implementation! Which of course means that our LinkedList is *still completely useless*. Hemos taken the enormous performance penalty of implementing a Deque as a linked list, **and we no have any of the APIs that make it actually useful**. 
+¡¡¡Vale!!! Ahora tenemos una `LinkedList` a la altura de la implementación 1.0 de `std`. Lo que, por supuesto, significa que nuestra `LinkedList` *sigue siendo completamente inútil*. Hemos pagado la enorme penalización de rendimiento de implementar una `Deque` como lista enlazada, **y todavía no tenemos ninguna de las API que la harían realmente útil**.
 
-Here's how we do against the "killer apps" of linked lists:
+Así nos va frente a los «casos de uso estrella» de las listas enlazadas:
 
-* 🚫 Getting to do [weird intrusive stuff](https://docs.rs/linked-hash-map/latest/linked_hash_map/)
-* 🚫 Getting to do [weird lockfree stuff](https://doc.rust-lang.org/std/sync/mpsc/)
-* 🚫 Getting to store [Dynamically Sized Types](https://doc.rust-lang.org/nomicon/exotic-sizes.html#dynamically-sized-types-dsts)
-* 🌟 O(1) push/pop without [amortization](https://en.wikipedia.org/wiki/Amortized_analysis) (if you are willing to believe that malloc is O(1))
-* 🚫 O(1) list splitting
-* 🚫 O(1) list splicing
+* 🚫 Poder hacer [cosas intrusivas extrañas](https://docs.rs/linked-hash-map/latest/linked_hash_map/)
+* 🚫 Poder hacer [cosas extrañas sin bloqueo](https://doc.rust-lang.org/std/sync/mpsc/)
+* 🚫 Poder almacenar [tipos de tamaño dinámico](https://doc.rust-lang.org/nomicon/exotic-sizes.html#dynamically-sized-types-dsts)
+* 🌟 `push`/`pop` en O(1) sin [amortización](https://en.wikipedia.org/wiki/Amortized_analysis) (si estás dispuesto a creer que `malloc` es O(1))
+* 🚫 Dividir listas en O(1)
+* 🚫 Intercalar listas en O(1)
 
-Well... 1 out of 6 is... better than nothing! Do you see why I wanted to rip this thing out of std?
+Bueno... 1 de 6 es... ¡mejor que nada! ¿Ves por qué quería sacar esta cosa de `std`?
 
-Estamos not going to make our list support "weird" stuff, because that's all adhoc and domain-specific. But the splitting and splicing thing, now that's something we can do!
+No vamos a hacer que nuestra lista admita cosas «extrañas», porque todo eso es específico de cada dominio y bastante improvisado. Pero lo de dividir e intercalar listas sí es algo que podemos hacer.
 
-But here's the problem: actually *reaching* the k<sup>th</sup> element in a LinkedList takes O(k) time, so how can we *possibly* do arbitrary splits and merges in O(1)? Well, the trick is that you no have an API like `split_at(index)` -- you make a system where the user can statefully iterate to a position in the list and make O(1) modifications at that point!
+Pero aquí está el problema: *alcanzar* el elemento k<sup>ésimo</sup> de una `LinkedList` tarda O(k), así que ¿cómo podemos hacer *posibles* divisiones y fusiones arbitrarias en O(1)? El truco consiste en no tener una API como `split_at(index)`, sino en crear un sistema que permita al usuario iterar con estado hasta una posición de la lista y hacer modificaciones O(1) en ese punto.
 
-Hey, we already have iterators! Can we use them for this? Kind of... but one of their super-powers gets in the way. You may recall that the way that we write out the lifetimes for by-ref iterators means that the references they return *aren't* tied to the iterator. This lets us repeatedly call `next` and hold onto the elements:
+Oye, ¡ya tenemos iteradores! ¿Podemos usarlos para esto? Más o menos... pero una de sus superpoderes se interpone. Quizá recuerdes que la forma en que escribimos los tiempos de vida de los iteradores por referencia hace que las referencias que devuelven *no* estén vinculadas al iterador. Esto nos permite llamar repetidamente a `next` y conservar los elementos:
 
 ```rust ,ignore
 let mut list = ...;
@@ -28,39 +28,39 @@ let elem2 = list.next();
 if elem1 == elem2 { ... }
 ```
 
-If the returned references borrowed the iterator, then this code no work at all. The compiler would just complain about the second call to `next`! This flexibility is great, but it puts some implicit constraints on us:
+Si las referencias devueltas tomaran prestado el iterador, este código no funcionaría en absoluto. ¡El compilador se quejaría de la segunda llamada a `next`! Esta flexibilidad es estupenda, pero nos impone algunas restricciones implícitas:
 
-* By-Mutable-Ref Iterators can never go backwards and yield an element again, because the user would be able to get two `&mut`'s to the same element, breaking fundamental rules of the language.
+* Los iteradores por referencia mutable nunca pueden retroceder y devolver de nuevo un elemento, porque el usuario podría obtener dos `&mut` del mismo elemento, infringiendo reglas fundamentales del lenguaje.
 
-* By-Ref Iterators no puede have extra methods which could possibly modify the underlying collection in a way that would invalidate any reference that has already been yielded.
+* Los iteradores por referencia no pueden tener métodos adicionales que puedan modificar la colección subyacente de una forma que invalide una referencia ya devuelta.
 
-Desafortunadamente, both of these things are *exactly* what we want our LinkedList API to do! So we no puede just use iterators, we need something new: *Cursors*.
+¡Desafortunadamente, ambas cosas son *exactamente* lo que queremos que haga nuestra API de `LinkedList`! Por tanto, no podemos usar simplemente iteradores; necesitamos algo nuevo: los *cursores*.
 
-Cursors are exactly like the little blinking `|` you get when you're editing some text on a computer. Es a position in a sequence (the text) that you can move around (with the arrow keys), and whenever you type the edits happen at that point.
+Los cursores son como la pequeña barra parpadeante `|` que aparece al editar texto en un ordenador. Son una posición dentro de una secuencia (el texto) que puedes desplazar con las teclas de dirección; cada vez que escribes, la edición sucede en ese punto.
 
-See if I just
+Mira: si
 
-press
+pulso
 
-enter
+Intro,
 
-the whole
+todo el
 
-text
+texto
 
-gets broken in half.
+se parte por la mitad.
 
-Sorry you're standing behind me and watching me type this right? So that totally makes sense, right? Right.
+Perdona, estás detrás de mí observando cómo escribo esto, ¿verdad? Así que tiene todo el sentido, ¿no? ¿Verdad?
 
-Now if you've ever had the misfortune of having a keyboard with an "insert" key and actually pressed it, you know that hay actually technically two interpretations of cursors: they can either lie between elements (characters) or *on* elements. Estoy pretty sure no one has ever pressed "insert" on purpose in their life, and that it exists purely as a Suffering Button, so it's pretty obvious which one is Better and Right: cursors go between elements!
+Ahora bien, si alguna vez tuviste la desgracia de usar un teclado con una tecla «Insert» y llegaste a pulsarla, sabrás que técnicamente hay dos interpretaciones de los cursores: pueden situarse entre elementos (caracteres) o *sobre* los elementos. Estoy bastante seguro de que nadie ha pulsado «Insert» a propósito en su vida y de que existe únicamente como Botón del Sufrimiento, así que resulta obvio cuál es la opción Mejor y Correcta: ¡los cursores se sitúan entre los elementos!
 
-Pretty rock-solid logic right there, I no think anyone can disagree with me.
+Una lógica inexpugnable, ¿verdad? No creo que nadie pueda llevarme la contraria.
 
-Sorry what? There was an [RFC in 2018 to add Cursors to Rust's LinkedList](https://github.com/rust-lang/rfcs/blob/master/text/2570-linked-list-cursors.md)?
+¿Perdona? ¿Hubo una [RFC en 2018 para añadir cursores a la `LinkedList` de Rust](https://github.com/rust-lang/rfcs/blob/master/text/2570-linked-list-cursors.md)?
 
 > With a Cursor one can seek back and forth through a list and get the current element. With a CursorMut One can seek back and forth and get mutable references to elements, and it can insert and delete elements before and behind the current element (along with performing several list operations such as splitting and splicing).
 
-*Current element*? This cursor is *on* elements, not between them! I no puede believe they no accept my totally rock-solid argument! So yeah you can just go use the Cursor in std... wait, it's [2023, and Rust 1.71 still has Cursor marked as unstable](https://doc.rust-lang.org/1.71.0/std/collections/linked_list/struct.CursorMut.html)?
+*Current element*? This cursor is *on* elements, not between them! ¡No puedo creer que no aceptaran mi argumento totalmente irrefutable! Así que puedes usar el `Cursor` de `std`... espera, ¿estamos en [2023 y `Cursor` sigue marcado como inestable en Rust 1.71](https://doc.rust-lang.org/1.71.0/std/collections/linked_list/struct.CursorMut.html)?
 
 Hey wait:
 
@@ -70,7 +70,7 @@ HEY WAIT. This is the opposite of what the RFC says??? But wait all the docs on 
 
 > Cursors always rest between two elements in the list, and index in a logically circular way. To accomadate this, there is a "ghost" non-element that yields None between the head and tail of the List.
 
-Hold up what the fuck. This no es a gag, I am actually trying to Read The Docs right now. Did std actually RFC a different design from the one I proposed in 2015, but then copy-paste the docs from my prototype??? Is std meta-shitposting me for writing a book about how much I hate LinkedList????? Like yeah I built that prototype to demonstrate the concept so that people would let me add it to std and make LinkedList not useless but, qu'est-ce que le fuck??????????????
+Un momento, ¿qué demonios? Esto no es una broma: ahora mismo estoy intentando leer la documentación de verdad. ¿Acaso `std` propuso mediante una RFC un diseño distinto del que presenté en 2015, pero después copió y pegó la documentación de mi prototipo? ¿`std` se está burlando de mí por escribir un libro sobre cuánto odio `LinkedList`? Sí, construí aquel prototipo para demostrar el concepto y conseguir que me dejaran añadirlo a `std` para que `LinkedList` dejara de ser inútil, pero... ¿qué demonios?
 
 Ok you know what, clearly std is blessing my design as the objectively superior one, so we're going to do my design. Also that's nice because this entire chapter is me actually literally rewriting that library from scratch, so not changing the API sounds Good To Me!
 
@@ -82,7 +82,7 @@ Here's the full top-level docs I wrote:
 >
 > When created, cursors start between the ghost and the front of the list. That is, next will yield the front of the list, and prev will yield None. Calling prev again will yield the tail.
 
-Cute, even though we concluded that the whole "sentinel-node" thing was more trouble than it's worth, we're still going to end up with semantics that "pretend" hay a sentinel node so that the cursor can wrap around to the other side of the list.
+Qué bonito. Aunque concluimos que todo lo del «nodo centinela» daba más problemas de los que resolvía, acabaremos teniendo una semántica que «finge» que hay un nodo centinela para que el cursor pueda rodear la lista y llegar al otro extremo.
 
 *Skims over my old APIs some more*
 
@@ -94,7 +94,7 @@ fn splice(&mut self, other: &mut LinkedList<T>)
 
 Oh yeah, this is coming back to me. I wrote this when I was really mad about combinatoric explosion, and was trying to come up with a way for there to only be one copy of each operation. Unfortunately this is... semantically problematic. See, when the user wants to splice one list into another, they might want the cursor to end up *before* the splice or *after it*. The inserted list can be arbitrarily large, so it's a genuine issue for us to only allow for one and expect the user to walk over the entire inserted list!
 
-Estamos gonna have to rework this design from the ground up after all. What does our Cursor type need? Well it needs to:
+Al final tendremos que rediseñar esto desde cero. ¿Qué necesita nuestro tipo `Cursor`? Necesita:
 
 * point "between" two elements
 * as a nice little feature, keep track of what "index" is next
@@ -102,9 +102,9 @@ Estamos gonna have to rework this design from the ground up after all. What does
 
 How do you point between two elements? Well, you don't. You just point at the "next" element. So, yeah even though we're exposing "cursor goes in-between" semantics, we're really implementing it as "cursor is on", and just pretending everything happens before or after that point.
 
-But hay a reason! The splice use-case wants to let the user choose whether they end up before or after the list, but this is... *horribly* complicated to express with the std API! They have splice_after and splice_before, but neither changes the cursor's position, so really you'd need splice_after_before and splice_after_after...
+¡Pero hay una razón! El caso de uso de `splice` quiere permitir que el usuario elija si termina antes o después de la lista, pero esto es... *horriblemente* complicado de expresar con la API de `std`. They have splice_after and splice_before, but neither changes the cursor's position, so really you'd need splice_after_before and splice_after_after...
 
-Wait no Estoy being silly. In the std API you can just choose the node you want to end up on, and then use splice_after/before as appropriate.
+Espera, estoy diciendo una tontería. En la API de `std` puedes elegir el nodo en el que quieres terminar y usar después `splice_after` o `splice_before`, según corresponda.
 
 *squints*
 
@@ -118,6 +118,6 @@ Alright screw it, we're going to [implement the RFC](https://github.com/rust-lan
 
 I have my quibbles with some of the terminology std uses, but cursors are always going to be a bit brain-melty: `iter().next_back()`  gets you `back()`, so that's good, but then each subsequent `next_back()` is actually bringing you *closer to the front* and indeed, every pointer we follow is a "front" pointer! If I think about this seeming-paradox too much it hurts my brain, so, I can certainly respect going for different terminology to avoid this.
 
-The std API talks about operations before "before" (towards the front) and "after" (towards the back), and instead of `next` and `next_back`, it... calls things `move_next` and `move_prev`. HRM. Ok so they're getting into a bit of the iterator terminology, but at least `next` no evoke front/back, and helps you orient how things behave compared to the iterators.
+La API de `std` habla de operaciones «antes» (hacia el frente) y «después» (hacia atrás), y en lugar de `next` y `next_back` llama a las operaciones `move_next` y `move_prev`. Mmm. Está tomando parte de la terminología de los iteradores, pero al menos `next` no evoca el frente ni la parte trasera y ayuda a orientarse respecto a cómo se comportan los iteradores.
 
 We can work with this.

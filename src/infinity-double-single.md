@@ -1,12 +1,13 @@
 # La Lista Doblemente Enlazada Simple
 
-We struggled with doubly-linked lists because they have tangled ownership
-semantics: no node strictly owns any other node. However we struggled
-with this because we brought in our preconceived notions of what a linked
-list *is*. Namely, we assumed that all the links go in the same direction.
+Tuvimos problemas con las listas doblemente enlazadas porque tienen una
+semántica de propiedad enrevesada: ningún nodo posee estrictamente a otro. Sin
+embargo, la dificultad también se debía a nuestras ideas preconcebidas sobre lo
+que *es* una lista enlazada. En concreto, suponíamos que todos los enlaces iban
+en la misma dirección.
 
-Instead, we can smash our list into two halves: one going to the left,
-and one going to the right:
+En su lugar, podemos dividir nuestra lista en dos mitades: una que vaya hacia
+la izquierda y otra que vaya hacia la derecha:
 
 ```rust ,ignore
 // lib.rs
@@ -24,11 +25,12 @@ struct List<T> {
 }
 ```
 
-Now, rather than having a mere safe stack, we have a general purpose list.
-We can grow the list leftwards or rightwards by pushing onto either stack.
-We can also "walk" along the list by popping values off one end and onto the
-other. To avoid needless allocations, we're going to copy the source of
-our safe Stack to get access to its private details:
+Ahora, en lugar de tener una simple pila segura, tenemos una lista de propósito
+general. Podemos hacer crecer la lista hacia la izquierda o hacia la derecha
+insertando elementos en cualquiera de las dos pilas. También podemos «caminar»
+por la lista sacando valores de un extremo e introduciéndolos en el otro. Para
+evitar asignaciones innecesarias, copiaremos el código fuente de nuestra pila
+segura para acceder a sus detalles privados:
 
 ```rust ,ignore
 pub struct Stack<T> {
@@ -87,7 +89,7 @@ impl<T> Drop for Stack<T> {
 }
 ```
 
-And just rework `push` and `pop` a bit:
+Y solo tenemos que retocar un poco `push` y `pop`:
 
 ```rust ,ignore
 pub fn push(&mut self, elem: T) {
@@ -118,7 +120,7 @@ fn pop_node(&mut self) -> Option<Box<Node<T>>> {
 }
 ```
 
-Now we can make our List:
+Ahora podemos crear nuestra `List`:
 
 ```rust ,ignore
 pub struct List<T> {
@@ -133,7 +135,7 @@ impl<T> List<T> {
 }
 ```
 
-And we can do the usual stuff:
+Y podemos hacer las operaciones habituales:
 
 
 ```rust ,ignore
@@ -147,7 +149,7 @@ pub fn peek_left_mut(&mut self) -> Option<&mut T> { self.left.peek_mut() }
 pub fn peek_right_mut(&mut self) -> Option<&mut T> { self.right.peek_mut() }
 ```
 
-But most interestingly, we can walk around!
+¡Pero lo más interesante es que podemos desplazarnos por ella!
 
 
 ```rust ,ignore
@@ -164,8 +166,8 @@ pub fn go_right(&mut self) -> bool {
 }
 ```
 
-We return booleans here as just a convenience to indicate whether we actually
-managed to move. Now let's test this baby out:
+Aquí devolvemos booleanos simplemente para indicar si hemos conseguido
+movernos. Ahora probemos esta pequeña criatura:
 
 ```rust ,ignore
 #[cfg(test)]
@@ -230,14 +232,15 @@ test silly1::test::walk_aboot ... ok
 test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured
 ```
 
-This is an extreme example of a *finger* data structure, where we maintain
-some kind of finger into the structure, and as a consequence can support
-operations on locations in time proportional to the distance from the finger.
+Este es un ejemplo extremo de una estructura de datos de tipo *finger*, en la
+que mantenemos una especie de dedo apuntando a la estructura y, como
+consecuencia, podemos realizar operaciones en ubicaciones en un tiempo
+proporcional a la distancia desde el dedo.
 
-We can make very fast changes to the list around our finger, but if we want
-to make changes far away from our finger we have to walk all the way over there.
-We can permanently walk over there by shifting the elements from one stack to
-the other, or we could just walk along the links with an `&mut`
-temporarily to do the changes. However the `&mut` can never go back up the
-list, while our finger can!
+Podemos hacer cambios muy rápidos en la zona de la lista que rodea nuestro
+dedo, pero si queremos modificar algo alejado tenemos que recorrer todo el
+camino hasta allí. Podemos desplazarnos permanentemente trasladando los
+elementos de una pila a la otra, o recorrer temporalmente los enlaces con un
+`&mut` para hacer los cambios. Sin embargo, el `&mut` nunca puede volver hacia
+arriba por la lista, mientras que nuestro dedo sí.
 

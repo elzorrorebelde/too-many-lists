@@ -1,4 +1,4 @@
-# Una Cola Insegura Aceptable Enlazada Individualmente
+# Una Cola Insegura Aceptable Enlazada Simple
 
 Ok, eso de la mutabilidad interior con contador de referencias se salió un
 poco de control. Seguramente Rust no espera realmente que hagas ese tipo de
@@ -8,7 +8,7 @@ Especialmente si quieres ocultar que está sucediendo. ¡Tiene que haber una
 mejor manera!
 
 En este capítulo vamos a retroceder a listas enlazadas individualmente e
-implementar una cola enlazada individualmente para mojarnos los pies con
+implementar una cola enlazada simple para mojarnos los pies con
 *punteros crudos (raw pointers)* y *Rust Inseguro (Unsafe Rust)*.
 
 > **NARRADOR:** Y señalaré los errores.

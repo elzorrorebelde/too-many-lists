@@ -1,28 +1,28 @@
 # Diseño (Layout)
 
-Let us begin by first studying the structure of our enemy. A Doubly-Linked List is conceptually simple, but that's how it decieves and manipulates you. Es the same kind of linked list we've looked at over and over, but the links go both ways. Double the links, double the evil.
+Empecemos estudiando la estructura de nuestro enemigo. Una lista doblemente enlazada es conceptualmente sencilla, pero ahí está precisamente su capacidad para engañarte y manipularte. Es el mismo tipo de lista enlazada que hemos visto una y otra vez, pero los enlaces van en ambas direcciones. El doble de enlaces, el doble de maldad.
 
-So rather than this (gonna drop the Some/None stuff to keep it cleaner):
+Así que, en lugar de esto (eliminaremos `Some`/`None` para mantenerlo más limpio):
 
 ```text
 ... -> (A, ptr) -> (B, ptr) -> ...
 ```
 
-We have this:
+Tenemos esto:
 
 ```text
 ... <-> (ptr, A, ptr) <-> (ptr, B, ptr) <-> ...
 ```
 
-This lets you traverse the list from either direction, or seek back and forth with a [cursor](https://doc.rust-lang.org/std/collections/struct.LinkedList.html#method.cursor_back_mut).
+Esto permite recorrer la lista en cualquier dirección o desplazarse hacia delante y hacia atrás con un [cursor](https://doc.rust-lang.org/std/collections/struct.LinkedList.html#method.cursor_back_mut).
 
-In exchange for this flexibility, every node has to store twice as many pointers, and every operation has to fix up way more pointers. Es a significant enough complication that it's a lot easier to make a mistake, so we're going to be doing a lot of testing.
+A cambio de esta flexibilidad, cada nodo debe almacenar el doble de punteros y cada operación tiene que ajustar muchos más punteros. Es una complicación considerable que facilita mucho cometer errores, así que haremos muchas pruebas.
 
-You might have also noticed that I intentionally no he drawn the *ends* of the list. This is because this is one of the places where there are genuinely defensible options for our implementation. We *definitely* need our implementation to have two pointers: one to the start of the list, and one to the end of the list.
+Quizá también hayas notado que he decidido no dibujar los *extremos* de la lista. Esto se debe a que este es uno de los puntos en los que existen varias opciones defendibles para nuestra implementación. Sin duda necesitamos dos punteros: uno al principio de la lista y otro al final.
 
-There are two notable ways to do this in my mind: "traditional" and "dummy node".
+En mi opinión, hay dos formas destacables de hacerlo: el enfoque «tradicional» y el del «nodo ficticio».
 
-The traditional approach is the simple extension of how we did a Stack &mdash; just store the head and tail pointers on the stack:
+El enfoque tradicional es una extensión sencilla de lo que hicimos con una pila: almacenar los punteros `head` y `tail` en la pila:
 
 ```text
 [ptr, ptr] <-> (ptr, A, ptr) <-> (ptr, B, ptr)
@@ -30,9 +30,9 @@ The traditional approach is the simple extension of how we did a Stack &mdash; j
   +----------------------------------------+
 ```
 
-This is fine, but it has one downside: corner cases. There are now two edges to our list, which means twice as many corner cases. Es easy to forget one and have a serious bug.
+Está bien, pero tiene una desventaja: los casos límite. Ahora hay dos extremos en nuestra lista, lo que significa el doble de casos límite. Es fácil olvidarse de uno y acabar con un error grave.
 
-The dummy node approach attempts to smooth out these corner cases by adding an extra node to our list which contains no data but links the two ends together into a ring:
+El enfoque del nodo ficticio intenta simplificar estos casos límite añadiendo a nuestra lista un nodo adicional que no contiene datos, pero conecta ambos extremos formando un anillo:
 
 ```text
 [ptr] -> (ptr, ?DUMMY?, ptr) <-> (ptr, A, ptr) <-> (ptr, B, ptr)
@@ -40,7 +40,7 @@ The dummy node approach attempts to smooth out these corner cases by adding an e
            +-------------------------------------------------+ 
 ```
 
-By doing this, every node *always* has actual pointers to a previous and next node in the list. Even when you remove the last element from the list, you just end up stitching the dummy node to point at itself:
+De este modo, cada nodo *siempre* tiene punteros reales a un nodo anterior y a uno siguiente de la lista. Incluso al eliminar el último elemento, basta con hacer que el nodo ficticio apunte hacia sí mismo:
 
 ```text
 [ptr] -> (ptr, ?DUMMY?, ptr) 
@@ -48,25 +48,25 @@ By doing this, every node *always* has actual pointers to a previous and next no
            +-------------+
 ```
 
-There is a part of me that finds this *very* satisfying and elegant. Desafortunadamente, it has a couple practical problems:
+Hay una parte de mí a la que esto le parece *muy* satisfactorio y elegante. Desafortunadamente, tiene un par de problemas prácticos:
 
-Problem 1: An extra indirection and allocation, especially for the empty list, which must include the dummy node. Potential solutions include:
+Problema 1: una indirección y una asignación adicionales, especialmente para la lista vacía, que debe incluir el nodo ficticio. Algunas soluciones posibles son:
 
-* Don't allocate the dummy node until something is inserted: simple and effective, but it adds back some of the corner cases we were trying to avoid by using dummy pointers!
+* No asignar el nodo ficticio hasta que se inserte algo: es sencillo y eficaz, pero vuelve a introducir algunos de los casos límite que intentábamos evitar usando punteros ficticios.
 
-* Use a static copy-on-write empty singleton dummy node, with some really clever scheme that lets the Copy-On-Write checks piggy-back on normal checks: look Estoy really tempted, I really do love that shit, but we no puede go down that dark path in this book. Read [ThinVec's sourcecode](https://docs.rs/thin-vec/0.2.4/src/thin_vec/lib.rs.html#319-325) if you want to see that kind of perverted stuff.
+* Usar un nodo ficticio singleton vacío estático con copia al escribir, mediante algún esquema ingenioso que permita aprovechar las comprobaciones de copia al escribir junto con las comprobaciones normales. La verdad es que me tienta mucho, pero no podemos adentrarnos en ese camino oscuro en este libro. Lee el [código fuente de ThinVec](https://docs.rs/thin-vec/0.2.4/src/thin_vec/lib.rs.html#319-325) si quieres ver ese tipo de trucos perversos.
 
-* Store the dummy node on the stack - not practical in a language without C++-style move-constructors. Estoy sure hay something weird thing we could do here with [pinning](https://doc.rust-lang.org/std/pin/index.html) but we're not gonna.
+* Almacenar el nodo ficticio en la pila: no es práctico en un lenguaje sin constructores de movimiento al estilo de C++. Estoy seguro de que podríamos hacer algo extraño con el [anclaje](https://doc.rust-lang.org/std/pin/index.html), pero no lo haremos.
 
-Problem 2: What *value* is stored in the dummy node? Sure if it's an integer it's fine, but what if we're storing a list full of `Box`? It may be impossible for us to initialize this value! Potential solutions include:
+Problema 2: ¿qué *valor* se almacena en el nodo ficticio? Si es un entero no hay problema, pero ¿qué ocurre si almacenamos una lista llena de `Box`? ¡Podría ser imposible inicializar ese valor! Algunas soluciones posibles son:
 
-* Make every node store `Option<T>`: simple and effective, but also bloated and annoying.
+* Hacer que cada nodo almacene `Option<T>`: sencillo y eficaz, pero también innecesariamente pesado y molesto.
 
-* Make every node store [`MaybeUninit<T>`](https://doc.rust-lang.org/std/mem/union.MaybeUninit.html). Horrifying and annoying.
+* Hacer que cada nodo almacene [`MaybeUninit<T>`](https://doc.rust-lang.org/std/mem/union.MaybeUninit.html). Horrible y molesto.
 
-* *Really* careful and clever inheritance-style type punning so the dummy node no include the data field. This is also tempting but it's extremely dangerous and annoying. Read [BTreeMap's source](https://doc.rust-lang.org/1.55.0/src/alloc/collections/btree/node.rs.html#49-104) if you want to see that kind of perverted stuff.
+* Un juego de tipos al estilo de la herencia, *muy* cuidadoso e ingenioso, para que el nodo ficticio no incluya el campo de datos. También resulta tentador, pero es extremadamente peligroso y molesto. Lee el [código fuente de `BTreeMap`](https://doc.rust-lang.org/1.55.0/src/alloc/collections/btree/node.rs.html#49-104) si quieres ver ese tipo de trucos perversos.
 
-The problems really outweigh the convenience for a language like Rust, so we're going to stick to the traditional layout. Vamos a be using the same basic design as we did for the unsafe queue in the previous chapter:
+Para un lenguaje como Rust, los problemas superan con creces la comodidad, así que mantendremos el diseño tradicional. Usaremos el mismo diseño básico que empleamos para la cola insegura del capítulo anterior:
 
 ```rust
 pub struct LinkedList<T> {
@@ -84,6 +84,6 @@ struct Node<T> {
 }
 ```
 
-(Now that we have reached the doubly-linked-deque, we have finally earned the right to call ourselves LinkedList, for this is the True Linked List.)
+(Ahora que hemos llegado a la doble cola enlazada, por fin nos hemos ganado el derecho a llamarnos `LinkedList`, porque esta sí es la Verdadera Lista Enlazada.)
 
-This no es quite a *true* production-quality layout yet. Es *fine* but hay magic tricks we can do to tell Rust what we're doing a bit better. To do that we're going to need to go... deeper.
+Este todavía no es del todo un diseño de calidad de producción *real*. Está *bien*, pero hay trucos mágicos que podemos usar para explicar mejor a Rust lo que estamos haciendo. Para ello tendremos que profundizar...

@@ -3,7 +3,7 @@
 * [Introducción](README.md)
 * [Una Pila Mala](first.md)
     * [Diseño (Layout)](first-layout.md)
-    * [New](first-new.md)
+    * [Nuevo](first-new.md)
     * [Propiedad (Ownership) 101](first-ownership.md)
     * [Push](first-push.md)
     * [Pop](first-pop.md)

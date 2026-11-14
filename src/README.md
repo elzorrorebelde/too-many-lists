@@ -34,11 +34,11 @@ con todos estos conceptos al hacerlas reales.
 Todo está en la barra lateral (puede estar colapsada en móvil), pero para
 referencia rápida, aquí está lo que vamos a hacer:
 
-1. [Una Pila Mala Enlazada Individualmente](first.md)
-2. [Una Pila Aceptable Enlazada Individualmente](second.md)
-3. [Una Pila Persistente Enlazada Individualmente](third.md)
+1. [Una Pila Mala Enlazada Simple](first.md)
+2. [Una Pila Aceptable Enlazada Simple](second.md)
+3. [Una Pila Persistente Enlazada Simple](third.md)
 4. [Una Doble Cola Mala Pero Segura Doblemente Enlazada](fourth.md)
-5. [Una Cola Aceptable Insegura Enlazada Individualmente](fifth.md)
+5. [Una Cola Aceptable Insegura Enlazada Simple](fifth.md)
 6. [Una Doble Cola Insegura de Producción Doblemente Enlazada](sixth.md)
 7. [Bonus: Un Montón de Listas Tontas](infinity.md)
 
@@ -199,7 +199,7 @@ solo tiene tres punteros de sobrecarga para todo el array. Básicamente sin
 sobrecarga.
 
 Las listas enlazadas, por otro lado, desperdician espacio incondicionalmente
-por elemento. Una lista enlazada individualmente desperdicia un puntero mientras
+por elemento. Una lista enlazada simple desperdicia un puntero mientras
 que una doblemente enlazada desperdicia dos. A diferencia de un array, el
 desperdicio relativo es proporcional al tamaño del elemento. Si tienes elementos
 *enormes* esto se acerca al 0% de desperdicio. Si tienes elementos diminutos

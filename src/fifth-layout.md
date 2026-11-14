@@ -1,7 +1,7 @@
 # Diseño (Layout)
 
-Entonces, ¿cómo es una cola enlazada individualmente? Bueno, cuando teníamos
-una pila enlazada individualmente, insertábamos (push) en un extremo de la
+Entonces, ¿cómo es una cola enlazada simple? Bueno, cuando teníamos
+una pila enlazada simple, insertábamos (push) en un extremo de la
 lista, y luego eliminábamos (pop) del mismo extremo. La única diferencia entre
 una pila y una cola es que una cola elimina del *otro* extremo. Así que de
 nuestra implementación de pila tenemos:
@@ -67,7 +67,7 @@ simplemente saltar directamente allí!
 
 Resulta que solo una inversión de `push` y `pop` funciona con esto.
 Para invertir `pop` tendríamos que mover el puntero "tail" hacia atrás, pero
-como nuestra lista está enlazada individualmente, no podemos hacer eso
+como nuestra lista está enlazada simple, no podemos hacer eso
 eficientemente. Si en su lugar invertimos `push` solo tenemos que mover el
 puntero "head" hacia adelante, lo cual es fácil.
 
@@ -88,7 +88,6 @@ struct Node<T> {
     next: Link<T>,
 }
 
-;
 impl<T> List<T> {
     pub fn new() -> Self {
         List { head: None, tail: None }
@@ -97,18 +96,22 @@ impl<T> List<T> {
     pub fn push(&mut self, elem: T) {
         let new_tail = Box::new(Node {
             elem: elem,
+            // Al insertar al final, next siempre es None
             next: None,
         });
 
-        // Replace the list's old tail with the new tail
+        // Intercambia el tail antiguo por el nuevo tail
         let old_tail = mem::replace(&mut self.tail, Some(new_tail));
 
-        // Now we need to fix the old tail's next pointer
         match old_tail {
-            // If there was an old tail, point it at the new guy
-            Some(mut old_tail) => old_tail.next = Some(new_tail),
-            // Otherwise the list was empty, set the head too
-            None => self.head = Some(new_tail),
+            Some(mut old_tail) => {
+                // Si existía un tail antiguo, haz que apunte al nuevo tail
+                old_tail.next = Some(new_tail);
+            }
+            None => {
+                // En caso contrario, haz que head apunte a él
+                self.head = Some(new_tail);
+            }
         }
     }
 }
@@ -197,4 +200,166 @@ así que necesitamos push inverso (que es el mismo que el push original de la
 pila), o simplemente podemos exponer `push_front` y `pop_front` como
 alias. Te dejaremos la decisión final a ti.
 
+Ahora voy a avanzar un poco más rápido con los detalles de la implementación, ya que deberíamos estar cómodos con este tipo de código. No significa que debas esperar producirlo a la primera: estoy omitiendo parte del ensayo y error anterior. Cometí muchos errores al escribirlo, pero ver cómo olvido un `mut` o un `;` deja de ser instructivo después de cierto tiempo. ¡No te preocupes, veremos muchos otros mensajes de error!
+
+```text
+> cargo build
+
+error[E0382]: use of moved value: `new_tail`
+```
+
+¡Rayos! `Box` no implementa `Copy`, así que no podemos asignarlo a dos lugares. Más importante aún, `Box` *posee* aquello a lo que apunta y tratará de liberarlo cuando se destruya. Si `push` compilara así, liberaríamos dos veces el final de la lista. De hecho, tal como está escrito, liberaríamos el `old_tail` en cada `push`. ¡Qué desastre! 🙀
+
+Sabemos cómo crear un puntero que no sea propietario: una referencia.
+
+```rust ,ignore
+pub struct List<T> {
+    head: Link<T>,
+    tail: Option<&mut Node<T>>, // NUEVO!
+}
+
+type Link<T> = Option<Box<Node<T>>>;
+
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
+}
+
+impl<T> List<T> {
+    pub fn new() -> Self {
+        List { head: None, tail: None }
+    }
+
+    pub fn push(&mut self, elem: T) {
+        let new_tail = Box::new(Node {
+            elem: elem,
+            next: None,
+        });
+
+        let new_tail = match self.tail.take() {
+            Some(old_tail) => {
+                old_tail.next = Some(new_tail);
+                old_tail.next.as_deref_mut()
+            }
+            None => {
+                self.head = Some(new_tail);
+                self.head.as_deref_mut()
+            }
+        };
+
+        self.tail = new_tail;
+    }
+}
+```
+
+La idea es la misma que antes, pero aprovechamos el valor de retorno implícito
+para extraer una referencia al `Node` del `Box` que acabamos de colocar.
+
+```text
+error[E0106]: missing lifetime specifier
+ --> src/fifth.rs:3:18
+```
+
+Claro, las referencias dentro de los tipos necesitan tiempos de vida. ¿Cuál es
+el tiempo de vida de esta referencia? Parece el mismo caso que `IterMut`, así
+que añadamos un tiempo de vida genérico `'a`:
+
+```rust ,ignore
+pub struct List<'a, T> {
+    head: Link<T>,
+    tail: Option<&'a mut Node<T>>, // NUEVO!
+}
+
+// ... el resto de la implementación es igual ...
+```
+
+El compilador nos da entonces un error de tiempos de vida: el préstamo de
+`self` no dura lo suficiente para satisfacer `'a`. Probemos a declarar que
+`self` se presta durante `'a`:
+
+```rust ,ignore
+pub fn push(&'a mut self, elem: T) {
+```
+
+¡Eso compila! Hagamos lo mismo con `pop`:
+
+```rust ,ignore
+pub fn pop(&'a mut self) -> Option<T> {
+    self.head.take().map(|head| {
+        let head = *head;
+        self.head = head.next;
+        if self.head.is_none() {
+            self.tail = None;
+        }
+        head.elem
+    })
+}
+```
+
+Pero una prueba sencilla revela el problema:
+
+```text
+error[E0499]: cannot borrow `list` as mutable more than once at a time
+```
+
+El compilador no se equivoca. Hemos cometido un pecado cardinal de Rust:
+hemos almacenado una referencia a nosotros mismos *dentro de nosotros mismos*.
+Cada llamada aislada a `push` o `pop` parece correcta, pero al usar la lista el
+préstamo mutable de `self` dura hasta `'a` y bloquea todas las operaciones
+posteriores.
+
+La lista se ha tragado su propia cola y ha ascendido a un mundo de sueños.
+
+> **NARRADOR:** Rust formalizó posteriormente la noción de un *pin* mediante
+> [`Pin`][pin]. Es una herramienta importante para async/await y los futuros,
+> donde una estructura puede contener referencias a sus propias variables
+> locales. No queremos fijar nuestra lista, y este libro tampoco va a
+> implementar un runtime asíncrono.
+
+El problema también explica por qué guardar una referencia a nosotros mismos
+puede ser peligroso:
+
+```rust ,ignore
+if self.head.is_none() {
+    self.tail = None;
+}
+```
+
+Si olvidáramos poner `tail` a `None`, apuntaría a un nodo que ya no pertenece a
+la lista. Ese nodo se liberaría inmediatamente y tendríamos un puntero colgante.
+Rust nos protege de ese peligro de una forma muy indirecta.
+
+¿Volvemos al infierno de `Rc<RefCell>`? Por favor, no. En su lugar,
+abandonaremos las referencias y usaremos punteros crudos. Nuestro diseño será:
+
+```rust ,ignore
+pub struct List<T> {
+    head: Link<T>,
+    tail: *mut Node<T>, // PELIGRO, PELIGRO
+}
+
+type Link<T> = Option<Box<Node<T>>>;
+
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
+}
+```
+
+Y eso es todo. ¡Nada de esa débil combinación de conteo de referencias y
+comprobación dinámica de préstamos! Punteros reales, duros y sin comprobar.
+
+> **NARRADOR:** Esta implementación todavía era peligrosamente incorrecta,
+> pero aún no había llegado el momento de aprender esa lección. La siguiente
+> sección nos lo enseñará por las malas, como de costumbre.
+
+Seamos C. Seamos C todo el día.
+
+Estoy en casa. Estoy preparado.
+
+Hola, `unsafe`.
+
+> **NARRADOR:** Vaya, qué arrogancia tan increíble la del autor.
+
 [real-time queue]: https://en.wikipedia.org/wiki/Queue_(abstract_data_type)#Real-time_queue
+[pin]: https://doc.rust-lang.org/std/pin/index.html
