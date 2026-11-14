@@ -323,7 +323,7 @@ Ok. Eso ya está fuera del camino. Escribamos un montón de listas enlazadas.
 
 [rust-std-list]: https://doc.rust-lang.org/std/collections/struct.LinkedList.html
 [cpp-std-list]: http://en.cppreference.com/w/cpp/container/list
-[github]: https://github.com/rust-unofficial/too-many-lists
+[github]: https://github.com/elzorrorebelde/too-many-lists
 [bjarne]: https://web.archive.org/web/20240228123439/https://www.youtube.com/watch?v=YQs6IC-vgmo
 [slices]: https://doc.rust-lang.org/std/primitive.slice.html
 [split]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at_mut

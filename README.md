@@ -1,7 +1,7 @@
 # Aprende Rust escribiendo Demasiadas Listas Enlazadas
-[![Build Status](https://github.com/rust-unofficial/too-many-lists/actions/workflows/main.yml/badge.svg)](https://github.com/rust-unofficial/too-many-lists/actions)
+[![Build Status](https://github.com/elzorrorebelde/too-many-lists/actions/workflows/main.yml/badge.svg)](https://github.com/elzorrorebelde/too-many-lists/actions)
 
-Lee la versión bonita en https://rust-unofficial.github.io/too-many-lists/.
+Lee la versión bonita en https://elzorrorebelde.github.io/too-many-lists/.
 
 # Construcción (Build)
 
