@@ -1,9 +1,10 @@
-# Layout
+# Diseño (Layout)
 
-So what's a singly-linked queue like? Well, when we had a singly-linked stack
-we pushed onto one end of the list, and then popped off the same end. The only
-difference between a stack and a queue is that a queue pops off the *other*
-end. So from our stack implementation we have:
+Entonces, ¿cómo es una cola enlazada individualmente? Bueno, cuando teníamos
+una pila enlazada individualmente, insertábamos (push) en un extremo de la
+lista, y luego eliminábamos (pop) del mismo extremo. La única diferencia entre
+una pila y una cola es que una cola elimina del *otro* extremo. Así que de
+nuestra implementación de pila tenemos:
 
 ```text
 input list:
@@ -16,12 +17,13 @@ stack pop:
 [Some(ptr)] -> (A, Some(ptr)) -> (B, None)
 ```
 
-To make a queue, we just need to decide which operation to move to the
-end of the list: push, or pop? Since our list is singly-linked, we can
-actually move *either* operation to the end with the same amount of effort.
+Para hacer una cola, solo necesitamos decidir qué operación mover al
+final de la lista: push, o pop? Como nuestra lista está enlazada
+individualmente, podemos mover *cualquiera* de las operaciones al final con
+el mismo esfuerzo.
 
-To move `push` to the end, we just walk all the way to the `None` and set it
-to Some with the new element.
+Para mover `push` al final, simplemente caminamos hasta el `None` y lo
+establecemos a Some con el nuevo elemento.
 
 ```text
 input list:
@@ -31,8 +33,8 @@ flipped push X:
 [Some(ptr)] -> (A, Some(ptr)) -> (B, Some(ptr)) -> (X, None)
 ```
 
-To move `pop` to the end, we just walk all the way to the node *before* the
-None, and `take` it:
+Para mover `pop` al final, simplemente caminamos hasta el nodo *anterior* al
+None, y hacemos `take`:
 
 ```text
 input list:
@@ -42,39 +44,41 @@ flipped pop:
 [Some(ptr)] -> (A, Some(ptr)) -> (B, None)
 ```
 
-We could do this today and call it quits, but that would stink! Both of these
-operations walk over the *entire* list. Some would argue that such a queue
-implementation is indeed a queue because it exposes the right interface. However
-I believe that performance guarantees are part of the interface. I don't care
-about precise asymptotic bounds, just "fast" vs "slow". Queues guarantee
-that push and pop are fast, and walking over the whole list is definitely *not*
-fast.
+Podríamos hacer esto hoy y darlo por terminado, ¡pero eso apestaría! Ambas
+operaciones recorren la lista *completa*. Algunos argumentarían que tal
+implementación de cola es de hecho una cola porque expone la interfaz
+correcta. Sin embargo, creo que las garantías de rendimiento son parte de la
+interfaz. No me importan las cotas asintóticas precisas, solo "rápido" vs
+"lento". Las colas garantizan que push y pop son rápidos, ¡y caminar sobre
+toda la lista definitivamente no es rápido!
 
-Purely functional programmers have devised complex solutions for queues with
-constant worst-time operations, such as [real-time queue][], using techniques
-such as laziness, memoization and scheduling. As far as our book is concerned,
-this is cheating. It replaces a good understanding of pointers by some
-more-or-less clever mathematical tricks. We will happily ignore it and keep our
-data structure as a simple sequence of nodes.
+Los programadores puramente funcionales han ideado soluciones complejas para
+colas con operaciones de tiempo constante en el peor caso, como la
+[cola en tiempo real][real-time queue], usando técnicas como la pereza
+(laziness), memoización y planificación. En lo que respecta a nuestro libro,
+esto es hacer trampa. Reemplaza una buena comprensión de los punteros por
+trucos matemáticos más o menos inteligentes. Lo ignoraremos felizmente y
+mantendremos nuestra estructura de datos como una secuencia simple de nodos.
 
-One key observation is that we're wasting a ton of work doing *the same thing*
-over and over. Can we "cache" all that work and reuse it? Why, yes! We can store a pointer to
-the end of the list, and just jump straight to there!
+Una observación clave es que estamos desperdiciando un montón de trabajo
+haciendo *lo mismo* una y otra vez. ¿Podemos "cachear" todo ese trabajo y
+reutilizarlo? ¡Pues sí! ¡Podemos almacenar un puntero al final de la lista, y
+simplemente saltar directamente allí!
 
-It turns out that only one inversion of `push` and `pop` works with this.
-To invert `pop` we would have to move the "tail" pointer backwards, but
-because our list is singly-linked, we can't do that efficiently.
-If we instead invert `push` we only have to move the "head" pointer
-forward, which is easy.
+Resulta que solo una inversión de `push` y `pop` funciona con esto.
+Para invertir `pop` tendríamos que mover el puntero "tail" hacia atrás, pero
+como nuestra lista está enlazada individualmente, no podemos hacer eso
+eficientemente. Si en su lugar invertimos `push` solo tenemos que mover el
+puntero "head" hacia adelante, lo cual es fácil.
 
-Let's try that:
+Intentemos:
 
 ```rust ,ignore
 use std::mem;
 
 pub struct List<T> {
     head: Link<T>,
-    tail: Link<T>, // NEW!
+    tail: Link<T>, // NUEVO!
 }
 
 type Link<T> = Option<Box<Node<T>>>;
@@ -84,6 +88,7 @@ struct Node<T> {
     next: Link<T>,
 }
 
+;
 impl<T> List<T> {
     pub fn new() -> Self {
         List { head: None, tail: None }
@@ -92,442 +97,104 @@ impl<T> List<T> {
     pub fn push(&mut self, elem: T) {
         let new_tail = Box::new(Node {
             elem: elem,
-            // When you push onto the tail, your next is always None
             next: None,
         });
 
-        // swap the old tail to point to the new tail
+        // Replace the list's old tail with the new tail
         let old_tail = mem::replace(&mut self.tail, Some(new_tail));
 
+        // Now we need to fix the old tail's next pointer
         match old_tail {
-            Some(mut old_tail) => {
-                // If the old tail existed, update it to point to the new tail
-                old_tail.next = Some(new_tail);
-            }
-            None => {
-                // Otherwise, update the head to point to it
-                self.head = Some(new_tail);
-            }
+            // If there was an old tail, point it at the new guy
+            Some(mut old_tail) => old_tail.next = Some(new_tail),
+            // Otherwise the list was empty, set the head too
+            None => self.head = Some(new_tail),
         }
     }
 }
 ```
 
-I'm going a bit faster with the impl details now since we should be pretty
-comfortable with this sort of thing. Not that you should necessarily expect
-to produce this code on the first try. I'm just skipping over some of the
-trial-and-error we've had to deal with before. I actually made a ton of mistakes
-writing this code that I'm not showing, but you can only see me leave off a `mut` or
-`;` so many times before it stops being instructive. Don't worry, we'll see
-plenty of *other* error messages!
+Como sea, veamos si esto compila:
 
 ```text
 > cargo build
 
-error[E0382]: use of moved value: `new_tail`
-  --> src/fifth.rs:38:38
-   |
-26 |         let new_tail = Box::new(Node {
-   |             -------- move occurs because `new_tail` has type `std::boxed::Box<fifth::Node<T>>`, which does not implement the `Copy` trait
-...
-33 |         let old_tail = mem::replace(&mut self.tail, Some(new_tail));
-   |                                                          -------- value moved here
-...
-38 |                 old_tail.next = Some(new_tail);
-   |                                      ^^^^^^^^ value used here after move
+   Finished dev [unoptimized + debuginfo] target(s) in 0.31s
 ```
 
-Shoot!
+¡Excelente!
 
-> use of moved value: `new_tail`
-
-Box doesn't implement Copy, so we can't just assign it to two locations. More
-importantly, Box *owns* the thing it points to, and will try to free it when
-it's dropped. If our `push` implementation compiled, we'd double-free the tail
-of our list! Actually, as written, our code would free the old_tail on every
-push. Yikes! 🙀
-
-Alright, well we know how to make a non-owning pointer. That's just a reference!
+Ahora para `pop`, queremos eliminar de la cabeza. `pop` básicamente funciona
+como nuestro pop de antes para la pila, excepto que ahora tenemos que asegurar
+que `tail` también recibe mantenimiento:
 
 ```rust ,ignore
-pub struct List<T> {
-    head: Link<T>,
-    tail: Option<&mut Node<T>>, // NEW!
-}
-
-type Link<T> = Option<Box<Node<T>>>;
-
-struct Node<T> {
-    elem: T,
-    next: Link<T>,
-}
-
-impl<T> List<T> {
-    pub fn new() -> Self {
-        List { head: None, tail: None }
-    }
-
-    pub fn push(&mut self, elem: T) {
-        let new_tail = Box::new(Node {
-            elem: elem,
-            // When you push onto the tail, your next is always None
-            next: None,
-        });
-
-        // Put the box in the right place, and then grab a reference to its Node
-        let new_tail = match self.tail.take() {
-            Some(old_tail) => {
-                // If the old tail existed, update it to point to the new tail
-                old_tail.next = Some(new_tail);
-                old_tail.next.as_deref_mut()
-            }
-            None => {
-                // Otherwise, update the head to point to it
-                self.head = Some(new_tail);
-                self.head.as_deref_mut()
-            }
-        };
-
-        self.tail = new_tail;
-    }
-}
-```
-
-Nothing too tricky here. Same basic idea as the previous code, except we're
-using some of that implicit return goodness to extract the tail reference from
-wherever we stuff the actual Box.
-
-```text
-> cargo build
-
-error[E0106]: missing lifetime specifier
- --> src/fifth.rs:3:18
-  |
-3 |     tail: Option<&mut Node<T>>, // NEW!
-  |                  ^ expected lifetime parameter
-```
-
-Oh right, we need to give lifetimes to references in types. Hmm... what's the
-lifetime of this reference? Well, this seems like IterMut, right? Let's try
-what we did for IterMut, and just add a generic `'a`:
-
-```rust ,ignore
-pub struct List<'a, T> {
-    head: Link<T>,
-    tail: Option<&'a mut Node<T>>, // NEW!
-}
-
-type Link<T> = Option<Box<Node<T>>>;
-
-struct Node<T> {
-    elem: T,
-    next: Link<T>,
-}
-
-impl<'a, T> List<'a, T> {
-    pub fn new() -> Self {
-        List { head: None, tail: None }
-    }
-
-    pub fn push(&mut self, elem: T) {
-        let new_tail = Box::new(Node {
-            elem: elem,
-            // When you push onto the tail, your next is always None
-            next: None,
-        });
-
-        // Put the box in the right place, and then grab a reference to its Node
-        let new_tail = match self.tail.take() {
-            Some(old_tail) => {
-                // If the old tail existed, update it to point to the new tail
-                old_tail.next = Some(new_tail);
-                old_tail.next.as_deref_mut()
-            }
-            None => {
-                // Otherwise, update the head to point to it
-                self.head = Some(new_tail);
-                self.head.as_deref_mut()
-            }
-        };
-
-        self.tail = new_tail;
-    }
-}
-```
-
-```text
-cargo build
-
-error[E0495]: cannot infer an appropriate lifetime for autoref due to conflicting requirements
-  --> src/fifth.rs:35:27
-   |
-35 |                 self.head.as_deref_mut()
-   |                           ^^^^^^^^^^^^
-   |
-note: first, the lifetime cannot outlive the anonymous lifetime #1 defined on the method body at 18:5...
-  --> src/fifth.rs:18:5
-   |
-18 | /     pub fn push(&mut self, elem: T) {
-19 | |         let new_tail = Box::new(Node {
-20 | |             elem: elem,
-21 | |             // When you push onto the tail, your next is always None
-...  |
-39 | |         self.tail = new_tail;
-40 | |     }
-   | |_____^
-note: ...so that reference does not outlive borrowed content
-  --> src/fifth.rs:35:17
-   |
-35 |                 self.head.as_deref_mut()
-   |                 ^^^^^^^^^
-note: but, the lifetime must be valid for the lifetime 'a as defined on the impl at 13:6...
-  --> src/fifth.rs:13:6
-   |
-13 | impl<'a, T> List<'a, T> {
-   |      ^^
-   = note: ...so that the expression is assignable:
-           expected std::option::Option<&'a mut fifth::Node<T>>
-              found std::option::Option<&mut fifth::Node<T>>
-
-
-```
-
-Woah, that's a really detailed error message. That's a bit concerning, because it
-suggests we're doing something really messed up. Here's an interesting part:
-
-> the lifetime must be valid for the lifetime `'a` as defined on the impl
-
-We're borrowing from `self`, but the compiler wants us to last as long as `'a`,
-what if we tell it `self` *does* last that long..?
-
-```rust ,ignore
-    pub fn push(&'a mut self, elem: T) {
-```
-
-```text
-cargo build
-
-warning: field is never used: `elem`
- --> src/fifth.rs:9:5
-  |
-9 |     elem: T,
-  |     ^^^^^^^
-  |
-  = note: #[warn(dead_code)] on by default
-```
-
-Oh, hey, that worked! Great!
-
-Let's just do `pop` too:
-
-```rust ,ignore
-pub fn pop(&'a mut self) -> Option<T> {
-    // Grab the list's current head
-    self.head.take().map(|head| {
-        let head = *head;
-        self.head = head.next;
-
-        // If we're out of `head`, make sure to set the tail to `None`.
+pub fn pop(&mut self) -> Option<T> {
+    self.head.take().map(|old_head| {
+        self.head = old_head.next;
         if self.head.is_none() {
             self.tail = None;
         }
-
-        head.elem
+        old_head.elem
     })
 }
 ```
 
-And write a quick test for that:
+```text
+> cargo build
+
+error[E0507]: cannot move out of borrowed content
+  --> src/fifth.rs:34:19
+   |
+34 |         self.head.take().map(|old_head| {
+   |                        ^^^ cannot move out of borrowed content
+   :
+38 |             old_head.elem
+   |             ^^^^^^^^^^^^^ cannot move out of borrowed content
+```
+
+Mmm, no está contento porque estamos usando `map` en un Option que estamos
+obteniendo a través de un método de instancia. `map` toma el Option por valor,
+y no debería hacerlo aquí. Podríamos evitarlo fácilmente separando el `take`
+y el `map`:
 
 ```rust ,ignore
-#[cfg(test)]
-mod test {
-    use super::List;
-    #[test]
-    fn basics() {
-        let mut list = List::new();
-
-        // Check empty list behaves right
-        assert_eq!(list.pop(), None);
-
-        // Populate list
-        list.push(1);
-        list.push(2);
-        list.push(3);
-
-        // Check normal removal
-        assert_eq!(list.pop(), Some(1));
-        assert_eq!(list.pop(), Some(2));
-
-        // Push some more just to make sure nothing's corrupted
-        list.push(4);
-        list.push(5);
-
-        // Check normal removal
-        assert_eq!(list.pop(), Some(3));
-        assert_eq!(list.pop(), Some(4));
-
-        // Check exhaustion
-        assert_eq!(list.pop(), Some(5));
-        assert_eq!(list.pop(), None);
-    }
+pub fn pop(&mut self) -> Option<T> {
+    let old_head = self.head.take();
+    old_head.map(|old_head| {
+        self.head = old_head.next;
+        if self.head.is_none() {
+            self.tail = None;
+        }
+        old_head.elem
+    })
 }
 ```
 
 ```text
-cargo test
+> cargo build
 
-error[E0499]: cannot borrow `list` as mutable more than once at a time
-  --> src/fifth.rs:68:9
+warning: unused import: `std::mem`
+  --> src/fifth.rs:1:9
    |
-65 |         assert_eq!(list.pop(), None);
-   |                    ---- first mutable borrow occurs here
-...
-68 |         list.push(1);
-   |         ^^^^
-   |         |
-   |         second mutable borrow occurs here
-   |         first borrow later used here
-
-error[E0499]: cannot borrow `list` as mutable more than once at a time
-  --> src/fifth.rs:69:9
+1  | use std::mem;
+   |         ^^^^^
    |
-65 |         assert_eq!(list.pop(), None);
-   |                    ---- first mutable borrow occurs here
-...
-69 |         list.push(2);
-   |         ^^^^
-   |         |
-   |         second mutable borrow occurs here
-   |         first borrow later used here
-
-error[E0499]: cannot borrow `list` as mutable more than once at a time
-  --> src/fifth.rs:70:9
-   |
-65 |         assert_eq!(list.pop(), None);
-   |                    ---- first mutable borrow occurs here
-...
-70 |         list.push(3);
-   |         ^^^^
-   |         |
-   |         second mutable borrow occurs here
-   |         first borrow later used here
-
-
-....
-
-** WAY MORE LINES OF ERRORS **
-
-....
-
-error: aborting due to 11 previous errors
+   = note: #[warn(unused_imports)] on by default
 ```
 
-🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀
-
-Oh my goodness.
-
-The compiler's not wrong for vomiting all over us. We just committed a
-cardinal Rust sin: we stored a reference to ourselves *inside ourselves*.
-Somehow, we managed to convince Rust that this totally made sense in our
-`push` and `pop` implementations (I was legitimately shocked we did). 
-
-The reason this *sort of* works is that Rust doesn't really have the notion
-of a pointer into yourself at all. Each part of the code is *technically* correct
-in isolation (we *can* call push and pop *once*) but then the absurdity of what
-we created takes affect and everything just *locks up*. 
-
-I'm sure there is *some* use for what we've written, but as far as *I'm* concerned it's
-just syntatically valid *gibberish*. We're saying we contain something with
-lifetime `'a`,  and that `push` and `pop` borrows *self* for that lifetime. 
-That's *weird* but Rust can look at each part of our code *individually* and
-it doesn't see any rules being broken.
-
-But as soon as we try to actually *use* the list, the compiler quickly goes 
-"yep you've borrowed `self` mutably for `'a`, so you can't use `self` anymore
-until the end of `'a`" but *also* "because you contain `'a`, it must be valid
-for the entire list's existence".
-
-It's *nearly* a contradiction but there *is* one solution: as soon as you `push`
-or `pop`, the list "pins" itself in place and can't be accessed anymore. It has
-swallowed its own proverbial tail, and ascended to a world of dreams.
-
-> **NARRATOR**: it didn't exist when this book was first written, but Rust
-> actually [formalized the notion of a *pin* into something useful][pin]! 
-> This was probably the most complex addition to the language since 
-> *the borrowchecker*. We don't *want* our list to be pinned though!
->
-> Pins *are* necessary and useful for async-await/futures/coroutines because
-> the compiler needs to be able to bundle up all the local variables of a
-> function into some kind of struct and store them somewhere until the 
-> future/coroutine is ready to be resumed. Since local variables can reference
-> other local variables, and we want that to *work*, these structs can end
-> up containing references to themselves!
->
-> So to `await` or `yield` Rust needs a way to be able to properly describe
-> and manipulate pinned values. Thankfully all of this stuff is *largely*
-> just hidden away in automatic compiler machinery and no one actually has to
-> think about `Pin` (or even *Futures*) under normal circumstances. The main
-> exception is that this stuff is very important for the folks building and
-> designing async *runtimes* like tokio.
->
-> We will not be implementing an async runtime in this book. I know my friends
-> know all sorts of "cool" (messed up) *tricks* you can do with `Pin`,
-> but from what I can tell, I'd be happier to just not know them. I will
-> continue to tell myself that Pinned types aren't real and they can't hurt me. 
-
-Our `pop` implementation hints at why storing a reference to ourselves
-*inside* ourselves could be really dangerous:
-
-```rust ,ignore
-// ...
-if self.head.is_none() {
-    self.tail = None;
-}
-```
-
-What if we forgot to do this? Then our tail would point to some node *that
-had been removed from the list*. Such a node would be instantly freed, and we'd
-have a dangling pointer which Rust was supposed to protect us from!
-
-And indeed Rust is protecting us from that kind of danger. Just in a very...
-**roundabout** way.
-
-So what can we do? Go back to `Rc<RefCell>>` hell?
-
-Please. No.
-
-No, instead we're going to go off the rails and use *raw pointers*.
-Our layout is going to look like this:
-
-```rust ,ignore
-pub struct List<T> {
-    head: Link<T>,
-    tail: *mut Node<T>, // DANGER DANGER
-}
-
-type Link<T> = Option<Box<Node<T>>>;
-
-struct Node<T> {
-    elem: T,
-    next: Link<T>,
-}
-```
+¡Un poco de una advertencia, pero compiló! Muy bien, podemos eliminar esa
+importación de memoria. No la necesitábamos realmente porque estamos usando
+el método `take` de Option, y manejando el None por nosotros mismos.
 
 
-And that's that. None of this wimpy reference-counted-dynamic-borrow-checking
-nonsense! Real. Hard. Unchecked. Pointers.
 
-> **NARRATOR:** This implementation was in fact still dangerously wrong, but it wasn't yet time to learn that lesson. The next section will learn that the hard way, as usual.
+Bien, también deberíamos querer hacer flexibilizar tipos de las colas para
+que también puedan usarse como pilas. Afortunadamente, como nuestra cola está
+implementada sobre una pila, todo lo que tenemos que hacer es añadir los
+métodos de la pila también. Ya hemos implementado la operación inversa pop,
+así que necesitamos push inverso (que es el mismo que el push original de la
+pila), o simplemente podemos exponer `push_front` y `pop_front` como
+alias. Te dejaremos la decisión final a ti.
 
-Let's be C everyone. Let's be C all day.
-
-I'm home. I'm ready.
-
-Hello `unsafe`.
-
-> **NARRATOR:** Wow, just incredible hubris from the author here.
-
-
-[pin]: https://doc.rust-lang.org/std/pin/index.html
 [real-time queue]: https://en.wikipedia.org/wiki/Queue_(abstract_data_type)#Real-time_queue
