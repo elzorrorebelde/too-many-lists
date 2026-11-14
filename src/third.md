@@ -1,17 +1,19 @@
-# A Persistent Singly-Linked Stack
+# Una Pila Persistente Enlazada Individualmente
 
-Alright, we've mastered the art of mutable singly-linked stacks.
+Muy bien, hemos dominado el arte de las pilas enlazadas individualmente
+mutables.
 
-Let's move from *single* ownership to *shared* ownership by writing a
-*persistent* immutable singly-linked list. This will be exactly the list
-that functional programmers have come to know and love. You can get the
-head *or* the tail and put someone's head on someone else's tail...
-and... that's basically it. Immutability is a hell of a drug.
+Pasemos de la propiedad *única (single ownership)* a la propiedad *compartida
+(shared ownership)* escribiendo una lista enlazada individualmente *persistente*
+e inmutable. Esta será exactamente la lista que los programadores funcionales
+han llegado a conocer y amar. Puedes obtener la cabeza *o* la cola y poner la
+cabeza de alguien en la cola de otro... y... eso es básicamente todo.
+La inmutabilidad es una droga poderosa.
 
-In the process we'll largely just become familiar with Rc and Arc, but this
-will set us up for the next list which will *change the game*.
+En el proceso, nos familiarizaremos en gran medida con Rc y Arc, pero esto
+nos preparará para la siguiente lista que *cambiará el juego*.
 
-Let's add a new file called `third.rs`:
+Añadamos un nuevo archivo llamado `third.rs`:
 
 ```rust ,ignore
 // in lib.rs
@@ -21,4 +23,4 @@ pub mod second;
 pub mod third;
 ```
 
-No copy-pasta this time. This is a clean room operation.
+Sin copia-pega esta vez. Esta es una operación en sala limpia.
